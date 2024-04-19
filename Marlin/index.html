@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Michael Lagana's Portfolio</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<div id="header">
+
+				<div class="top">
+
+					<!-- Logo -->
+						<div id="logo">
+							<span class="image avatar48"><img src="/images/myphoto.png" alt="" /></span>
+							<h1 id="title">Michael Lagana</h1>
+							<p>Engineer, Gadgeteer, Cyber-Enthusiast</p>
+						</div>
+
+					<!-- Nav -->
+						<nav id="nav">
+							<ul>
+								<li><a href="/#top" id="top-link"><span class="icon solid fa-home">Intro</span></a></li>
+								<li><a href="/#portfolio" id="portfolio-link"><span class="icon solid fa-th">Portfolio</span></a></li>
+								<li><a href="/#about" id="about-link"><span class="icon solid fa-user">About Me</span></a></li>
+							</ul>
+						</nav>
+
+				</div>
+
+				<div class="bottom">
+
+					<!-- Social Icons -->
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/michael-lagana-975528245/" class="icon brands fa-linkedin"><span class="label">LinkedIn</span></a></li>
+							<li><a href="mailto:michaell92601@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+						</ul>
+
+				</div>
+
+			</div>
+
+		<!-- Main -->
+			<div id="main">
+
+				<!-- Intro -->
+					<section id="top" class="one dark cover">
+						<div class="container">
+
+							<header>
+								<h2 class="alt"><strong>Marlin and Nemo</strong>
+								
+							</header>
+
+						</div>
+					</section>
+
+				<!-- About Me -->
+					<section id="about" class="three">
+						<div class="container">
+
+							<header>
+								<h2>About</h2>
+							</header>
+
+							<!-- Picture: <a href="#" class="image featured"><img src="images/103262.jpg" alt="" /></a> <img src="images/IMG_5657.jpg" alt="" width="400" height="250"/>-->
+
+							<p>This was the final project for AE 3030, an aerodynamics course at Georgia Tech. 
+								We were offered a choice of project, to either write code to simulate some aerodynamic theory, 
+								present some research on an aerodynamic topic, or build something to demonstrate aerodynamic theory.
+							I decided on the latter, and the plan was to build an rc plane capable of interchanging wings in order
+						 to demonstrate different airfoils and their effects. </p>
+							
+						 <img src="images/IMG_6200.jpg" alt="" width="400" height="250"/>
+						 <img src="images/img_6208.jpg" alt="" width="400" height="250"/>
+
+						 <p>
+							Over time the project developed and I decided to split it into two seperate products: one fully 
+							functional RC plane, and a smaller glider with interchanging wings. Marlin and Nemo. For the RC plane, 
+							I used and Arduino Nano connected to an HC-12 radio embedded onto a custom designed and milled PCB 
+							for the flight controls. I leveraged the ground control hardware and code I made for my QuadFrog project and adapted 
+							it for control of a plane. This also meant that I needed to write additional code for the Arduino since the 
+							QuadFrog remote code was meant for use on a Raspberry Pi 4.
+						 </p>
+						
+						 <img src="images/IMG_6199.jpg" style="transform:rotate(270deg);" alt="" width="300" height="300"/>
+						 <img src="images/plane_pcb.png" alt="" width="400" height="250"/>
+
+						 <p>
+							For the short timeframe of the project, I was pretty happy with the results:
+							 an aerodynamically functional glider, able to demonstrate various airfoils, including
+							 some fun aerodynamic phenomenon such as the roll that occurs when you mount a wing upsidedown on one side.
+							 The RC plane for the most part worked as intended, with steady communications between the Nano and my laptop 
+							 and functional ailerons and throttle control. I plan to continue to develop this project, as I feel that
+							  the circuit and code I wrote can be easily implemented in a variety of plane designs.
+						 </p>
+
+						 <img src="images/IMG_6211.jpg" alt="" width="400" height="250"/>
+						 <img src="images/IMG_6194.jpg" alt="" width="400" height="250"/>
+
+						</div>
+					</section>
+
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
