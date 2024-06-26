@@ -15,7 +15,7 @@
 
 					<!-- Logo -->
 						<div id="logo">
-							<span class="image avatar48"><img src="/images/myphoto.png" alt="" /></span>
+							<span class="image avatar48"><img src="/images/myphoto.jpg" alt="" /></span>
 							<h1 id="title">Michael Lagana</h1>
 							<p>Engineer, Gadgeteer, Cyber-Enthusiast</p>
 						</div>
@@ -51,7 +51,7 @@
 						<div class="container">
 
 							<header>
-								<h2 class="alt"><strong>Project Title</strong>
+								<h2 class="alt"><strong>EEVI</strong>
 								
 							</header>
 
@@ -67,9 +67,36 @@
 							</header>
 
 							<!-- Picture: <a href="#" class="image featured"><img src="images/103262.jpg" alt="" /></a> <img src="images/IMG_5657.jpg" alt="" width="400" height="250"/>-->
-
-							<p>Project Description</p>
-
+							<img src="images/IMG_6048.jpg" alt="" width="400" height="250"/>
+							<img src="images/IMG_6415.jpg" alt="" width="400" height="250"/>
+							<p>I'm part of the RoboNav team of RoboJackets, a competetive robotics organization at Georgia Tech. 
+								We competed at the annual Univeristy Rover Challenge in Utah where our rover, Walli, along with the drone, Eevi, operated in
+							simulated martian conditions to complete a series of tasks such as a science mission and an equipment servicing mission.
+							The rover was the main priority for the team, and as such, the drone subteam consisted only of me and one other member. 
+						We were given parts from a drone that was broken and experimented with by old members and we set out to make a drone capable of assisting the rover.
+					</p>
+					<img src="images/IMG_6074.jpg" alt="" width="400" height="250"/>
+					<img src="images/IMG_6075.jpg" alt="" width="400" height="250"/>
+							<p>
+								The heart of our drone was a Pixhawk flight controller running Ardupilot, something I was familiar with from previous
+								 projects. We made a classic quadcopter which allowed us to use well-developed Ardupilot PID profiles for the automatic 
+								 stabilization. With the main drone hardware built out, we were faced with cost constraints and were forced to use less-than-ideal 
+								 camera and telemetry hardware, which would present issues later on. Additionally, we wanted to integrate an end effector on the bottom 
+								 of the frame that would allow us to pick up and transport some hand-tools, allowing the rover to focus on the larger tasks.
+								 While my teammate made the mechanical design for the end effector, I handled the electrical and software integration into the drone 
+								 architecture. We ran into some issues supplying the necessary voltage from the Pixhawk to the end effector servos, which I decided to bypass 
+								 by using a custom PCB I designed for a different project that used a seperate microcontroller to supply power and PWM to the servos.
+							</p>
+					<img src="images/IMG_6374.jpg" alt="" width="400" height="250"/>
+							<p>
+								Shortly before competition, we realized the range of our telemetry and analog radios were more limited than we initially thought.
+								 As a result, I decided that the best way to proceed would be to mount the telemetry and analog reciever on the rover itself, and relay 
+								 the incoming data through its more reliable communication hardware. In this setup, the range of the drone would be localized to the 
+								 operational location of the rover itself, which was much better than being tethered to the base station. Unfortunately, at competition we 
+								 encountered a faulty wire connection, which prevented us from receiving video and thus from using the drone for the delivery task. 
+								 We were definitely disappointed that we couldn't compete the way we wanted, but we were still proud of the work we were able to complete, 
+								 and everything we learned along the way. We have a great plan going forward for version 2, and are excited to return to URC next year.
+							</p>
 						</div>
 					</section>
 
