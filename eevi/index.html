@@ -63,10 +63,35 @@
 						<div class="container">
 
 							<header>
-								<h2>About</h2>
+								<h2>URC 2025</h2>
 							</header>
 
 							<!-- Picture: <a href="#" class="image featured"><img src="images/103262.jpg" alt="" /></a> <img src="images/IMG_5657.jpg" alt="" width="400" height="250"/>-->
+							<img src="/images/IMG_2836.jpg" alt="" width="1200" height="800">
+							<p>
+								As Drone Lead, I decided to overhaul our entire system, start from scratch and focus on maintaining comms since that was our point of failure last year. I rebuilt the frame using scrapped carbon fiber
+								 components from a Tarot frame, and integrating them with a custom designed and 3D printed shell. To solve the issue of operating within the HAB, I designed and built a tracking antenna that used an Intel 
+								 Nuc to receive telemtery and video and relay it into the ground station. For the telemtery, I used a pair of RFD900x radios. For high quality aerial video, I decided to switch away from an analog setup and 
+								 instead used OpenHD for digital transmission. The OpenHD setup used a Raspberry Pi 4, an Arducam camera, and an ASUS AC56 wifi adapter which I powered directly from the PDB.
+							</p>
+							<img src="/images/robo1.png" alt=""/>
+							<p>
+								During the competition, I plotted the given target coordinates into Mission Planner and EEVI had a successful autonomous takeoff. The drone began flying towards the target and it was very stable during its flight.
+								 Unfortunately, gps terrain data was not properly implemented and EEVI collided with a tall hill that was between the ground station and the target. In hindsight, I should have plotted a path around the hill 
+								 so I wouldn't have to rely on gps elevation data, but nevertheless I was very pleased with how the drone performed. THe autonomous flight was stable, the video feed was very stable and high quality, with only around 
+								 a half second of latency, and even after the crash, the only damage sustained was to the 3D printed motor mounts, and to one leg of the landing gear. All electronics were fully intact, and we were still receiving
+								  video and telemtery data after the crash. Looking forward, I want to include more distance sensor integration and rework the frame design so its lighter and easier to access.
+							</p>
+							<img src="/images/robo3.png" alt=""/>
+							<video width="500" height="400" controls="controls">
+								<source src="/media/robo.mp4" type="video/mp4">
+							</video>
+							<p>
+								
+							</p>
+							<header>
+								<h2>URC 2024</h2>
+							</header>
 							<img src="images/IMG_6048.jpg" alt="" width="400" height="250"/>
 							<img src="images/IMG_6415.jpg" alt="" width="400" height="250"/>
 							<p>I'm part of the RoboNav team of RoboJackets, a competetive robotics organization at Georgia Tech. 
@@ -74,7 +99,7 @@
 							simulated martian conditions to complete a series of tasks such as a science mission and an equipment servicing mission.
 							The rover was the main priority for the team, and as such, the drone subteam consisted only of me and one other member. 
 						We were given parts from a drone that was broken and experimented with by old members and we set out to make a drone capable of assisting the rover.
-					</p>
+							</p>
 					<img src="images/IMG_6074.jpg" alt="" width="400" height="250"/>
 					<img src="images/IMG_6075.jpg" alt="" width="400" height="250"/>
 							<p>
