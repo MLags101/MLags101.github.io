@@ -5,6 +5,81 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
+		<style>
+        /* Flexbox container for side-by-side images */
+        .image-container {
+            display: flex;
+            gap: 5rem; /* Controls spacing between images */
+            justify-content: center; /* Centers images horizontally */
+            flex-wrap: wrap; /* Stacks images on smaller screens */
+            padding: 1rem; /* Optional: outer padding for container */
+        }
+
+		.image-wrapper {
+            /*overflow: hidden;*/ /* Clips overflow from rotation */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Style for figure to control image and caption */
+        figure {
+            margin: 0; /* Remove default margins */
+            text-align: center;
+        }
+
+        /* Image scaling and optional rotation */
+        .scaled-image {
+            max-width: 100%; /* Responsive scaling */
+            height: auto; /* Maintains aspect ratio */
+            display: block; /* Ensures proper alignment */
+            /* transform: rotate(90deg); */ /* Uncomment for rotation */
+        }
+
+		.scaled-image-large {
+            max-width: 500px; /* Larger image */
+        }
+
+		.image-wrapper-large {
+            width: 500px; /* Container matches image size */
+            height: 400px; /* Adjusted for rotated image (assuming 4:5 aspect ratio) */
+        }
+
+        .scaled-image-medium {
+            max-width: 400px; /* Medium image (matches your original) */
+        }
+
+		.image-wrapper-medium {
+            width: 400px;
+            height: auto; /* Adjusted for rotated image */
+        }
+
+        .scaled-image-small {
+            max-width: 300px; /* Smaller image */
+        }
+
+		.image-wrapper-small {
+            width: 300px;
+            height: 400; /* Adjusted for rotated image */
+        }
+
+        /* Caption styling */
+        figcaption {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 0.5em;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .image-container {
+                gap: 1rem; /* Smaller gap on mobile */
+            }
+            figure {
+                max-width: 100%; /* Full width on mobile */
+            }
+        }
+    </style>
 	</head>
 	<body class="is-preload">
 
@@ -76,14 +151,16 @@
 							</header>
 
 							<!-- Picture: <a href="#" class="image featured"><img src="images/103262.jpg" alt="" /></a> <img src="images/IMG_5657.jpg" alt="" width="400" height="250"/>-->
-							<img src="/images/IMG_2836.jpg" alt="" width="1200" height="800">
+							<img src="/images/IMG_2836.jpg" alt="" width="1000">
 							<p>
 								As Drone Lead, I decided to overhaul our entire system, start from scratch and focus on maintaining comms since that was our point of failure last year. I rebuilt the frame using scrapped carbon fiber
 								 components from a Tarot frame, and integrating them with a custom designed and 3D printed shell. To solve the issue of operating within the HAB, I designed and built a tracking antenna that used an Intel 
 								 Nuc to receive telemtery and video and relay it into the ground station. For the telemtery, I used a pair of RFD900x radios. For high quality aerial video, I decided to switch away from an analog setup and 
 								 instead used OpenHD for digital transmission. The OpenHD setup used a Raspberry Pi 4, an Arducam camera, and an ASUS AC56 wifi adapter which I powered directly from the PDB.
 							</p>
-							<img src="/images/robo1.png" alt=""/>
+							<div class="image-container">
+								<img src="/images/robo1.png" width="600px" alt=""/>
+							</div>"
 							<p>
 								During the competition, I plotted the given target coordinates into Mission Planner and EEVI had a successful autonomous takeoff. The drone began flying towards the target and it was very stable during its flight.
 								 Unfortunately, gps terrain data was not properly implemented and EEVI collided with a tall hill that was between the ground station and the target. In hindsight, I should have plotted a path around the hill 
@@ -91,26 +168,32 @@
 								 a half second of latency, and even after the crash, the only damage sustained was to the 3D printed motor mounts, and to one leg of the landing gear. All electronics were fully intact, and we were still receiving
 								  video and telemtery data after the crash. Looking forward, I want to include more distance sensor integration and rework the frame design so its lighter and easier to access.
 							</p>
-							<img src="/images/robo3.png" alt=""/>
-							<video width="500" height="400" controls="controls">
-								<source src="/media/robo.mp4" type="video/mp4">
-							</video>
+							<div class="image-container">
+								<img src="/images/robo3.png" width="800px" alt=""/>
+								<video width="800" controls="controls">
+									<source src="/media/robo.mp4" type="video/mp4">
+								</video>
+							</div>
 							<p>
 								
 							</p>
 							<header>
 								<h2>URC 2024</h2>
 							</header>
-							<img src="images/IMG_6048.jpg" alt="" width="400" height="250"/>
-							<img src="images/IMG_6415.jpg" alt="" width="400" height="250"/>
+							<div class="image-container">
+								<img src="images/IMG_6048.jpg" alt="" width="500"/>
+								<img src="images/IMG_6415.jpg" alt="" width="500"/>
+							</div>
 							<p>I'm part of the RoboNav team of RoboJackets, a competetive robotics organization at Georgia Tech. 
 								We competed at the annual Univeristy Rover Challenge in Utah where our rover, Walli, along with the drone, Eevi, operated in
 							simulated martian conditions to complete a series of tasks such as a science mission and an equipment servicing mission.
 							The rover was the main priority for the team, and as such, the drone subteam consisted only of me and one other member. 
 						We were given parts from a drone that was broken and experimented with by old members and we set out to make a drone capable of assisting the rover.
 							</p>
-					<img src="images/IMG_6074.jpg" alt="" width="400" height="250"/>
-					<img src="images/IMG_6075.jpg" alt="" width="400" height="250"/>
+					<div class="image-container">
+						<img src="images/IMG_6074.jpg" alt="" width="500"/>
+						<img src="images/IMG_6075.jpg" alt="" width="500"/>
+					</div>
 							<p>
 								The heart of our drone was a Pixhawk flight controller running Ardupilot, something I was familiar with from previous
 								 projects. We made a classic quadcopter which allowed us to use well-developed Ardupilot PID profiles for the automatic 
@@ -121,7 +204,9 @@
 								 architecture. We ran into some issues supplying the necessary voltage from the Pixhawk to the end effector servos, which I decided to bypass 
 								 by using a custom PCB I designed for a different project that used a seperate microcontroller to supply power and PWM to the servos.
 							</p>
-					<img src="images/IMG_6374.jpg" alt="" width="400" height="250"/>
+					<div class="image-container">
+						<img src="images/IMG_6374.jpg" alt="" width="800px"/>
+					</div>
 							<p>
 								Shortly before competition, we realized the range of our telemetry and analog radios were more limited than we initially thought.
 								 As a result, I decided that the best way to proceed would be to mount the telemetry and analog reciever on the rover itself, and relay 

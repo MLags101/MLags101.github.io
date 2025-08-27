@@ -5,6 +5,81 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
+		<style>
+        /* Flexbox container for side-by-side images */
+        .image-container {
+            display: flex;
+            gap: 5rem; /* Controls spacing between images */
+            justify-content: center; /* Centers images horizontally */
+            flex-wrap: wrap; /* Stacks images on smaller screens */
+            padding: 1rem; /* Optional: outer padding for container */
+        }
+
+		.image-wrapper {
+            /*overflow: hidden;*/ /* Clips overflow from rotation */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Style for figure to control image and caption */
+        figure {
+            margin: 0; /* Remove default margins */
+            text-align: center;
+        }
+
+        /* Image scaling and optional rotation */
+        .scaled-image {
+            max-width: 100%; /* Responsive scaling */
+            height: auto; /* Maintains aspect ratio */
+            display: block; /* Ensures proper alignment */
+            /* transform: rotate(90deg); */ /* Uncomment for rotation */
+        }
+
+		.scaled-image-large {
+            max-width: 500px; /* Larger image */
+        }
+
+		.image-wrapper-large {
+            width: 500px; /* Container matches image size */
+            height: 400px; /* Adjusted for rotated image (assuming 4:5 aspect ratio) */
+        }
+
+        .scaled-image-medium {
+            max-width: 400px; /* Medium image (matches your original) */
+        }
+
+		.image-wrapper-medium {
+            width: 400px;
+            height: auto; /* Adjusted for rotated image */
+        }
+
+        .scaled-image-small {
+            max-width: 300px; /* Smaller image */
+        }
+
+		.image-wrapper-small {
+            width: 300px;
+            height: 400; /* Adjusted for rotated image */
+        }
+
+        /* Caption styling */
+        figcaption {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 0.5em;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .image-container {
+                gap: 1rem; /* Smaller gap on mobile */
+            }
+            figure {
+                max-width: 100%; /* Full width on mobile */
+            }
+        }
+    </style>
 	</head>
 	<body class="is-preload">
 
@@ -75,8 +150,6 @@
 								<h2>About</h2>
 							</header>
 
-							
-
 							<p>This project is my hands-on exploration of drones and their capabilites. 
 							I wanted to grow my skills in many different areas by developing as many components of the drone myself.
 							As such, I designed and fabricated the frame of the drone, choosing a V-tail configuration to account for 
@@ -86,8 +159,10 @@
 							from my previous VIP as well as lessons from classes such as Statics. I was able to grow several skills as well as learn a few 
 							more over the course of this project, and the drone itself will serve as a test-bed for any flying project I want to develop. 
 							</p>
-							<img src="images/IMG_5642.jpg" alt="" width="400" height="250"/>
-							<img src="images/IMG_5657.jpg" alt="" width="400" height="250"/>
+							<div class="image-container">
+								<img src="images/IMG_5642.jpg" alt="" width="500"/>
+								<img src="images/IMG_5657.jpg" alt="" width="500"/>
+							</div>
 
 						</div>
 					</section>

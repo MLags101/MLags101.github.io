@@ -5,6 +5,81 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
+		<style>
+			/* Flexbox container for side-by-side images */
+			.image-container {
+				display: flex;
+				gap: 20rem; /* Controls spacing between images */
+				justify-content: center; /* Centers images horizontally */
+				flex-wrap: wrap; /* Stacks images on smaller screens */
+				padding: 1rem; /* Optional: outer padding for container */
+			}
+
+			.image-wrapper {
+				/*overflow: hidden;*/ /* Clips overflow from rotation */
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			/* Style for figure to control image and caption */
+			figure {
+				margin: 0; /* Remove default margins */
+				text-align: center;
+			}
+
+			/* Image scaling and optional rotation */
+			.scaled-image {
+				max-width: 100%; /* Responsive scaling */
+				height: auto; /* Maintains aspect ratio */
+				display: block; /* Ensures proper alignment */
+				/* transform: rotate(90deg); */ /* Uncomment for rotation */
+			}
+
+			.scaled-image-large {
+				max-width: 500px; /* Larger image */
+			}
+
+			.image-wrapper-large {
+				width: 500px; /* Container matches image size */
+				height: 400px; /* Adjusted for rotated image (assuming 4:5 aspect ratio) */
+			}
+
+			.scaled-image-medium {
+				max-width: 400px; /* Medium image (matches your original) */
+			}
+
+			.image-wrapper-medium {
+				width: 400px;
+				height: auto; /* Adjusted for rotated image */
+			}
+
+			.scaled-image-small {
+				max-width: 300px; /* Smaller image */
+			}
+
+			.image-wrapper-small {
+				width: 300px;
+				height: 400; /* Adjusted for rotated image */
+			}
+
+			/* Caption styling */
+			figcaption {
+				font-size: 0.9em;
+				color: #555;
+				margin-top: 0.5em;
+			}
+
+			/* Responsive adjustments */
+			@media (max-width: 768px) {
+				.image-container {
+					gap: 1rem; /* Smaller gap on mobile */
+				}
+				figure {
+					max-width: 100%; /* Full width on mobile */
+				}
+			}
+		</style>
 	</head>
 	<body class="is-preload">
 
@@ -83,10 +158,12 @@
 							</br> By developing this rover, I hope to gain a better understanding of the challenges faced in areas of impact resistance, highly robust design, and abnormal terrain traversal. I'm also using the project to learn how to use the ArduRover stack of ardupilot so I can gain more experience in autonomous path planning and navigation.
 
 							</p>
-							<figure>
-								<img src="images/irobot.jpg" alt=""/>
+							<div class="image-container">
+								<figure>
+								<img src="images/irobot.jpg" alt="" width="800px"/>
 								<figcaption>iRobot 110 "FirstLook"</figcaption>
 							</figure>
+							</div>
 
 							<p>
 								I found the FirstLook when doing research on harsh-environment resistant rovers for my robotics team and it amazed me just how versatile such a small device could be. Compact enough to be thrown by hand into hard to reach areas, durable enough to survive the landing, all while having a full array of sensors and communications equipment for reporting back to first responders. It even has additional articulating stilts that enable it to traverse tall obstacles with ease.
