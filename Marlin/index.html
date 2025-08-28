@@ -9,7 +9,7 @@
         /* Flexbox container for side-by-side images */
         .image-container {
             display: flex;
-            gap: 5rem; /* Controls spacing between images */
+            gap: 10rem; /* Controls spacing between images */
             justify-content: center; /* Centers images horizontally */
             flex-wrap: wrap; /* Stacks images on smaller screens */
             padding: 1rem; /* Optional: outer padding for container */
@@ -152,42 +152,78 @@
 
 							<!-- Picture: <a href="#" class="image featured"><img src="images/103262.jpg" alt="" /></a> <img src="images/IMG_5657.jpg" alt="" width="400" height="250"/>-->
 
-							<p>This was the final project for AE 3030, an aerodynamics course at Georgia Tech. 
-								We were offered a choice of project, to either write code to simulate some aerodynamic theory, 
-								present some research on an aerodynamic topic, or build something to demonstrate aerodynamic theory.
-							I decided on the latter, and the plan was to build an rc plane capable of interchanging wings in order
-						 to demonstrate different airfoils and their effects. </p>
+							<p>
+								For the final project in my AE 3030 (Aerodynamics) course at Georgia Tech, I chose to design and build two devices—a fully 
+								functional RC plane (Marlin) and an unpowered glider (Nemo)—to demonstrate aerodynamic principles, specifically the effects 
+								of different airfoils. Marlin featured a custom-designed, milled PCB with an Arduino Nano and HC-12 radio for flight control, 
+								while Nemo was a smaller glider with interchangeable wings to showcase airfoil variations. This project allowed me to apply 
+								aerodynamic theory through hands-on design and fabrication, creating practical tools for learning and experimentation.
+								<br>
+								The assignment was to bridge theoretical concepts from AE 3030, like lift and drag, with real-world engineering. 
+								By building Marlin and Nemo, I aimed to create tangible demonstrations of airfoil effects, fostering a deeper understanding of 
+								aerodynamics while honing my skills in electronics, programming, and fabrication.
+							</p>
 						<div class="image-container">
-							<img src="images/IMG_6200.jpg" alt="" width="400" loading="lazy"/>
-						 	<img src="images/img_6208.jpg" alt="" width="400" loading="lazy"/>
+							<img src="images/IMG_6194.jpg" alt="" width="600" loading="lazy"/>
+							<img src="images/plane_pcb.png" alt="" width="600" loading="lazy"/>
+							
+						 	
 						</div>	
 
-						 <p>
-							Over time the project developed and I decided to split it into two seperate products: one fully 
-							functional RC plane, and a smaller glider with interchanging wings. Marlin and Nemo. For the RC plane, 
-							I used and Arduino Nano connected to an HC-12 radio embedded onto a custom designed and milled PCB 
-							for the flight controls. I leveraged the ground control hardware and code I made for my QuadFrog project and adapted 
-							it for control of a plane. This also meant that I needed to write additional code for the Arduino since the 
-							QuadFrog remote code was meant for use on a Raspberry Pi 4.
-						 </p>
+						<p>
+							Marlin: The RC Plane
+							<br>
+							For Marlin, I designed a custom PCB using KiCAD to integrate an Arduino Nano and HC-12 radio module (433 MHz) for flight control. 
+							The PCB was milled using the Invention Studio's PCB mill, leveraging my prior experience with FlatCAM to generate precise G-code. 
+							I adapted the ground control hardware and code from my QuadFrog project, originally written for a Raspberry Pi 4, to work with the 
+							Arduino Nano. This required rewriting portions of the control software in Arduino IDE to handle aileron and throttle inputs as well as adapting the python GUI I made for my quadcopter to work for a fixed wing plane, ensuring 
+							reliable communication between the plane and my laptop. 
+							<br>
+							The airframe was designed in SolidWorks and fabricated using 3D-printed PLA components for the fuselage and 
+							motor mount. I iterated on prototypes to optimize weight and balance, ensuring the plane could handle the aerodynamic 
+							loads of different airfoils.
+							<br>
+							Nemo: The Glider
+							<br>
+							Nemo was designed as a smaller, unpowered glider to demonstrate airfoil effects. I created interchangeable wings with different 
+							airfoil profiles (e.g., NACA 2412, flat-bottom, and inverted configurations) using laser-cut foam board. The wings attached via a 
+							slot-and-tab system, allowing quick swaps during demonstrations. During testing, Nemo showcased aerodynamic phenomena like roll 
+							induced by an upside-down wing, providing clear visual demonstrations of lift asymmetry.
+							<br>
+							Fabrication and Iteration
+							<br>
+							Both airframes were prototyped at the Invention Studio. I used the Ultimaker S3s for precise component fabrication. Iterative testing 
+							involved hand-launching Nemo to evaluate airfoil performance and powered test flights for Marlin to tune control responses. Feedback 
+							from classmates helped refine wing attachment mechanisms and balance, ensuring both devices met the project's goals within the short timeframe.
+						</p>
+
 						<div class="image-container">
-							<img src="images/IMG_6199.jpg" style="transform:rotate(270deg);" alt="" width="300" loading="lazy"/>
-						 	<img src="images/plane_pcb.png" alt="" width="400" loading="lazy"/>
+							<img src="images/IMG_6199.jpg" style="transform:rotate(270deg);" alt="" width="400" loading="lazy"/>
+						 	<img src="images/IMG_6200.jpg" alt="" width="600" loading="lazy"/>
 						</div>
 
-						 <p>
-							For the short timeframe of the project, I was pretty happy with the results:
-							 an aerodynamically functional glider, able to demonstrate various airfoils, including
-							 some fun aerodynamic phenomenon such as the roll that occurs when you mount a wing upsidedown on one side.
-							 The RC plane for the most part worked as intended, with steady communications between the Nano and my laptop 
-							 and functional ailerons and throttle control. I plan to continue to develop this project, as I feel that
-							  the circuit and code I wrote can be easily implemented in a variety of plane designs.
-						 </p>
+						<p>
+							This project fused aerodynamic design with electronics and programming. Aesthetically, Marlin and Nemo featured sleek, 
+							functional designs inspired by real aircraft, enhancing their educational appeal. Technically, I applied airfoil theory 
+							to optimize wing performance and embedded programming to enable precise flight control.
+							<br>
+							As the sole designer, I handled the aerodynamic design, PCB development, programming, and fabrication for both Marlin and Nemo. 
+							I collaborated with AE 3030 classmates, who provided feedback on airfoil selection and flight stability during group testing sessions. 
+							Their insights helped me adjust Nemo's design for better glide performance. My unique contribution was the custom PCB for Marlin, 
+							which integrated the Arduino Nano and HC-12 radio, enabling adaptable control code that could be reused across various plane designs.
+							<br>
+							Both devices met the project's goals, earning positive feedback from my instructor for their functionality and creativity. The project's 
+							success has inspired me to continue developing the RC plane's circuitry and code for broader applications in future aircraft designs.
+						</p>
+
 						 <div class="image-container">
-							<img src="images/IMG_6211.jpg" alt="" width="400" loading="lazy"/>
-						 	<img src="images/IMG_6194.jpg" alt="" width="400" loading="lazy"/>
+							<img src="images/IMG_6211.jpg" alt="" width="500" loading="lazy"/>
+						 	<img src="images/img_6208.jpg" alt="" width="700" height="600" loading="lazy"/>
 						 </div>
 						 
+						 <p>
+
+						 </p>
 
 						</div>
 					</section>

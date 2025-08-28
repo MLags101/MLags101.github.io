@@ -151,8 +151,22 @@
 							</header>
 
 							<!-- Picture: <a href="#" class="image featured"><img src="images/103262.jpg" alt="" /></a> <img src="images/IMG_5657.jpg" alt="" width="400" height="250"/>-->
-							 <div class="image-container">
-								<img src="images/IMG_6131.jpg" alt="" width="300" style="transform:rotate(90deg);" loading="lazy"/>
+							
+							<p>
+								As a Prototyping Instructor (PI) at the Invention Studio, a campus makerspace, I pursued the role of Electronics Master for which the final task was to design and build something to better the space. 
+								I decided to make a lockbox to secure the electronics cabinet keys. The project required demonstrating expertise in electronics while serving a practical 
+								purpose for the tool group. My lockbox integrates an RFID sensor compatible with university student ID cards, a MOSFET-driven solenoid 
+								for the lock mechanism, an RF module for remote activation, and a spark gap for audio deterrence, creating a secure and fun solution for key management.
+								<br>
+								I wanted to be an Electronics Master because of my strong belief in the value of a broad skillset, and that even as an Aerospace Engineer, I would benefit greatly 
+								by becoming proficient and self-suficient in electrical knowledge. Besides the value of what I learned, being part of the Electronics tool group was a greatly reward because 
+								of the small family of engineers that it consisted of. The master who trained me was a good friend since I joined the makerspace and while I was in the tool group I got to meet 
+								several other passionate and friendly students, with whom I learned and built things. The lockbox would provide a solution usable by all of us via our student ID cards that would 
+								enable a way of locking up our special equipment without making getting the key burdensome.
+							</p>
+							
+							<div class="image-container">
+								<img src="images/IMG_6131.jpg" alt="" width="500" style="transform:rotate(90deg);" loading="lazy"/>
 							 </div>
 							
 							<p>At the Invention Studio, a makerspace on campus, Prototyping Instructors (PIs) have the opportunity to specialize in a 
@@ -162,6 +176,32 @@
 								 including an RFID sensor that works with student ID cards, a MOSFET driven solenoid for the lock mechanism, an RF module for remote opening, 
 								 and a spark gap for audio deterence.
 							</p>
+
+							<p>
+								The project began with concept sketches to outline the lockbox's functionality and layout, prioritizing a compact design that could house multiple electronic components. I collaborated with fellow PIs at the Invention Studio, sharing sketches to gather feedback on usability and security features, ensuring the design met the needs of the electronics tool group.
+
+The technical core involved integrating four key features:
+<br>
+RFID Sensor: I used an MFRC522 RFID module (13.56 MHz) to interface with university student ID cards, which use the MIFARE protocol. I wrote Arduino code to read card UIDs, authenticating users by comparing them to a preprogrammed list stored in the microcontroller's EEPROM. This ensured only authorized PIs could access the lockbox.
+<br>
+MOSFET-Driven Solenoid: The lock mechanism used a 12V solenoid, controlled by a MOSFET to handle the high current safely. The solenoid retracts when an authorized ID or RF signal is detected, unlocking the box.
+<br>
+RF Module: I incorporated a 433 MHz RF module for remote opening, allowing PIs to unlock the box from a distance. I programmed the receiver in Arduino to decode specific RF commands, adding a layer of convenience for key access.
+<br>
+Spark Gap Audio Deterrence: To deter unauthorized access, I designed a spark gap circuit that generates a loud, intimidating arc sound when an incorrect ID is scanned. The circuit used a high-voltage transformer driven by a PWM controlled MOSFET.
+<br>
+Fabrication was done at the Invention Studio. I used SolidWorks to design a 3D-printed door and laser-cut sides from MDF. Iterative prototypes addressed challenges like component fit and solenoid alignment, ensuring the lock mechanism operated smoothly.
+							</p>
+
+							<div class="image-container">
+								<img src="images/Image.jpg" alt="" width="800" loading="lazy"/>
+							 </div>
+
+							 <p>
+								<br>
+								The lockbox successfully secured the electronics cabinet keys, with the RFID system authenticating student IDs and the RF module enabling remote access. The solenoid mechanism operated reliably, and the spark gap's audio 
+								deterrence activated consistently for unauthorized attempts, enhancing security. The device was adopted by our toolgroup, streamlining key access and earning my spot alongside the other Electronics Master.
+							 </p>
 
 						</div>
 					</section>
