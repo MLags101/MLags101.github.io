@@ -2099,6 +2099,7 @@ input, select, textarea {
 		margin: 1.75em 1.5em 1.5em 1.5em;
 		min-height: 48px;
 		cursor: default;
+		padding-left: 56px;
 	}
 
 		#logo h1 {
