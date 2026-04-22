@@ -1,0 +1,393 @@
+/* ====================================
+   PORTFOLIO ENHANCEMENTS
+   Michael Lagana's Portfolio
+   ==================================== */
+
+/* ---- Google Fonts ---- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* ---- #5 Typography Upgrade ---- */
+
+body, input, textarea, select {
+	font-family: 'Inter', 'Source Sans Pro', sans-serif;
+	font-weight: 400;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Space Grotesk', 'Source Sans Pro', sans-serif;
+	font-weight: 600;
+	color: #e6edf3;
+}
+
+h2 {
+	font-weight: 700;
+	letter-spacing: -0.5px;
+}
+
+h2.alt strong {
+	color: #fff;
+	font-weight: 700;
+}
+
+strong, b {
+	font-weight: 600;
+	color: #e6edf3;
+}
+
+#logo h1 {
+	font-family: 'Space Grotesk', sans-serif;
+	font-weight: 700;
+	letter-spacing: -0.5px;
+}
+
+#logo p {
+	font-family: 'Inter', sans-serif;
+	font-weight: 400;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+	font-size: 0.55em;
+}
+
+/* ---- #4 Dark Theme ---- */
+
+body {
+	background: #0d1117;
+	color: #c9d1d9;
+}
+
+a {
+	border-bottom-color: rgba(200, 200, 200, 0.2);
+}
+
+a:hover {
+	color: #E27689;
+}
+
+#header {
+	background: #0d1117;
+	box-shadow: inset -1px 0 0 0 rgba(240, 246, 252, 0.1);
+}
+
+#header .icons a {
+	color: #484f58;
+}
+
+#header .icons a:hover {
+	color: #E27689;
+}
+
+#main > section {
+	background-image: none;
+	box-shadow: none;
+}
+
+#main > section.two {
+	background-color: #111318;
+}
+
+#main > section.three {
+	background-color: #161b22;
+}
+
+#main > section.four {
+	background-color: #1c2128;
+}
+
+#main > section.dark {
+	color: #c9d1d9;
+}
+
+#footer {
+	background-color: #0d1117;
+	border-top: 1px solid rgba(240, 246, 252, 0.1);
+	color: #8b949e;
+	box-shadow: none;
+}
+
+/* Nav active state */
+#nav ul li a.active span:before {
+	color: #E27689;
+}
+
+/* ---- #1 Full Viewport Hero ---- */
+
+#main > section.cover {
+	min-height: 100vh;
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	background-attachment: fixed;
+	position: relative;
+}
+
+#main > section.cover::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		180deg,
+		rgba(0, 0, 0, 0.3) 0%,
+		rgba(0, 0, 0, 0.5) 50%,
+		rgba(13, 17, 23, 1) 100%
+	);
+	pointer-events: none;
+}
+
+#main > section.cover > .container {
+	position: relative;
+	z-index: 1;
+}
+
+.translucent-bg {
+	background-color: rgba(0, 0, 0, 0.5);
+	color: white;
+	padding: 20px 35px;
+	display: inline-block;
+	border-radius: 8px;
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ---- #2 Scroll Reveal Animations ---- */
+
+.reveal {
+	opacity: 0;
+	transform: translateY(40px);
+	transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1),
+	            transform 0.8s cubic-bezier(0.5, 0, 0, 1);
+	transition-delay: var(--reveal-delay, 0s);
+}
+
+.reveal.active {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.reveal-left {
+	opacity: 0;
+	transform: translateX(-40px);
+	transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1),
+	            transform 0.8s cubic-bezier(0.5, 0, 0, 1);
+}
+
+.reveal-left.active {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+/* ---- #3 Card Hover Effects ---- */
+
+.item {
+	border-radius: 12px;
+	overflow: hidden;
+	background: #1c2128;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+	transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+	            box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.item:hover {
+	transform: translateY(-8px);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.item .image.fit {
+	position: relative;
+	overflow: hidden;
+	display: block;
+}
+
+.item .image.fit img {
+	transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.item:hover .image.fit img {
+	transform: scale(1.08);
+}
+
+.item .image.fit::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.7) 100%);
+	opacity: 0;
+	transition: opacity 0.4s ease;
+	pointer-events: none;
+}
+
+.item:hover .image.fit::after {
+	opacity: 1;
+}
+
+.item header {
+	background: #1c2128 !important;
+	color: #e6edf3;
+	padding: 1em 1em !important;
+	transition: background 0.3s ease;
+	margin: 0;
+}
+
+.item header h3 {
+	color: #e6edf3 !important;
+	font-family: 'Space Grotesk', sans-serif;
+	font-weight: 500;
+	transition: color 0.3s ease;
+}
+
+.item:hover header h3 {
+	color: #E27689 !important;
+}
+
+/* ---- #6 Consistent Image Handling ---- */
+
+.image-container {
+	gap: 2rem !important;
+}
+
+.image-container img,
+.image-container video {
+	border-radius: 8px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+	max-width: 100%;
+}
+
+/* ---- #7 Back to Top / Portfolio Button ---- */
+
+.back-to-top {
+	position: fixed;
+	bottom: 2rem;
+	right: 2rem;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: rgba(226, 118, 137, 0.9);
+	color: #fff !important;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-decoration: none;
+	border: none !important;
+	opacity: 0;
+	transform: translateY(20px);
+	transition: all 0.3s ease;
+	z-index: 9999;
+	backdrop-filter: blur(10px);
+	font-size: 1.1em;
+}
+
+.back-to-top.visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.back-to-top:hover {
+	background: rgba(226, 118, 137, 1);
+	transform: translateY(-3px);
+	box-shadow: 0 8px 25px rgba(226, 118, 137, 0.4);
+}
+
+/* ---- #9 Footer Redesign ---- */
+
+#footer {
+	padding: 3em 2em 2em 2em;
+}
+
+#footer .footer-content {
+	max-width: 800px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+#footer .footer-links {
+	display: flex;
+	justify-content: center;
+	gap: 2em;
+	flex-wrap: wrap;
+	margin-bottom: 1.5em;
+}
+
+#footer .footer-links a {
+	color: #8b949e;
+	text-decoration: none;
+	border: none;
+	font-size: 0.85em;
+	font-family: 'Space Grotesk', sans-serif;
+	font-weight: 500;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+	transition: color 0.3s ease;
+}
+
+#footer .footer-links a:hover {
+	color: #E27689;
+}
+
+#footer .footer-tagline {
+	font-family: 'Space Grotesk', sans-serif;
+	font-weight: 600;
+	color: #e6edf3;
+	font-size: 0.9em;
+	margin-bottom: 0.5em;
+}
+
+#footer .footer-copyright {
+	color: #484f58;
+	font-size: 0.75em;
+}
+
+/* ---- #10 Page Load Animation ---- */
+
+body:not(.is-preload) #main > section {
+	transition: opacity 0.6s ease;
+}
+
+/* Section text colors for dark theme */
+#main > section p,
+#main > section li {
+	color: #c9d1d9;
+}
+
+#main > section h2 {
+	color: #e6edf3;
+}
+
+/* About section text readability */
+#about p {
+	text-align: left;
+	line-height: 1.8em;
+}
+
+/* ---- Responsive Overrides ---- */
+
+@media screen and (max-width: 960px) {
+	#main > section.cover {
+		min-height: 60vh;
+		background-attachment: scroll;
+	}
+
+	.item {
+		border-radius: 8px;
+	}
+}
+
+@media screen and (max-width: 736px) {
+	#main > section.cover {
+		min-height: 50vh;
+	}
+
+	.translucent-bg {
+		padding: 15px 20px;
+	}
+
+	#footer .footer-links {
+		gap: 1em;
+	}
+
+	.back-to-top {
+		bottom: 1rem;
+		right: 1rem;
+		width: 42px;
+		height: 42px;
+	}
+}

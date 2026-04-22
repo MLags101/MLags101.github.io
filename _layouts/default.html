@@ -5,82 +5,17 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}" />
+		<link rel="stylesheet" href="{{ '/assets/css/enhancements.css' | relative_url }}" />
 		<link type="image/png" sizes="32x32" rel="icon" href="{{ '/images/icons8-rocket-32.png' | relative_url }}">
+		{% if page.hero_image %}
 		<style>
-        /* Flexbox container for side-by-side images */
-        .image-container {
-            display: flex;
-            gap: 5rem; /* Controls spacing between images */
-            justify-content: center; /* Centers images horizontally */
-            flex-wrap: wrap; /* Stacks images on smaller screens */
-            padding: 1rem; /* Optional: outer padding for container */
-        }
-
-		.image-wrapper {
-            /*overflow: hidden;*/ /* Clips overflow from rotation */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Style for figure to control image and caption */
-        figure {
-            margin: 0; /* Remove default margins */
-            text-align: center;
-        }
-
-        /* Image scaling and optional rotation */
-        .scaled-image {
-            max-width: 100%; /* Responsive scaling */
-            height: auto; /* Maintains aspect ratio */
-            display: block; /* Ensures proper alignment */
-            /* transform: rotate(90deg); */ /* Uncomment for rotation */
-        }
-
-		.scaled-image-large {
-            max-width: 500px; /* Larger image */
-        }
-
-		.image-wrapper-large {
-            width: 500px; /* Container matches image size */
-            height: 400px; /* Adjusted for rotated image (assuming 4:5 aspect ratio) */
-        }
-
-        .scaled-image-medium {
-            max-width: 400px; /* Medium image (matches your original) */
-        }
-
-		.image-wrapper-medium {
-            width: 400px;
-            height: auto; /* Adjusted for rotated image */
-        }
-
-        .scaled-image-small {
-            max-width: 300px; /* Smaller image */
-        }
-
-		.image-wrapper-small {
-            width: 300px;
-            height: 400; /* Adjusted for rotated image */
-        }
-
-        /* Caption styling */
-        figcaption {
-            font-size: 0.9em;
-            color: #555;
-            margin-top: 0.5em;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .image-container {
-                gap: 1rem; /* Smaller gap on mobile */
-            }
-            figure {
-                max-width: 100%; /* Full width on mobile */
-            }
-        }
-    	</style>
+			#main > section.one {
+				background-image: url('{{ page.hero_image }}') !important;
+				background-size: cover;
+				background-position: center center;
+			}
+		</style>
+		{% endif %}
 	</head>
 	<body class="is-preload">
 
@@ -91,7 +26,7 @@
 
 					<!-- Logo -->
 						<div id="logo">
-							<span class="image avatar48"><img src="{{ '/images/myphoto.jpg' | relative_url }}" alt="" /></span>
+							<span class="image avatar48"><img src="{{ '/images/myphoto.jpg' | relative_url }}" alt="Michael Lagana" /></span>
 							<h1 id="title">Michael Lagana</h1>
 							<p>Engineer, Gadgeteer, Cyber-Enthusiast</p>
 						</div>
@@ -126,8 +61,23 @@
 
 		<!-- Footer -->
 			<div id="footer">
-				<p>Last updated August 2025. Based on Prologue from HTML5 UP</p>
+				<div class="footer-content">
+					<div class="footer-links">
+						<a href="/#top">Home</a>
+						<a href="/#portfolio">Portfolio</a>
+						<a href="/#about">About</a>
+						<a href="https://www.linkedin.com/in/mlagana6/">LinkedIn</a>
+						<a href="mailto:michaell92601@gmail.com">Email</a>
+					</div>
+					<p class="footer-tagline">Designed & Built by Michael Lagana</p>
+					<p class="footer-copyright">&copy; 2025 Michael Lagana. Based on Prologue by HTML5 UP.</p>
+				</div>
 			</div>
+
+		<!-- Back to Top Button -->
+			<a href="#top" class="back-to-top" id="backBtn" title="Back to top">
+				<span class="icon solid fa-chevron-up"></span>
+			</a>
 
 		<!-- Scripts -->
 			<script src="{{ '/assets/js/jquery.min.js' | relative_url }}"></script>
@@ -137,6 +87,51 @@
 			<script src="{{ '/assets/js/breakpoints.min.js' | relative_url }}"></script>
 			<script src="{{ '/assets/js/util.js' | relative_url }}"></script>
 			<script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+
+		<!-- Scroll Reveal & Back to Top -->
+			<script>
+				document.addEventListener('DOMContentLoaded', function() {
+
+					// Auto-add reveal class to key elements
+					document.querySelectorAll(
+						'.item, #main > section > .container > header, .image-container'
+					).forEach(function(el) {
+						el.classList.add('reveal');
+					});
+
+					// Stagger cards within rows
+					document.querySelectorAll('.row').forEach(function(row) {
+						row.querySelectorAll('.item').forEach(function(item, i) {
+							item.style.setProperty('--reveal-delay', (i * 0.1) + 's');
+						});
+					});
+
+					// IntersectionObserver for reveal animations
+					var observer = new IntersectionObserver(function(entries) {
+						entries.forEach(function(entry) {
+							if (entry.isIntersecting) {
+								entry.target.classList.add('active');
+							}
+						});
+					}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+					document.querySelectorAll('.reveal, .reveal-left').forEach(function(el) {
+						observer.observe(el);
+					});
+
+					// Back to top button visibility
+					var backBtn = document.getElementById('backBtn');
+					if (backBtn) {
+						window.addEventListener('scroll', function() {
+							if (window.scrollY > 400) {
+								backBtn.classList.add('visible');
+							} else {
+								backBtn.classList.remove('visible');
+							}
+						});
+					}
+				});
+			</script>
 
 	</body>
 </html>
