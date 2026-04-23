@@ -358,6 +358,26 @@ body:not(.is-preload) #main > section {
 	line-height: 1.8em;
 }
 
+/* ---- 3D Model Viewer ---- */
+
+model-viewer {
+	width: 100%;
+	height: 450px;
+	border-radius: 12px;
+	background-color: #1c2128;
+	border: 1px solid rgba(240, 246, 252, 0.1);
+	--poster-color: #1c2128;
+	margin: 1em 0;
+}
+
+.model-caption {
+	text-align: center;
+	color: #8b949e;
+	font-size: 0.85em;
+	font-family: 'Inter', sans-serif;
+	margin-top: 0.5em;
+}
+
 /* ---- Project Mosaic Grid ---- */
 
 .project-grid {
