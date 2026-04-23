@@ -20,6 +20,11 @@
 	</head>
 	<body class="is-preload">
 
+		<!-- Hamburger toggle — hardcoded so CSS cannot hide it -->
+			<div id="headerToggle" style="display:block;position:fixed;top:0;left:0;z-index:10002;">
+				<a href="#header" class="toggle"></a>
+			</div>
+
 		<!-- Header -->
 			<div id="header">
 
@@ -189,26 +194,35 @@
 					}
 
 					// Welcome box collapse/expand
-					var welcomeBox = document.getElementById('welcomeBox');
-					var collapseBtn = document.getElementById('welcomeCollapseBtn');
-					if (welcomeBox && collapseBtn) {
-						var iconSpan = collapseBtn.querySelector('span');
-						collapseBtn.addEventListener('click', function(e) {
-							e.stopPropagation();
-							welcomeBox.classList.add('collapsed');
-							if (iconSpan) {
-								iconSpan.className = 'icon solid fa-expand-alt';
-							}
-						});
-						welcomeBox.addEventListener('click', function() {
-							if (welcomeBox.classList.contains('collapsed')) {
-								welcomeBox.classList.remove('collapsed');
-								if (iconSpan) {
-									iconSpan.className = 'icon solid fa-compress-alt';
+						var welcomeBox = document.getElementById('welcomeBox');
+						var collapseBtn = document.getElementById('welcomeCollapseBtn');
+						if (welcomeBox && collapseBtn) {
+							var iconSpan = collapseBtn.querySelector('span');
+
+							function setCollapsed(collapsed) {
+								if (collapsed) {
+									welcomeBox.classList.add('collapsed');
+									if (iconSpan) iconSpan.className = 'icon solid fa-expand-alt';
+								} else {
+									welcomeBox.classList.remove('collapsed');
+									if (iconSpan) iconSpan.className = 'icon solid fa-compress-alt';
 								}
 							}
-						});
-					}
+
+							// Collapse button shrinks the box
+							collapseBtn.addEventListener('click', function(e) {
+								e.stopPropagation();
+								setCollapsed(true);
+							});
+
+							// Clicking the collapsed circle expands it
+							welcomeBox.addEventListener('click', function(e) {
+								if (welcomeBox.classList.contains('collapsed')) {
+									e.stopPropagation();
+									setCollapsed(false);
+								}
+							});
+						}
 				});
 			</script>
 

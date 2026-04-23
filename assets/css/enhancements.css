@@ -245,30 +245,39 @@ body.header-visible #header {
 }
 
 .welcome-content {
-	transition: opacity 0.3s ease, max-height 0.4s ease;
 	overflow: hidden;
 }
 
-/* Collapsed state: box becomes a small circle */
+/* Welcome box: always fixed so CSS can transition it smoothly */
+#welcomeBox {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 50;
+	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	max-width: 600px;
+	width: 90%;
+}
+
+/* Collapsed: shrink to a circle and anchor to top-right */
 #welcomeBox.collapsed {
-	padding: 0;
+	top: 1.2em;
+	right: 1.2em;
+	left: auto;
+	transform: none;
 	width: 3em;
 	height: 3em;
+	padding: 0;
 	border-radius: 50%;
-	position: fixed;
-	bottom: 2em;
-	right: 2em;
-	left: auto;
-	top: auto;
+	overflow: hidden;
+	cursor: pointer;
+	background-color: rgba(13, 17, 23, 0.85) !important;
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(255,255,255,0.25) !important;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: rgba(13, 17, 23, 0.85);
-	backdrop-filter: blur(10px);
-	border: 1px solid rgba(255,255,255,0.2);
-	cursor: pointer;
-	z-index: 200;
-	transition: all 0.4s ease;
 }
 
 #welcomeBox.collapsed .welcome-content {
@@ -277,14 +286,10 @@ body.header-visible #header {
 
 #welcomeBox.collapsed .welcome-collapse-btn {
 	position: static;
-	width: 2em;
-	height: 2em;
 	background: transparent;
 	border: none;
-}
-
-#welcomeBox {
-	transition: all 0.4s ease;
+	width: 2em;
+	height: 2em;
 }
 
 /* ---- #1 Full Viewport Hero ---- */
