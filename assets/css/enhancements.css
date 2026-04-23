@@ -239,6 +239,12 @@ body.header-visible #header {
 	padding: 0;
 }
 
+/* Icon inside button must not intercept clicks */
+.welcome-collapse-btn span,
+.welcome-collapse-btn * {
+	pointer-events: none;
+}
+
 .welcome-collapse-btn:hover {
 	background: rgba(226, 118, 137, 0.6);
 	transform: scale(1.1);
@@ -260,11 +266,12 @@ body.header-visible #header {
 	width: 90%;
 }
 
-/* Collapsed: shrink to a circle and anchor to top-right */
+/* Collapsed: shrink to a circle, anchored to bottom-right */
 #welcomeBox.collapsed {
-	top: 1.2em;
-	right: 1.2em;
+	top: auto;
+	bottom: 2.5em;
 	left: auto;
+	right: 0.5em;
 	transform: none;
 	width: 3em;
 	height: 3em;
