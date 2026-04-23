@@ -139,6 +139,22 @@ a:hover {
 
 body.header-visible #headerToggle {
 	transform: translateX(375px);
+	/* Sit flush against the sidebar's right edge */
+	left: -0.5em !important;
+}
+
+/* Dark overlay when sidebar is open — blocks page interaction */
+#sidebarOverlay {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 9999;
+	cursor: pointer;
+}
+
+body.header-visible #sidebarOverlay {
+	display: block;
 }
 
 /* Sidebar slides OVER content — no content shift, no blank bar */

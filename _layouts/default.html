@@ -20,10 +20,13 @@
 	</head>
 	<body class="is-preload">
 
-		<!-- Hamburger toggle — hardcoded so CSS cannot hide it -->
+		<!-- Hamburger toggle -->
 			<div id="headerToggle" style="display:block;position:fixed;top:0;left:0;z-index:10002;">
 				<a href="#" class="toggle" onclick="document.body.classList.toggle('header-visible'); return false;"></a>
 			</div>
+
+		<!-- Sidebar overlay — blocks interaction + click-to-close -->
+			<div id="sidebarOverlay" onclick="document.body.classList.remove('header-visible');"></div>
 
 		<!-- Header -->
 			<div id="header">
