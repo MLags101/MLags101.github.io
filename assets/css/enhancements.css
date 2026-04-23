@@ -66,6 +66,10 @@ a:hover {
 #header {
 	background: #0d1117;
 	box-shadow: inset -1px 0 0 0 rgba(240, 246, 252, 0.1);
+	/* Hidden by default at all widths */
+	-moz-transform: translateX(-275px);
+	-webkit-transform: translateX(-275px);
+	transform: translateX(-275px);
 }
 
 #header .icons a {
@@ -74,6 +78,37 @@ a:hover {
 
 #header .icons a:hover {
 	color: #E27689;
+}
+
+/* Always show hamburger toggle */
+#headerToggle {
+	display: block !important;
+}
+
+/* Sidebar badges */
+.sidebar-badges {
+	display: flex;
+	justify-content: center;
+	gap: 1.2em;
+	padding: 1.5em 1em;
+	flex-wrap: wrap;
+}
+
+.sidebar-badges img {
+	height: 40px;
+	width: auto;
+	opacity: 0.7;
+	transition: opacity 0.3s ease;
+	object-fit: contain;
+}
+
+.sidebar-badges img:hover {
+	opacity: 1;
+}
+
+/* Sidebar hidden — full-width content */
+#main, #footer {
+	margin-left: 0 !important;
 }
 
 #main > section {
@@ -126,11 +161,40 @@ a:hover {
 	inset: 0;
 	background: linear-gradient(
 		180deg,
-		rgba(0, 0, 0, 0.3) 0%,
-		rgba(0, 0, 0, 0.5) 50%,
-		rgba(13, 17, 23, 1) 100%
+		rgba(0, 0, 0, 0.1) 0%,
+		rgba(0, 0, 0, 0.3) 50%,
+		rgba(13, 17, 23, 0.9) 100%
 	);
 	pointer-events: none;
+	z-index: 1;
+}
+
+/* ---- Hero Slideshow ---- */
+
+.hero-slideshow {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	overflow: hidden;
+}
+
+.hero-slide {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	transition: opacity 1.5s ease-in-out;
+	background-size: cover;
+	background-position: center center;
+}
+
+.hero-slide.active {
+	opacity: 1;
+}
+
+.hero-slide video {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 
 #main > section.cover > .container {

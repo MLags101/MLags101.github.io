@@ -43,6 +43,12 @@
 
 				</div>
 
+				<!-- Sidebar Badges (swap images in /images/sidebar/) -->
+				<div class="sidebar-badges">
+					<img src="{{ '/images/sidebar/gt_logo.png' | relative_url }}" alt="Georgia Tech" />
+					<img src="{{ '/images/sidebar/us_flag.png' | relative_url }}" alt="United States" />
+				</div>
+
 				<div class="bottom">
 
 					<!-- Social Icons -->
@@ -157,6 +163,29 @@
 								backBtn.classList.remove('visible');
 							}
 						});
+					}
+
+					// Hero slideshow
+					var slideshow = document.querySelector('.hero-slideshow');
+					if (slideshow) {
+						var slides = slideshow.querySelectorAll('.hero-slide');
+						var current = 0;
+						if (slides.length > 1) {
+							setInterval(function() {
+								var prev = slides[current];
+								var prevVid = prev.querySelector('video');
+								if (prevVid) prevVid.pause();
+								prev.classList.remove('active');
+								current = (current + 1) % slides.length;
+								var next = slides[current];
+								next.classList.add('active');
+								var nextVid = next.querySelector('video');
+								if (nextVid) { nextVid.currentTime = 0; nextVid.play(); }
+							}, 5000);
+						}
+						// Auto-play first video if present
+						var firstVid = slides[0] && slides[0].querySelector('video');
+						if (firstVid) firstVid.play();
 					}
 				});
 			</script>
