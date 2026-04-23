@@ -50,8 +50,12 @@
 
 				<!-- Sidebar Badges (swap images in /images/sidebar/) -->
 				<div class="sidebar-badges">
-					<img src="{{ '/images/sidebar/gt_logo.png' | relative_url }}" alt="Georgia Tech" />
-					<img src="{{ '/images/sidebar/us_flag.png' | relative_url }}" alt="United States" />
+					<div class="sidebar-badge-card">
+						<img src="{{ '/images/sidebar/gt_logo.png' | relative_url }}" alt="Georgia Tech" />
+					</div>
+					<div class="sidebar-badge-card">
+						<img src="{{ '/images/sidebar/us_flag.png' | relative_url }}" alt="United States" />
+					</div>
 				</div>
 
 				<div class="bottom">
@@ -209,10 +213,11 @@
 								}
 							}
 
-							// Collapse button shrinks the box
+							// Collapse button: toggles collapse state
+							// (stopPropagation so box's own click handler doesn't also fire)
 							collapseBtn.addEventListener('click', function(e) {
 								e.stopPropagation();
-								setCollapsed(true);
+								setCollapsed(!welcomeBox.classList.contains('collapsed'));
 							});
 
 							// Clicking the collapsed circle expands it
