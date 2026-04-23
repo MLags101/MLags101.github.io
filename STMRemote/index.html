@@ -2,55 +2,60 @@
 layout: default
 title: STM Remote
 hero_image: /images/stmremote.png
+date_completed: "Ongoing"
+skills:
+  - name: "KiCAD"
+    level: 5
+  - name: "STM32"
+    level: 5
+  - name: "Embedded C"
+    level: 4
+  - name: "PCB Fabrication"
+    level: 4
+  - name: "IMU Integration"
+    level: 3
 ---
-				<!-- Intro -->
-					<section id="top" class="one dark cover">
-						<div class="container">
-						
-							<header>
-								<div class="translucent-bg">
-								<h2 class="alt"><strong>STM Remote</strong>
-								</div>
-							</header>
+<section id="top" class="one dark cover">
+	<div class="container">
+		<header>
+			<div class="translucent-bg">
+				<h2 class="alt"><strong>STM Remote</strong></h2>
+			</div>
+		</header>
+	</div>
+</section>
 
-						</div>
-					</section>
+<section id="about" class="three">
+	<div class="container">
 
-				<!-- About Me -->
-					<section id="about" class="three">
-						<div class="container">
+		<header><h2>Overview</h2></header>
 
-							<header>
-								<h2>About</h2>
-							</header>
+		<p>As a continuation of my pursuit to learn embedded systems, I started this project to design and program custom PCBs using the STM32 family of microcontroller chips. This remote is an evolution of my previous project — where that remote acted as a simple trigger, this one includes an accelerometer/gyro module and a larger button array for intuitive robotic control.</p>
 
-							<!-- Picture: <a href="#" class="image featured"><img src="images/103262.jpg" alt="" /></a> <img src="images/IMG_5657.jpg" alt="" width="400" height="250"/>-->
+		<hr>
 
-							<p>As a continuation of my pursuit to learn embedded systems, I started this project to learn how to design and program custom PCBs using the STM32 family 
-								of microcontroller chips. The more practical purpose of the project is to be an evolution of my previous remote project, but where that remote acted as 
-								simply a trigger for arbitrary devices, this remote will include an accelerometer/gyro module and a larger array of buttons so that the user can utilize the remote 
-								to control robotic(or airborne) movement. Using the IMU(inertial measurment unit), which is the accelerometer/gyro module, the user can direct motion using the motion of 
-								the hand holding the remote, enabling much more intuitive and easy control, especially for people newer to controlling robots.
-							</p>
+		<h3>Design Philosophy</h3>
 
-							<div class="image-container">
-								<img src="images/stm_rem_sch.png" alt="" width="800px" loading="lazy"/>
-							</div>
+		<p>Using the IMU (inertial measurement unit), the user can direct motion using the motion of the hand holding the remote, enabling much more intuitive and easy control, especially for people newer to controlling robots.</p>
 
-							<p>
-								I leveraged online resources to learn how to design with these chips, specifically Phil's Lab on YouTube, and of course the very extensive datasheets 
-								provided by STMicroelectronics. The process was more difficult than I expected due to the specificity needed when tailoring circuits to a specific STM chip 
-								from the precise external crystal oscillator circuit, to the large capacitor network highly suggested in the datasheets to ensure proper power delivery. 
-								If I got something wrong and ordered the circuit, I would have to wait weeks to receive it, find the issue, fix it in the design, and wait many more weeks to get 
-								the updated version. When using a Fab house, I knew that I had to be meticulous in my design process in order to ensure I use my time effectively.
-								<br>
-								I'm currently in the process of assembling and testing the received boards.
-							</p>
+		<div class="image-container">
+			<img src="images/stm_rem_sch.png" alt="STM Remote schematic" width="800px" loading="lazy"/>
+		</div>
 
-							<div class="image-container">
-								<img src="images/stm_rem_2d.png" alt="" width="800px" loading="lazy"/>
-								<img src="images/stm_rem_pcb.png" alt="" width="800px" loading="lazy"/>
-							</div>
+		<hr>
 
-						</div>
-					</section>
+		<h3>Technical Challenges</h3>
+
+		<p>I leveraged online resources to learn how to design with STM32 chips, specifically Phil's Lab on YouTube and STMicroelectronics datasheets. The process was more difficult than expected — from the precise external crystal oscillator circuit to the large capacitor network needed for proper power delivery. When using a fab house, I had to be meticulous since each mistake meant weeks of waiting for updated boards.</p>
+
+		<h3>Current Status</h3>
+
+		<p>I'm currently in the process of assembling and testing the received boards.</p>
+
+		<div class="image-container">
+			<img src="images/stm_rem_2d.png" alt="STM Remote 2D layout" width="800px" loading="lazy"/>
+			<img src="images/stm_rem_pcb.png" alt="STM Remote PCB render" width="800px" loading="lazy"/>
+		</div>
+
+	</div>
+</section>

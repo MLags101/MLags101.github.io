@@ -2,82 +2,75 @@
 layout: default
 title: Custom Remote
 hero_image: /Remote/images/IMG_6510.jpg
+date_completed: "March 2024"
+skills:
+  - name: "KiCAD"
+    level: 5
+  - name: "Arduino"
+    level: 4
+  - name: "RF Communication"
+    level: 4
+  - name: "PCB Milling"
+    level: 5
+  - name: "FlatCAM"
+    level: 4
+  - name: "SolidWorks"
+    level: 3
+  - name: "3D Printing"
+    level: 3
 ---
-				<!-- Intro -->
-					<section id="top" class="one dark cover">
-						<div class="container">
+<section id="top" class="one dark cover">
+	<div class="container">
+		<header>
+			<div class="translucent-bg">
+				<h2 class="alt"><strong>Custom Remote</strong></h2>
+			</div>
+		</header>
+	</div>
+</section>
 
-							<header>
-								<div class="translucent-bg">
-								<h2 class="alt"><strong>Custom Remote</strong>
-								</div>
-							</header>
+<section id="about" class="three">
+	<div class="container">
 
-						</div>
-					</section>
-				<!-- About Me -->
-					<section id="about" class="three">
-						<div class="container">
+		<header><h2>Overview</h2></header>
 
-							<header>
-								<h2>About</h2>
-							</header>
+		<p>This project was a personal exploration into RF modules and PCB fabrication. I wanted a device that could selectively activate any device outfitted with a matching module or MOSFET switch. The opportunity to fabricate my own PCB was especially important as it was my responsibility as Electronics Apprentice to create a procedure for a new PCB mill at the Invention Studio.</p>
 
+		<hr>
 
-							<p>
-								This project was a personal exploration of mine into RF modules and PCB fabrication. 
-							I wanted to have a device that would be able to selectively activate any device which could be easily outfitted with a matching module, 
-							or by a MOSFET switch controlled by the RF module. I was able to explore various libraries for RF communication and 
-							I enjoyed testing out the RF module hardware. I decided it was important to make the resulting circuit as compact as possible 
-							which meant it needed to be put onto a PCB. The opportunity to fabricate my own PCB was an important component of this project 
-							as it was my responsibility as Electronics Apprentice to make a procedure for a new PCB mill acquired by the Invention Studio. 
-							I applied my experience with KiCAD and learned how to use FlatCAM so I could make this project as a demo board for the new mill.
-							</p>
+		<h3>Circuit Design</h3>
 
-							<p>
-								This project was a personal exploration into RF modules and PCB fabrication, driven by my desire to create a versatile remote control capable of selectively 
-								activating devices equipped with compatible RF modules or MOSFET switches. The goal was to design a compact, reliable circuit that demonstrates the power of 
-								RF communication while showcasing my skills in PCB design and fabrication, using my role and access to equipment as an Electronics Apprentice at the Invention Studio.
-								<br>
-								This project allowed me to dive into RF communication and its use for portable and modular controls in any project. By designing a compact remote and fabricating a custom PCB, I aimed 
-								to enhance the capabilites of any future projects by providing an existing standard that could be easily implemented.
-							</p>
-							
-							<div class="image-container">
-									<div class="image-wrapper">
-										<img src="images/2024-01-12 211309.jpg" width="500px" style="transform: rotate(90deg);" loading="lazy"/>
-									</div>
-									<div class="image-wrapper">
-										<img src="images/IMG_5901.jpg" width="500px" style="transform: rotate(-90deg);" loading="lazy"/>
-									</div>
-							</div>
+		<p>Using KiCAD, I designed a schematic for a microcontroller-based circuit that interfaced with an RF module and supported MOSFET switch control. I explored various RF communication libraries and protocols to ensure reliable signal transmission.</p>
 
-							<p>
-								The technical core was the RF module integration. I explored various RF communication libraries, experimenting with protocols 
-								to ensure reliable signal transmission. Using KiCAD, I designed a schematic for a microcontroller-based circuit that interfaced 
-								with an RF module and supported MOSFET switch control for device activation.
-								<br>
-								To achieve compactness, I fabricated a custom PCB using the Invention Studio's new PCB mill. As Electronics Apprentice, I developed a 
-								procedure for the mill, learning FlatCAM to convert my KiCAD designs into machine-readable G-code. This process involved iterative testing 
-								to perfect milling parameters, ensuring clean traces and reliable boards. The final PCB was a demo board for the mill, showcasing its capabilities 
-								while meeting the project's size constraints.
-							</p>
+		<div class="image-container">
+			<div class="image-wrapper">
+				<img src="images/2024-01-12 211309.jpg" width="500px" style="transform: rotate(90deg);" loading="lazy"/>
+			</div>
+			<div class="image-wrapper">
+				<img src="images/IMG_5901.jpg" width="500px" style="transform: rotate(-90deg);" loading="lazy"/>
+			</div>
+		</div>
 
-							<div class="image-container">
-									<div class="image-wrapper">
-										<img src="images/IMG_5221.jpg" width="500px" loading="lazy"/>
-									</div>
-									<div class="image-wrapper">
-										<img src="images/IMG_6510.jpg" width="500px" style="transform: rotate(-90deg);" loading="lazy"/>
-									</div>
-							</div>
+		<hr>
 
-							<p>
-								<br>
-								The enclosure, designed in SolidWorks and 3D-printed, was tailored to fit the compact PCB while maintaining accessibility for user controls and a simple and easy area to view the user OLED display.
-								<br>
-								The final remote successfully activated devices equipped with matching RF modules or MOSFET switches, with testing confirming reliable performance across a 10-meter range. The compact PCB design and custom enclosure made the device portable and user-friendly.
-							</p>
+		<h3>PCB Fabrication</h3>
 
-						</div>
-					</section>
+		<p>I fabricated a custom PCB using the Invention Studio's new PCB mill. I developed a procedure for the mill, learning FlatCAM to convert my KiCAD designs into machine-readable G-code. This involved iterative testing to perfect milling parameters, ensuring clean traces and reliable boards.</p>
+
+		<div class="image-container">
+			<div class="image-wrapper">
+				<img src="images/IMG_5221.jpg" width="500px" loading="lazy"/>
+			</div>
+			<div class="image-wrapper">
+				<img src="images/IMG_6510.jpg" width="500px" style="transform: rotate(-90deg);" loading="lazy"/>
+			</div>
+		</div>
+
+		<hr>
+
+		<h3>Results</h3>
+
+		<p>The enclosure, designed in SolidWorks and 3D-printed, was tailored to fit the compact PCB while maintaining accessibility for controls and the OLED display. The final remote successfully activated devices with reliable performance across a 10-meter range.</p>
+
+	</div>
+</section>

@@ -358,6 +358,183 @@ body:not(.is-preload) #main > section {
 	line-height: 1.8em;
 }
 
+/* ---- Project Mosaic Grid ---- */
+
+.project-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1.5rem;
+	grid-auto-flow: dense;
+}
+
+.item .image.fit img {
+	height: 220px;
+	object-fit: cover;
+	width: 100%;
+}
+
+.item-xl {
+	grid-column: span 2;
+}
+
+.item-xl .image.fit img {
+	height: 350px;
+}
+
+.item-lg .image.fit img {
+	height: 260px;
+}
+
+.item-sm .image.fit img {
+	height: 170px;
+}
+
+/* ---- Skills Hover Dropdown (Main Page Cards) ---- */
+
+.item-skills {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.5s ease, padding 0.5s ease;
+	padding: 0 0.8em;
+	background: #161b22;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5em;
+}
+
+.item:hover .item-skills {
+	max-height: 250px;
+	padding: 0.7em 0.8em 0.9em;
+}
+
+.item-date {
+	color: #8b949e;
+	font-size: 0.65em;
+	font-family: 'Inter', sans-serif;
+	font-weight: 400;
+	display: flex;
+	align-items: center;
+	gap: 0.4em;
+}
+
+.item-skills-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35em;
+	justify-content: center;
+}
+
+.skill-tag {
+	background: rgba(226, 118, 137, 0.12);
+	color: #E27689;
+	padding: 0.2em 0.5em;
+	border-radius: 20px;
+	font-size: 0.6em;
+	font-family: 'Inter', sans-serif;
+	font-weight: 500;
+	border: 1px solid rgba(226, 118, 137, 0.25);
+	white-space: nowrap;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3em;
+}
+
+/* ---- Skill Dots ---- */
+
+.dots {
+	display: inline-flex;
+	gap: 2px;
+	vertical-align: middle;
+}
+
+.dot {
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: rgba(226, 118, 137, 0.2);
+	display: inline-block;
+}
+
+.dot.filled {
+	background: #E27689;
+}
+
+.skill-tag-lg .dots {
+	gap: 3px;
+}
+
+.skill-tag-lg .dot {
+	width: 7px;
+	height: 7px;
+}
+
+/* ---- Skills Section (Project Pages) ---- */
+
+.skills-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.8em;
+	justify-content: center;
+}
+
+.skill-tag-lg {
+	background: rgba(226, 118, 137, 0.12);
+	color: #E27689;
+	padding: 0.5em 1em;
+	border-radius: 25px;
+	font-size: 0.85em;
+	font-family: 'Inter', sans-serif;
+	font-weight: 500;
+	border: 1px solid rgba(226, 118, 137, 0.25);
+	transition: all 0.3s ease;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+}
+
+.skill-tag-lg:hover {
+	background: rgba(226, 118, 137, 0.25);
+	transform: translateY(-2px);
+}
+
+/* ---- Project Date (Project Pages) ---- */
+
+.project-date {
+	color: #8b949e;
+	font-size: 0.85em;
+	font-family: 'Inter', sans-serif;
+	font-weight: 400;
+	margin-bottom: 1.5em;
+	text-align: left;
+}
+
+.project-date .icon {
+	margin-right: 0.3em;
+}
+
+/* ---- Project Page Section Dividers & Subheaders ---- */
+
+#main > section h3 {
+	color: #e6edf3;
+	font-family: 'Space Grotesk', sans-serif;
+	font-weight: 600;
+	font-size: 1.3em;
+	margin-bottom: 1em;
+	text-align: left;
+}
+
+#main > section hr {
+	border: none;
+	border-top: 1px solid rgba(240, 246, 252, 0.1);
+	margin: 2.5em 0;
+}
+
+#main > section .container > p {
+	text-align: left;
+	line-height: 1.8em;
+}
+
 /* ---- Responsive Overrides ---- */
 
 @media screen and (max-width: 960px) {
@@ -368,6 +545,14 @@ body:not(.is-preload) #main > section {
 
 	.item {
 		border-radius: 8px;
+	}
+
+	.project-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.item-xl {
+		grid-column: span 2;
 	}
 }
 
@@ -389,5 +574,18 @@ body:not(.is-preload) #main > section {
 		right: 1rem;
 		width: 42px;
 		height: 42px;
+	}
+
+	.project-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.item-xl {
+		grid-column: span 1;
+	}
+
+	.item-xl .image.fit img,
+	.item-lg .image.fit img {
+		height: 220px;
 	}
 }

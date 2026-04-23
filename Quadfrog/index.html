@@ -2,100 +2,94 @@
 layout: default
 title: QuadFrog
 hero_image: /Quadfrog/images/IMG_6257.jpg
+date_completed: "May 2023"
+skills:
+  - name: "Fusion 360"
+    level: 5
+  - name: "Python"
+    level: 4
+  - name: "Raspberry Pi"
+    level: 4
+  - name: "ArduPilot"
+    level: 3
+  - name: "3D Printing"
+    level: 5
+  - name: "Soldering"
+    level: 4
+  - name: "HC-12 Radio"
+    level: 3
 ---
-				<!-- Intro -->
-					<section id="top" class="one dark cover">
-						<div class="container">
+<!-- Intro -->
+<section id="top" class="one dark cover">
+	<div class="container">
+		<header>
+			<div class="translucent-bg">
+				<h2 class="alt"><strong>QuadFrog</strong></h2>
+			</div>
+		</header>
+	</div>
+</section>
 
-							<header>
-								<div class="translucent-bg">
-								<h2 class="alt"><strong>QuadFrog</strong>
-								</div>
-							</header>
+<!-- Content -->
+<section id="about" class="three">
+	<div class="container">
 
-						</div>
-					</section>
-				<!-- About Me -->
-					<section id="about" class="three">
-						<div class="container">
+		<header>
+			<h2>Overview</h2>
+		</header>
 
-							<header>
-								<h2>About</h2>
-							</header>
+		<p>This project is my hands-on exploration of drones and their capabilities. I wanted to grow my skills in many different areas by developing as many components of the drone myself. As such, I designed and fabricated the frame, chose a V-tail configuration, selected and soldered the electronics, built my own ground station module, and wrote Python and C++ programs for both the onboard Raspberry Pi and my laptop.</p>
 
-							<p>This project is my hands-on exploration of drones and their capabilites. 
-							I wanted to grow my skills in many different areas by developing as many components of the drone myself.
-							As such, I designed and fabricated the frame of the drone, choosing a V-tail configuration to account for 
-							the position of my battery. I selected and soldered the main drone electronics, as well as built my own ground station 
-							module compatible with my laptop. Finally, I wrote Python and C++ programs to run on the on-board Raspberry Pi flight 
-							computer as well as ground control programs for my laptop and accompanying GCS hardware. I was glad to apply experience 
-							from my previous VIP as well as lessons from classes such as Statics. I was able to grow several skills as well as learn a few 
-							more over the course of this project, and the drone itself will serve as a test-bed for any flying project I want to develop. 
-							</p>
+		<hr>
 
-							<p>
-								This project was a self-driven exploration into drone design, aimed at developing a custom quadcopter from the ground up to 
-								expand my skills in mechanical design, electronics, and programming. I designed and fabricated a V-tail frame, soldered the main 
-								drone electronics, built a compatible ground station module for laptop control, and wrote Python and C++ programs for both the 
-								onboard Raspberry Pi flight computer and ground control system (GCS). Drawing on experience from my Vertically Integrated Project (VIP) 
-								and coursework like Statics, I created a versatile drone to serve as a testbed for future flight experiments.
-								<br>
-								My passion for drones stems from their blend of mechanical, electrical, and software engineering, offering endless possibilities for innovation. 
-								This project was an opportunity to challenge myself by designing and building as many components as possible, fostering a deep understanding of 
-								drone systems. My goal was to create a functional, customizable platform that not only flies but also serves as a foundation for future experimentation, 
-								reflecting my commitment to hands-on learning and interdisciplinary engineering.
-								<br>
-								The project began with defining the drone's V-tail configuration, chosen to increase forward flight capabilities and optimize component placement. I used 
-								Fusion 360 to design the frame, ensuring structural integrity(after a few interations and lessons learned) and precise motor placement for balanced flight.
-							</p>
+		<h3>Motivation</h3>
 
-							<div class="image-container">
-								<img src="images/IMG_5642.jpg" alt="" width="500" loading="lazy"/>
-								<img src="images/IMG_5657.jpg" alt="" width="500" loading="lazy"/>
-							</div>
+		<p>My passion for drones stems from their blend of mechanical, electrical, and software engineering, offering endless possibilities for innovation. This project was an opportunity to challenge myself by designing and building as many components as possible, fostering a deep understanding of drone systems. My goal was to create a functional, customizable platform that serves as a foundation for future experimentation.</p>
 
-							<p>
-								The onboard flight computer, a Raspberry Pi, ran custom Python scripts to manage flight control inputs and sensor data, interfaced with the flight controller 
-								via a serial connection. For the ground station, I built a custom 
-								box using an Raspberry Pi Pico and HC-12 radio module, paired with Python GCS software I wrote on my laptop for real-time control and telemetry.
-								<br>
-								Over the course of my iterations, I improved many features as I tested and researched more about drone building. I improved the arm design by moving from a flat 
-								arm to a more I beam shaped design to account for the weakness of PLA. I incorporated a live digital camera feed using a webcam connected to the onboard Raspberry Pi, 
-								which streamed over a self hosted python flask server. Unfortunately, some of these changes increased the amount of wiring and slack that had to be tied up or taped down, which wasn't visually pleasing.
-							</p>
+		<h3>Frame Design</h3>
 
-							<div class="image-container">
-								<img src="images/IMG_5797.jpg" alt="" width="500" loading="lazy"/>
-								<img src="images/IMG_5798.jpg" alt="" width="500" loading="lazy"/>
-							</div>
+		<p>The project began with defining the drone's V-tail configuration, chosen to increase forward flight capabilities and optimize component placement. I used Fusion 360 to design the frame, ensuring structural integrity (after a few iterations and lessons learned) and precise motor placement for balanced flight.</p>
 
-							<p>
-								For fabrication, I 3D-printed the frame using the Ultimakers at the Invention Studio with PLA filament, iterating on prototypes to address issues like frame cracking and arm bowing. The 
-								final frame was lightweight yet robust, supporting the drone's electronics. I selected and soldered components, including a flight controller, ESCs, and motors onto an off the shelf power-distribution board.
-								 An issue I faced was working with powerful electronics like LiPo batteries for the first time, and because I didn't realize how dangerous they were and because of how new I was to these components, 
-								 I ended up accidentally blowing up an ESC in my dorm, nearly setting off the fire alarm. It was very stressful, but I'm partially glad it happened because it quickly taught me to respect the hardware and to 
-								 be more careful with my procedures, which is why I now always double-check through continuity testing with a multimeter.
-							</p>
+		<div class="image-container">
+			<img src="images/IMG_5642.jpg" alt="QuadFrog frame CAD" width="500" loading="lazy"/>
+			<img src="images/IMG_5657.jpg" alt="QuadFrog assembled frame" width="500" loading="lazy"/>
+		</div>
 
-							<div class="image-container">
-								<img src="images/IMG_6253.jpg" alt="" width="500" loading="lazy"/>
-								<img src="images/IMG_6257.jpg" alt="" width="500" loading="lazy"/>
-							</div>
+		<hr>
 
-							<p>
-								This project merged mechanical design, electronics, and programming. The V-tail frame's sleek aesthetic was both functional and visually appealing, inspired by a favorite game of mine: Watch Dogs 2. Mechanically, I applied 
-								Statics to ensure structural stability. Electronically, I gained important experience with soldering and UAV part selection. In software, I integrated Python with the Pixhawk to create a cohesive control system. This fusion 
-								of disciplines produced a drone that I'm proud of as an early technical achievement in my work with UAVs as well as a practical basis for future projects.
-								<br>
-								I ended bringing Kermit back home from college and test flying in my backyard. It went pretty well up until my inexperience flying caused me to hit a branch and come tumbling down.
-								Onward to version 2.
-							</p>
+		<h3>Electronics & Software</h3>
 
-							<div class="image-container">
-								<video width="800" controls="controls">
-									<source src="images/IMG_6259.mp4" type="video/mp4">
-								</video>
-							</div>
+		<p>The onboard flight computer, a Raspberry Pi, ran custom Python scripts to manage flight control inputs and sensor data, interfaced with the flight controller via a serial connection. For the ground station, I built a custom box using a Raspberry Pi Pico and HC-12 radio module, paired with Python GCS software I wrote on my laptop for real-time control and telemetry.</p>
 
-						</div>
-					</section>
+		<p>Over the course of my iterations, I improved many features as I tested and researched more about drone building. I improved the arm design by moving from a flat arm to a more I-beam shaped design to account for the weakness of PLA. I incorporated a live digital camera feed using a webcam connected to the onboard Raspberry Pi, which streamed over a self-hosted Python Flask server.</p>
+
+		<div class="image-container">
+			<img src="images/IMG_5797.jpg" alt="QuadFrog electronics" width="500" loading="lazy"/>
+			<img src="images/IMG_5798.jpg" alt="QuadFrog wiring" width="500" loading="lazy"/>
+		</div>
+
+		<hr>
+
+		<h3>Fabrication</h3>
+
+		<p>I 3D-printed the frame using the Ultimakers at the Invention Studio with PLA filament, iterating on prototypes to address issues like frame cracking and arm bowing. The final frame was lightweight yet robust. I selected and soldered components, including a flight controller, ESCs, and motors onto an off-the-shelf power-distribution board. An issue I faced was working with powerful electronics like LiPo batteries for the first time — I ended up accidentally blowing up an ESC in my dorm, nearly setting off the fire alarm. It quickly taught me to respect the hardware and to be more careful with my procedures.</p>
+
+		<div class="image-container">
+			<img src="images/IMG_6253.jpg" alt="QuadFrog final build" width="500" loading="lazy"/>
+			<img src="images/IMG_6257.jpg" alt="QuadFrog completed" width="500" loading="lazy"/>
+		</div>
+
+		<hr>
+
+		<h3>Results</h3>
+
+		<p>This project merged mechanical design, electronics, and programming. The V-tail frame's sleek aesthetic was both functional and visually appealing, inspired by Watch Dogs 2. I ended up bringing Kermit back home from college and test flying in my backyard. It went pretty well up until my inexperience flying caused me to hit a branch and come tumbling down. Onward to version 2.</p>
+
+		<div class="image-container">
+			<video width="800" controls="controls">
+				<source src="images/IMG_6259.mp4" type="video/mp4">
+			</video>
+		</div>
+
+	</div>
+</section>

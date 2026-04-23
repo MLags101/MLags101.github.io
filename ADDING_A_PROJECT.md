@@ -17,9 +17,14 @@ Instead of copying the entire website code (with the header, footer, etc.), you 
 ---
 layout: default
 title: Your Project Title Here
+hero_image: /MyNewProject/images/hero.jpg
+skills:
+  - SolidWorks
+  - Python
+  - 3D Printing
 ---
 
-<!-- Intro Header Section -->
+<!-- Hero Section -->
 <section id="top" class="one dark cover">
     <div class="container">
         <header>
@@ -30,41 +35,40 @@ title: Your Project Title Here
     </div>
 </section>
 
-<!-- Include translucent background style -->
-<style>
-    .translucent-bg {
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    padding: 15px;
-    display: inline-block;
-    border-radius: 5px;
-    }
-</style>
-
-<!-- About Section -->
+<!-- Content Section -->
 <section id="about" class="three">
     <div class="container">
-        <header>
-            <h2>About</h2>
-        </header>
 
-        <p>
-            Write the first paragraph of your project description here.
-        </p>
+        <header><h2>Overview</h2></header>
 
-        <!-- Example of adding images side by side -->
+        <p>Write a brief overview of the project here.</p>
+
+        <hr>
+
+        <h3>Design</h3>
+
+        <p>Describe the design process...</p>
+
         <div class="image-container">
             <img src="images/your_image_1.jpg" alt="Description" width="500" loading="lazy"/>
             <img src="images/your_image_2.jpg" alt="Description" width="500" loading="lazy"/>
         </div>
 
-        <p>
-            Write another paragraph explaining more details.
-        </p>
+        <hr>
+
+        <h3>Results</h3>
+
+        <p>Describe the outcome...</p>
 
     </div>
 </section>
 ```
+
+### Front Matter Options
+- `layout: default` — Required. Uses the site-wide template.
+- `title:` — The page title shown in the browser tab.
+- `hero_image:` — Path to the background image for the hero section (optional).
+- `skills:` — A YAML list of skills/tools. These automatically render as tags at the bottom of the project page.
 
 ## Step 3: Add the Project to the Main Page
 To make sure people can actually navigate to your new project, you must add a link to it on your homepage (`index.html` in the root folder).

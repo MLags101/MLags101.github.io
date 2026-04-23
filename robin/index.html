@@ -2,75 +2,69 @@
 layout: default
 title: Robin
 hero_image: /robin/images/IMG_6511.jpg
+date_completed: "August 2024"
+skills:
+  - name: "SolidWorks"
+    level: 4
+  - name: "Python"
+    level: 4
+  - name: "BetaFlight"
+    level: 4
+  - name: "MultiWii Protocol"
+    level: 5
+  - name: "Raspberry Pi"
+    level: 3
+  - name: "3D Printing"
+    level: 4
 ---
-<!-- Intro -->
-					<section id="top" class="one dark cover">
-						<div class="container">
+<section id="top" class="one dark cover">
+	<div class="container">
+		<header>
+			<div class="translucent-bg">
+				<h2 class="alt"><strong>Robin</strong></h2>
+			</div>
+		</header>
+	</div>
+</section>
 
-							<header>
-								<div class="translucent-bg">
-								<h2 class="alt"><strong>Robin</strong>
-								</div>
-							</header>
+<section id="about" class="three">
+	<div class="container">
 
-						</div>
-					</section>
-				<!-- About Me -->
-					<section id="about" class="three">
-						<div class="container">
+		<header><h2>Overview</h2></header>
 
-							<header>
-								<h2>About</h2>
-							</header>
+		<p>Robin, named after Kermit the Frog's nephew, is a compact, fully custom-designed quadcopter built as a learning platform for BetaFlight and advanced control schemes. Powered by an F7 flight controller-ESC stack and a Raspberry Pi Zero W 2 as a companion computer, Robin was designed to test how low-cost I could prototype a quadcopter while maintaining a strong frame with decent capabilities.</p>
 
-							<!-- Picture: <a href="#" class="image featured"><img src="images/103262.jpg" alt="" /></a> <img src="images/IMG_5657.jpg" alt="" width="400" height="250"/>-->
-							
-							<p>
-								Robin, named after Kermit the Frog's nephew, is a compact, fully custom-designed, and 3D-printed quadcopter developed as a learning platform for experimenting with 
-								BetaFlight and advanced control schemes. Powered by an F7 flight controller-ESC stack and a Raspberry Pi Zero W 2 as a companion computer, Robin was designed to push 
-								the just how low-cost I could prototype a quadcopter while maintaining a strong frame with decent capabilities. This project allowed me to explore multi-purpose component design, 
-								and gain experience with common off the shelf frame hardware.
-								<br>
-								I wanted to build a platform that could handle risky control experiments while being cost-effective and customizable. Robin reflects my commitment to designing tools that enable 
-								learning and innovation. The result is a drone that is both a practical testbed and a fun test of resourcefulness.
-							</p>
+		<div class="image-container">
+			<img src="images/IMG_6461.jpg" alt="Robin quadcopter" width="400" loading="lazy"/>
+		</div>
 
-							<div class="image-container">
-								<img src="images/IMG_6461.jpg" alt="" width="400" loading="lazy"/>
-							</div>
+		<hr>
 
-							<p>Named after the nephew of Kermit, Robin is a smaller drone designed as a learning tool for BetaFlight and more risky control schemes. 
-								Like Kermit(the drone), Robin's frame is completely custom designed and 3D printed. It uses an F7 flight controller-ESC stack bought 
-								from AliExpress and a Raspberry Pi Zero W 2 as a flight computer. Because the F7 runs BetaFlight, I couldn't use the same MAVProxy code I 
-								wrote for Kermit. Instead, I learned how to use the MultiWii Serial protocol to send direct RC channel values via the Pi. I'm currently 
-								working on a handheld remote control to communicate with the Pi and control the RC channels based on buttons for throttle and yaw, as well as the remote gyro-state 
-								for pitch and roll control.
-							</p>
+		<h3>Frame Design</h3>
 
-							<p>
-								I used SolidWorks to design the frame, ensuring all components—F7 flight controller, ESC stack, Raspberry Pi Zero W 2, and motors—fit within a streamlined, 3D-printable chassis. 
-								Feedback from peers in my robotics club helped refine the design for balance and durability, emphasizing collaborative iteration. One notable design feature is the use of rotor arms as also 
-								critical structural standoffs for the top and bottom frame layers. This feature was great for simplifying the amount of components I needed to print as well as how many fasters I needed to use, 
-								further reducing weight.
-								<br>
-								The technical core was integrating the F7 flight controller, sourced from AliExpress, with the Raspberry Pi Zero W 2. The F7 runs BetaFlight, requiring a different communication approach than the 
-								MAVProxy code I wrote for my previous drone, Kermit. I learned the MultiWii Serial Protocol to send direct RC channel values from the Pi to the F7, enabling precise control of throttle, yaw, pitch, and roll. 
-								This involved writing Python scripts on the Pi to interface with BetaFlight, enabling limitless future development because updates to the flight control software are as simple as ssh-ing into the Pi and 
-								uploading just another script, rather than having to deal with firmware updates to BetaFlight on the controller itself.
-								<br>
-								The frame was 3D-printed at the Invention Studio, with iterative prototypes to perfect structural integrity and component fit. I adjusted wall thicknesses and motor mounts to withstand crash impacts, addressing early failures during test flights. 
-								I'm currently designing a handheld remote control to communicate with the Pi, using buttons for throttle and yaw and the remote's gyroscopic state for pitch and roll. This involves prototyping the remote's circuitry and enclosure, also 3D-printed, 
-								to ensure ergonomic handling. For more information about that remote, see the STM Remote page.
-							</p>
+		<p>I used SolidWorks to design the frame, ensuring all components fit within a streamlined, 3D-printable chassis. One notable design feature is the use of rotor arms as critical structural standoffs for the top and bottom frame layers, simplifying the component count and reducing weight and fastener usage.</p>
 
-							<div class="image-container">
-								<img src="images/IMG_6511.jpg" alt="" width="400" style="transform: rotate(-90deg);" loading="lazy"/>
-							</div>
+		<hr>
 
-							<p>
-								Robin successfully serves as a testbed for BetaFlight and experimental control schemes, with stable flight performance during initial tests. The compact, 3D-printed frame proved durable, surviving multiple crashes, and the Pi-based control system allowed 
-								precise RC channel manipulation. The project has enhanced my understanding of drone control and is paving the way for a custom remote, which will further improve user interaction. Robin's versatility makes it an ideal platform for ongoing flight control experiments.
-							</p>
+		<h3>Software Integration</h3>
 
-						</div>
-					</section>
+		<p>The F7 runs BetaFlight, requiring a different communication approach than the MAVProxy code I wrote for Kermit. I learned the MultiWii Serial Protocol to send direct RC channel values from the Pi to the F7. This involved writing Python scripts that enable limitless future development — updates are as simple as SSH-ing into the Pi and uploading a new script, rather than reflashing BetaFlight firmware.</p>
+
+		<hr>
+
+		<h3>Fabrication & Iteration</h3>
+
+		<p>The frame was 3D-printed at the Invention Studio, with iterative prototypes to perfect structural integrity and component fit. I adjusted wall thicknesses and motor mounts to withstand crash impacts. I'm currently designing a handheld remote control to communicate with the Pi — see the STM Remote page for more details.</p>
+
+		<div class="image-container">
+			<img src="images/IMG_6511.jpg" alt="Robin completed build" width="400" loading="lazy"/>
+		</div>
+
+		<hr>
+
+		<h3>Results</h3>
+
+		<p>Robin successfully serves as a testbed for BetaFlight and experimental control schemes, with stable flight performance during initial tests. The compact, 3D-printed frame proved durable, surviving multiple crashes, and the Pi-based control system allowed precise RC channel manipulation.</p>
+
+	</div>
+</section>

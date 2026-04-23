@@ -56,7 +56,22 @@
 
 		<!-- Main -->
 			<div id="main">
+				{% if page.date_completed %}<span id="project-date-data" style="display:none">{{ page.date_completed }}</span>{% endif %}
                 {{ content }}
+				{% if page.skills %}
+				<section id="skills" class="four">
+					<div class="container">
+						<header>
+							<h2>Skills & Tools</h2>
+						</header>
+						<div class="skills-grid">
+							{% for skill in page.skills %}
+							<span class="skill-tag-lg">{{ skill.name }}<span class="dots">{% assign lvl = skill.level | default: 1 %}{% for i in (1..5) %}{% if i <= lvl %}<span class="dot filled"></span>{% else %}<span class="dot"></span>{% endif %}{% endfor %}</span></span>
+							{% endfor %}
+						</div>
+					</div>
+				</section>
+				{% endif %}
 			</div>
 
 		<!-- Footer -->
@@ -69,7 +84,7 @@
 						<a href="https://www.linkedin.com/in/mlagana6/">LinkedIn</a>
 						<a href="mailto:michaell92601@gmail.com">Email</a>
 					</div>
-					<p class="footer-tagline">Designed & Built by Michael Lagana</p>
+
 					<p class="footer-copyright">&copy; 2025 Michael Lagana. Based on Prologue by HTML5 UP.</p>
 				</div>
 			</div>
@@ -88,7 +103,7 @@
 			<script src="{{ '/assets/js/util.js' | relative_url }}"></script>
 			<script src="{{ '/assets/js/main.js' | relative_url }}"></script>
 
-		<!-- Scroll Reveal & Back to Top -->
+		<!-- Scroll Reveal, Date Inject & Back to Top -->
 			<script>
 				document.addEventListener('DOMContentLoaded', function() {
 
@@ -99,12 +114,24 @@
 						el.classList.add('reveal');
 					});
 
-					// Stagger cards within rows
-					document.querySelectorAll('.row').forEach(function(row) {
-						row.querySelectorAll('.item').forEach(function(item, i) {
-							item.style.setProperty('--reveal-delay', (i * 0.1) + 's');
+					// Stagger cards within grids
+					document.querySelectorAll('.project-grid, .row').forEach(function(grid) {
+						grid.querySelectorAll('.item').forEach(function(item, i) {
+							item.style.setProperty('--reveal-delay', (i * 0.08) + 's');
 						});
 					});
+
+					// Inject project date into overview section
+					var dateEl = document.getElementById('project-date-data');
+					if (dateEl) {
+						var aboutHeader = document.querySelector('#about header');
+						if (aboutHeader) {
+							var dateBadge = document.createElement('p');
+							dateBadge.className = 'project-date';
+							dateBadge.innerHTML = '<span class="icon solid fa-calendar"></span> ' + dateEl.textContent;
+							aboutHeader.parentNode.insertBefore(dateBadge, aboutHeader.nextSibling);
+						}
+					}
 
 					// IntersectionObserver for reveal animations
 					var observer = new IntersectionObserver(function(entries) {

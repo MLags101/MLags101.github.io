@@ -2,92 +2,98 @@
 layout: default
 title: EEVI
 hero_image: /images/robo2.png
+date_completed: "May 2025"
+skills:
+  - name: "ArduPilot"
+    level: 5
+  - name: "Mission Planner"
+    level: 4
+  - name: "OpenHD"
+    level: 4
+  - name: "Raspberry Pi"
+    level: 4
+  - name: "RFD900x Radio"
+    level: 3
+  - name: "PCB Design"
+    level: 2
+  - name: "Carbon Fiber"
+    level: 3
 ---
-<!-- Intro -->
-					<section id="top" class="one dark cover">
-						<div class="container">
+<section id="top" class="one dark cover">
+	<div class="container">
+		<header>
+			<div class="translucent-bg">
+				<h2 class="alt"><strong>RoboJackets URC Drone</strong></h2>
+			</div>
+		</header>
+	</div>
+</section>
 
-							<header>
-								<div class="translucent-bg">
-								<h2 class="alt"><strong>EEVI</strong>
-								</div>
-							</header>
+<section id="about" class="three">
+	<div class="container">
 
-						</div>
-					</section>
-				<!-- About Me -->
-					<section id="about" class="three">
-						<div class="container">
+		<header><h2>URC 2025</h2></header>
 
-							<header>
-								<h2>URC 2025</h2>
-							</header>
+		<img src="/images/IMG_2836.jpg" alt="EEVI drone at URC" width="1000" loading="lazy"/>
 
-							<!-- Picture: <a href="#" class="image featured"><img src="images/103262.jpg" alt="" /></a> <img src="images/IMG_5657.jpg" alt="" width="400" height="250"/>-->
-							<img src="/images/IMG_2836.jpg" alt="" width="1000" loading="lazy"/>
-							<p>
-								As Drone Lead, I decided to overhaul our entire system, start from scratch and focus on maintaining comms since that was our point of failure last year. I rebuilt the frame using scrapped carbon fiber
-								 components from a Tarot frame, and integrating them with a custom designed and 3D printed shell. To solve the issue of operating within the HAB, I designed and built a tracking antenna that used an Intel 
-								 Nuc to receive telemtery and video and relay it into the ground station. For the telemtery, I used a pair of RFD900x radios. For high quality aerial video, I decided to switch away from an analog setup and 
-								 instead used OpenHD for digital transmission. The OpenHD setup used a Raspberry Pi 4, an Arducam camera, and an ASUS AC56 wifi adapter which I powered directly from the PDB.
-							</p>
-							<div class="image-container">
-								<img src="/images/robo1.png" width="600px" alt="" loading="lazy"/>
-							</div>"
-							<p>
-								During the competition, I plotted the given target coordinates into Mission Planner and EEVI had a successful autonomous takeoff. The drone began flying towards the target and it was very stable during its flight.
-								 Unfortunately, gps terrain data was not properly implemented and EEVI collided with a tall hill that was between the ground station and the target. In hindsight, I should have plotted a path around the hill 
-								 so I wouldn't have to rely on gps elevation data, but nevertheless I was very pleased with how the drone performed. THe autonomous flight was stable, the video feed was very stable and high quality, with only around 
-								 a half second of latency, and even after the crash, the only damage sustained was to the 3D printed motor mounts, and to one leg of the landing gear. All electronics were fully intact, and we were still receiving
-								  video and telemtery data after the crash. Looking forward, I want to include more distance sensor integration and rework the frame design so its lighter and easier to access.
-							</p>
-							<div class="image-container">
-								<img src="/images/robo3.png" width="800px" alt="" loading="lazy"/>
-								<video width="800" controls="controls">
-									<source src="/media/robo.mp4" type="video/mp4">
-								</video>
-							</div>
-							<p>
-								
-							</p>
-							<header>
-								<h2>URC 2024</h2>
-							</header>
-							<div class="image-container">
-								<img src="images/IMG_6048.jpg" alt="" width="500" loading="lazy"/>
-								<img src="images/IMG_6415.jpg" alt="" width="500" loading="lazy"/>
-							</div>
-							<p>I'm part of the RoboNav team of RoboJackets, a competetive robotics organization at Georgia Tech. 
-								We competed at the annual Univeristy Rover Challenge in Utah where our rover, Walli, along with the drone, Eevi, operated in
-							simulated martian conditions to complete a series of tasks such as a science mission and an equipment servicing mission.
-							The rover was the main priority for the team, and as such, the drone subteam consisted only of me and one other member. 
-						We were given parts from a drone that was broken and experimented with by old members and we set out to make a drone capable of assisting the rover.
-							</p>
-					<div class="image-container">
-						<img src="images/IMG_6074.jpg" alt="" width="500" loading="lazy"/>
-						<img src="images/IMG_6075.jpg" alt="" width="500" loading="lazy"/>
-					</div>
-							<p>
-								The heart of our drone was a Pixhawk flight controller running Ardupilot, something I was familiar with from previous
-								 projects. We made a classic quadcopter which allowed us to use well-developed Ardupilot PID profiles for the automatic 
-								 stabilization. With the main drone hardware built out, we were faced with cost constraints and were forced to use less-than-ideal 
-								 camera and telemetry hardware, which would present issues later on. Additionally, we wanted to integrate an end effector on the bottom 
-								 of the frame that would allow us to pick up and transport some hand-tools, allowing the rover to focus on the larger tasks.
-								 While my teammate made the mechanical design for the end effector, I handled the electrical and software integration into the drone 
-								 architecture. We ran into some issues supplying the necessary voltage from the Pixhawk to the end effector servos, which I decided to bypass 
-								 by using a custom PCB I designed for a different project that used a seperate microcontroller to supply power and PWM to the servos.
-							</p>
-					<div class="image-container">
-						<img src="images/IMG_6374.jpg" alt="" width="800px" loading="lazy"/>
-					</div>
-							<p>
-								Shortly before competition, we realized the range of our telemetry and analog radios were more limited than we initially thought.
-								 As a result, I decided that the best way to proceed would be to mount the telemetry and analog reciever on the rover itself, and relay 
-								 the incoming data through its more reliable communication hardware. In this setup, the range of the drone would be localized to the 
-								 operational location of the rover itself, which was much better than being tethered to the base station. Unfortunately, at competition we 
-								 encountered a faulty wire connection, which prevented us from receiving video and thus from using the drone for the delivery task. 
-								 We were definitely disappointed that we couldn't compete the way we wanted, but we were still proud of the work we were able to complete, 
-								 and everything we learned along the way. We have a great plan going forward for version 2, and are excited to return to URC next year.
-							</p>
-						</div>
-					</section>
+		<p>As Drone Lead, I overhauled our entire system from scratch, focusing on maintaining communications since that was our point of failure in 2024. I rebuilt the frame using scrapped carbon fiber components from a Tarot frame integrated with a custom 3D-printed shell.</p>
+
+		<hr>
+
+		<h3>Communications System</h3>
+
+		<p>To solve the HAB operational range issue, I designed and built a tracking antenna using an Intel NUC to receive telemetry and video and relay it into the ground station. For telemetry I used RFD900x radios. For high-quality aerial video, I switched from analog to digital using OpenHD with a Raspberry Pi 4, Arducam camera, and ASUS AC56 WiFi adapter powered directly from the PDB.</p>
+
+		<div class="image-container">
+			<img src="/images/robo1.png" width="600px" alt="EEVI system diagram" loading="lazy"/>
+		</div>
+
+		<hr>
+
+		<h3>Competition Results</h3>
+
+		<p>EEVI had a successful autonomous takeoff and began a stable flight towards the target. Unfortunately, GPS terrain data was not properly implemented and EEVI collided with a hill between the ground station and target. Despite the crash, the video feed remained stable with only half a second of latency, and all electronics were fully intact. Looking forward, I want to include more distance sensor integration and rework the frame design.</p>
+
+		<div class="image-container">
+			<img src="/images/robo3.png" width="800px" alt="EEVI flight path" loading="lazy"/>
+			<video width="800" controls="controls">
+				<source src="/media/robo.mp4" type="video/mp4">
+			</video>
+		</div>
+
+		<hr>
+
+		<header><h2>URC 2024</h2></header>
+
+		<div class="image-container">
+			<img src="images/IMG_6048.jpg" alt="URC 2024 team" width="500" loading="lazy"/>
+			<img src="images/IMG_6415.jpg" alt="URC 2024 field" width="500" loading="lazy"/>
+		</div>
+
+		<h3>Building the First Drone</h3>
+
+		<p>As part of the RoboNav team at RoboJackets, we competed at the University Rover Challenge in Utah. The drone subteam consisted of just me and one other member. We were given parts from a broken drone from old members and set out to build something capable of assisting the rover.</p>
+
+		<div class="image-container">
+			<img src="images/IMG_6074.jpg" alt="EEVI v1 build" width="500" loading="lazy"/>
+			<img src="images/IMG_6075.jpg" alt="EEVI v1 electronics" width="500" loading="lazy"/>
+		</div>
+
+		<hr>
+
+		<h3>Technical Approach</h3>
+
+		<p>The heart was a Pixhawk running ArduPilot. We integrated an end effector for transporting hand-tools, allowing the rover to focus on larger tasks. I handled the electrical and software integration, using a custom PCB from a different project to supply power and PWM to the servos.</p>
+
+		<div class="image-container">
+			<img src="images/IMG_6374.jpg" alt="EEVI v1 completed" width="800px" loading="lazy"/>
+		</div>
+
+		<hr>
+
+		<h3>Lessons Learned</h3>
+
+		<p>Shortly before competition, we realized our telemetry range was too limited. I mounted the receiver on the rover itself and relayed data through its more reliable communications. Unfortunately, a faulty wire connection at competition prevented video, but we were proud of what we accomplished and excited for version 2.</p>
+
+	</div>
+</section>
