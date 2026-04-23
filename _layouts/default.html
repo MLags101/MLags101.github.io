@@ -187,16 +187,6 @@
 						var firstVid = slides[0] && slides[0].querySelector('video');
 						if (firstVid) firstVid.play();
 					}
-
-					// Welcome Box Shrink Feature
-					var shrinkBtn = document.getElementById('shrink-btn');
-					var welcomeBox = document.getElementById('welcome-box');
-					if (shrinkBtn && welcomeBox) {
-						shrinkBtn.addEventListener('click', function(e) {
-							e.preventDefault();
-							welcomeBox.classList.toggle('shrunk');
-						});
-					}
 				});
 			</script>
 
