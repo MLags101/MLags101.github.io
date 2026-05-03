@@ -122,4 +122,21 @@
 					visibleClass: 'header-visible'
 				});
 
+	// Skill Dots Generator
+		$('.skill-tag[data-rating]').each(function() {
+			var rating = parseInt($(this).attr('data-rating')) || 0;
+			var maxDots = 5;
+			var $dotsContainer = $('<span class="dots"></span>');
+			
+			for (var i = 1; i <= maxDots; i++) {
+				var $dot = $('<span class="dot"></span>');
+				if (i <= rating) {
+					$dot.addClass('filled');
+				}
+				$dotsContainer.append($dot);
+			}
+			
+			$(this).append(' ').append($dotsContainer);
+		});
+
 })(jQuery);

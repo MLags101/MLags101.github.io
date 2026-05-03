@@ -2,260 +2,338 @@
 layout: default
 title: Michael Lagana's Portfolio
 ---
-				<!-- Intro -->
-					<section id="top" class="one dark cover">
+<!-- Intro -->
+<section id="top" class="one dark cover">
 
-						<!-- Cycling background slideshow -->
-						<!-- To add/remove slides: add images or videos to /images/hero/ and update the divs below -->
-						<!-- Supported: images (jpg/png/webp) and videos (mp4/webm) — videos auto-play muted -->
-						<div class="hero-slideshow">
-							<div class="hero-slide active" style="background-image: url('/images/hero/1.jpg');"></div>
-							<div class="hero-slide" style="background-image: url('/images/hero/2.png');"></div>
-							<div class="hero-slide" style="background-image: url('/images/hero/3.jpg');"></div>
-							<div class="hero-slide" style="background-image: url('/images/hero/4.png');"></div>
-							<!-- Example video slide (uncomment to use):
+	<!-- Cycling background slideshow -->
+	<!-- To add/remove slides: add images or videos to /images/hero/ and update the divs below -->
+	<!-- Supported: images (jpg/png/webp) and videos (mp4/webm) — videos auto-play muted -->
+	<div class="hero-slideshow">
+		<div class="hero-slide active" style="background-image: url('/images/hero/1.jpg');"></div>
+		<div class="hero-slide" style="background-image: url('/images/hero/2.png');"></div>
+		<div class="hero-slide" style="background-image: url('/images/hero/3.jpg');"></div>
+		<div class="hero-slide" style="background-image: url('/images/hero/4.png');"></div>
+		<div class="hero-slide" style="background-image: url('/images/hero/5.jpg');"></div>
+		<div class="hero-slide" style="background-image: url('/images/hero/6.jpg');"></div>
+		<div class="hero-slide" style="background-image: url('/images/hero/7.jpg');"></div>
+		<div class="hero-slide" style="background-image: url('/images/hero/8.jpg');"></div>
+		<div class="hero-slide" style="background-image: url('/images/hero/9.jpg');"></div>
+		<div class="hero-slide" style="background-image: url('/images/hero/10.jpg');"></div>
+		<div class="hero-slide">
+			<video muted loop playsinline>
+				<source src="/images/hero/drone.mp4" type="video/mp4">
+			</video>
+		</div>
+		<!-- Example video slide (uncomment to use):
 							<div class="hero-slide">
 								<video muted loop playsinline>
 									<source src="/images/hero/demo.mp4" type="video/mp4">
 								</video>
 							</div>
 							-->
-						</div>
+	</div>
 
-						<div class="container">
+	<div class="container">
 
-						<header>
-							<div class="translucent-bg" id="welcomeBox">
-								<!-- Collapse button: shrinks box to a circle in the corner -->
-								<button class="welcome-collapse-btn" id="welcomeCollapseBtn" title="Minimize welcome box" aria-label="Minimize welcome box">
-									<span class="icon solid fa-compress-alt"></span>
-								</button>
-								<div class="welcome-content">
-									<h2 class="alt"><strong>Welcome!</strong></h2>
-									<p>This website is an overview of my projects and explorations both personal and through school.<br />
-										Feel free to look at my projects, check out my LinkedIn, and reach out through email!</p>
-								</div>
-							</div>
-						</header>
+		<header>
+			<div class="translucent-bg" id="welcomeBox">
+				<!-- Collapse button: shrinks box to a circle in the corner -->
+				<button class="welcome-collapse-btn" id="welcomeCollapseBtn" title="Minimize welcome box"
+					aria-label="Minimize welcome box">
+					<span class="icon solid fa-compress-alt"></span>
+				</button>
+				<div class="welcome-content">
+					<h2 class="alt"><strong>Welcome!</strong></h2>
+					<p>This website is an overview of my projects and explorations both personal and through
+						school.<br />
+						Feel free to look at my projects, check out my LinkedIn, and reach out through email!</p>
+				</div>
+			</div>
+		</header>
+
+	</div>
+</section>
+
+<!-- Portfolio -->
+<section id="portfolio" class="two">
+	<div class="container">
+
+		<header>
+			<h2>My Projects</h2>
+		</header>
+
+		<div class="project-grid">
+
+			<!-- Kermit V3 — Importance: 9 -->
+			<article class="item item-xxl">
+				<a href="https://www.behance.net/gallery/248209671/Kermit-V3-Invention-Studio" class="image fit"><img
+						src="/images/IMG_8094.jpg" alt="Kermit V3 quadcopter" loading="lazy" /></a>
+				<header>
+					<h3>Kermit V3</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> April 2026</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">SolidWorks</span>
+						<span class="skill-tag" data-rating="3">ArduPilot</span>
+						<span class="skill-tag" data-rating="4">3D Printing</span>
 
 					</div>
-				</section>
+				</div>
+			</article>
 
-				<!-- Portfolio -->
-					<section id="portfolio" class="two">
-						<div class="container">
+			<!-- Kermit V2 — Importance: 9 -->
+			<article class="item item-xl">
+				<a href="https://www.behance.net/gallery/227630087/Kermit-V2-Maker-Grant-Invention-Studio"
+					class="image fit"><img src="/images/IMG_7406.jpg" alt="Kermit V2 quadcopter" loading="lazy" /></a>
+				<header>
+					<h3>Kermit V2</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> June 2025</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">SolidWorks</span>
+						<span class="skill-tag" data-rating="3">ArduPilot</span>
+						<span class="skill-tag" data-rating="4">3D Printing</span>
 
-							<header>
-								<h2>My Projects</h2>
-							</header>
+					</div>
+				</div>
+			</article>
 
-							<div class="project-grid">
+			<!-- URC Drone — Importance: 9 -->
+			<article class="item item-lg">
+				<a href="/eevi/" class="image fit"><img src="/images/robo2.png" alt="URC Drone" loading="lazy" /></a>
+				<header>
+					<h3>RoboJackets URC Drone</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> May 2025</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">ArduPilot</span>
+						<span class="skill-tag" data-rating="4">OpenHD</span>
+						<span class="skill-tag" data-rating="3">ROS2</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- Kermit V2 — Importance: 9 -->
-								<article class="item item-xl">
-									<a href="https://www.behance.net/gallery/227630087/Kermit-V2-Maker-Grant-Invention-Studio" class="image fit"><img src="/images/IMG_7406.jpg" alt="Kermit V2 quadcopter" loading="lazy"/></a>
-									<header><h3>Kermit V2</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> Ongoing</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">SolidWorks <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">ArduPilot <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-											<span class="skill-tag">3D Printing <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">PCB Design <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-											<span class="skill-tag">Embedded C++ <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span></span></span>
-										</div>
-									</div>
-								</article>
+			<!-- DUM-I(S) — Importance: 8 -->
+			<article class="item item-md">
+				<a href="https://www.behance.net/gallery/221851771/DUM-I-Maker-Grant-Invention-Studio"
+					class="image fit"><img src="/images/main.png" alt="DUM-I robot arm" loading="lazy" /></a>
+				<header>
+					<h3>DUM-I(S)</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> March 2025</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">SolidWorks</span>
+						<span class="skill-tag" data-rating="4">Arduino</span>
+						<span class="skill-tag" data-rating="4">3D Printing</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- URC Drone — Importance: 9 -->
-								<article class="item item-lg">
-									<a href="/eevi/" class="image fit"><img src="/images/robo2.png" alt="URC Drone" loading="lazy"/></a>
-									<header><h3>RoboJackets URC Drone</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> May 2025</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">ArduPilot <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">OpenHD <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-											<span class="skill-tag">ROS2 <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span></span></span>
-										</div>
-									</div>
-								</article>
+			<!-- QuadFrog — Importance: 8 -->
+			<article class="item item-lg">
+				<a href="/Quadfrog/" class="image fit"><img src="/Quadfrog/images/IMG_6257.jpg" alt="QuadFrog drone"
+						loading="lazy" /></a>
+				<header>
+					<h3>Kermit (QuadFrog)</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> May 2023</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">Fusion 360</span>
+						<span class="skill-tag" data-rating="4">Python</span>
+						<span class="skill-tag" data-rating="4">Raspberry Pi</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- DUM-I(S) — Importance: 8 -->
-								<article class="item item-lg">
-									<a href="https://www.behance.net/gallery/221851771/DUM-I-Maker-Grant-Invention-Studio" class="image fit"><img src="/images/main.png" alt="DUM-I robot arm" loading="lazy"/></a>
-									<header><h3>DUM-I(S)</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> 2024</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">SolidWorks <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">Arduino <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-											<span class="skill-tag">3D Printing <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-										</div>
-									</div>
-								</article>
+			<!-- Mr Toad — Importance: 7 -->
+			<article class="item item-lg">
+				<a href="/MrToad/" class="image fit"><img src="/images/rovercad.png" alt="Mr Toad rover CAD"
+						loading="lazy" /></a>
+				<header>
+					<h3>Mr Toad (ongoing)</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> January 2026</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">SolidWorks</span>
+						<span class="skill-tag" data-rating="4">ROS2</span>
+						<span class="skill-tag" data-rating="4">Python</span>
+						<span class="skill-tag" data-rating="3">Electronics</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- QuadFrog — Importance: 8 -->
-								<article class="item item-lg">
-									<a href="/Quadfrog/" class="image fit"><img src="/Quadfrog/images/IMG_6257.jpg" alt="QuadFrog drone" loading="lazy"/></a>
-									<header><h3>Kermit (QuadFrog)</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> May 2023</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">Fusion 360 <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">Python <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-											<span class="skill-tag">Raspberry Pi <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-										</div>
-									</div>
-								</article>
+			<!-- Marlin/Nemo — Importance: 7 -->
+			<article class="item item-lg">
+				<a href="/Marlin/" class="image fit"><img src="/Marlin/images/IMG_6210.jpg" alt="Marlin RC plane"
+						loading="lazy" /></a>
+				<header>
+					<h3>AE 3030 Plane</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> December 2024</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">SolidWorks</span>
+						<span class="skill-tag" data-rating="4">KiCAD</span>
+						<span class="skill-tag" data-rating="4">Arduino</span>
+						<span class="skill-tag" data-rating="3">PCB Milling</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- Mr Toad — Importance: 7 -->
-								<article class="item item-lg">
-									<a href="/MrToad/" class="image fit"><img src="/images/rovercad.png" alt="Mr Toad rover CAD" loading="lazy"/></a>
-									<header><h3>Mr Toad (ongoing)</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> Ongoing</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">SolidWorks <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">ArduPilot <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></span>
-										</div>
-									</div>
-								</article>
+			<!-- Robin — Importance: 6 -->
+			<article class="item item">
+				<a href="/robin/" class="image fit"><img src="/robin/images/IMG_6511.jpg" alt="Robin drone"
+						loading="lazy" /></a>
+				<header>
+					<h3>Robin</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> August 2024</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="4">BetaFlight</span>
+						<span class="skill-tag" data-rating="5">Fusion 360</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- Marlin/Nemo — Importance: 7 -->
-								<article class="item item-lg">
-									<a href="/Marlin/" class="image fit"><img src="/Marlin/images/IMG_6210.jpg" alt="Marlin RC plane" loading="lazy"/></a>
-									<header><h3>AE 3030 Plane</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> December 2024</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">KiCAD <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">Arduino <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-											<span class="skill-tag">PCB Milling <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-										</div>
-									</div>
-								</article>
+			<!-- STM Remote — Importance: 6 -->
+			<article class="item item-xs">
+				<a href="/STMRemote/" class="image fit"><img src="/images/stmremote.png" alt="STM Remote PCB"
+						loading="lazy" /></a>
+				<header>
+					<h3>STM Remote (ongoing)</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> April 2024</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">KiCAD</span>
+						<span class="skill-tag" data-rating="5">STM32</span>
+						<span class="skill-tag" data-rating="4">Embedded C</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- Robin — Importance: 6 -->
-								<article class="item">
-									<a href="/robin/" class="image fit"><img src="/robin/images/IMG_6511.jpg" alt="Robin drone" loading="lazy"/></a>
-									<header><h3>Robin</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> August 2024</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">BetaFlight <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-											<span class="skill-tag">Python <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-										</div>
-									</div>
-								</article>
+			<!-- Typhoon BGC — Importance: 5 -->
+			<article class="item item-md">
+				<a href="/TyphoonBGC/" class="image fit"><img src="/images/typhoonbgc.png"
+						alt="Typhoon gimbal controller" loading="lazy" /></a>
+				<header>
+					<h3>Typhoon Gimbal Controller (ongoing)</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> Feburary 2026</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">Altium</span>
+						<span class="skill-tag" data-rating="4">Arduino</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- STM Remote — Importance: 6 -->
-								<article class="item">
-									<a href="/STMRemote/" class="image fit"><img src="/images/stmremote.png" alt="STM Remote PCB" loading="lazy"/></a>
-									<header><h3>STM Remote (ongoing)</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> Ongoing</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">KiCAD <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">STM32 <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">Embedded C <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-										</div>
-									</div>
-								</article>
+			<!-- Custom Remote — Importance: 5 -->
+			<article class="item">
+				<a href="/Remote/" class="image fit"><img src="/Remote/images/IMG_6510.jpg" alt="Custom RF remote"
+						loading="lazy" /></a>
+				<header>
+					<h3>Custom Remote</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> March 2024</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">KiCAD</span>
+						<span class="skill-tag" data-rating="5">PCB Milling</span>
+						<span class="skill-tag" data-rating="4">RF Comms</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- Typhoon BGC — Importance: 5 -->
-								<article class="item">
-									<a href="/TyphoonBGC/" class="image fit"><img src="/images/typhoonbgc.png" alt="Typhoon gimbal controller" loading="lazy"/></a>
-									<header><h3>Typhoon Gimbal Controller (ongoing)</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> Ongoing</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">KiCAD <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">BLDC Control <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-										</div>
-									</div>
-								</article>
+			<!-- Electronics Box — Importance: 5 -->
+			<article class="item item-xs">
+				<a href="/electronicsbox/" class="image fit"><img src="/electronicsbox/images/Image.jpg"
+						alt="Electronics lockbox" loading="lazy" /></a>
+				<header>
+					<h3>Electronics Box</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> November 2023</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">Arduino</span>
+						<span class="skill-tag" data-rating="3">RFID</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- Custom Remote — Importance: 5 -->
-								<article class="item">
-									<a href="/Remote/" class="image fit"><img src="/Remote/images/IMG_6510.jpg" alt="Custom RF remote" loading="lazy"/></a>
-									<header><h3>Custom Remote</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> March 2024</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">KiCAD <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">PCB Milling <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">RF Comms <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-										</div>
-									</div>
-								</article>
+			<!-- Shuttle Model — Importance: 3 -->
+			<article class="item item-sm">
+				<a href="/Shuttle_Model/" class="image fit"><img src="/Shuttle_Model/images/IMG_5869.jpg"
+						alt="Space shuttle model" loading="lazy" /></a>
+				<header>
+					<h3>Space Shuttle Model</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> April 2023</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="5">SolidWorks</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- Electronics Box — Importance: 5 -->
-								<article class="item">
-									<a href="/electronicsbox/" class="image fit"><img src="/electronicsbox/images/Image.jpg" alt="Electronics lockbox" loading="lazy"/></a>
-									<header><h3>Electronics Box</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> November 2023</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">Arduino <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">RFID <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-										</div>
-									</div>
-								</article>
+			<!-- Glider — Importance: 3 -->
+			<article class="item item-xs">
+				<a href="/Glider/" class="image fit"><img src="/Glider/images/IMG_4780.jpg" alt="AE 1601 Glider"
+						loading="lazy" /></a>
+				<header>
+					<h3>AE 1601 Glider</h3>
+				</header>
+				<div class="item-skills">
+					<span class="item-date"><span class="icon solid fa-calendar"></span> December 2022</span>
+					<div class="item-skills-list">
+						<span class="skill-tag" data-rating="4">Laser Cutting</span>
+						<span class="skill-tag" data-rating="2">CAD</span>
+					</div>
+				</div>
+			</article>
 
-								<!-- Shuttle Model — Importance: 3 -->
-								<article class="item item-sm">
-									<a href="/Shuttle_Model/" class="image fit"><img src="/Shuttle_Model/images/IMG_5869.jpg" alt="Space shuttle model" loading="lazy"/></a>
-									<header><h3>Space Shuttle Model</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> April 2023</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">SolidWorks <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span></span></span>
-											<span class="skill-tag">SLS Printing <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span></span></span>
-										</div>
-									</div>
-								</article>
+		</div>
 
-								<!-- Glider — Importance: 3 -->
-								<article class="item item-sm">
-									<a href="/Glider/" class="image fit"><img src="/Glider/images/IMG_4780.jpg" alt="AE 1601 Glider" loading="lazy"/></a>
-									<header><h3>AE 1601 Glider</h3></header>
-									<div class="item-skills">
-										<span class="item-date"><span class="icon solid fa-calendar"></span> December 2022</span>
-										<div class="item-skills-list">
-											<span class="skill-tag">Laser Cutting <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span></span></span>
-											<span class="skill-tag">CAD <span class="dots"><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></span>
-										</div>
-									</div>
-								</article>
+	</div>
+</section>
 
-							</div>
+<!-- About Me -->
+<section id="about" class="three">
+	<div class="container">
 
-						</div>
-					</section>
+		<header>
+			<h2>About Me</h2>
+		</header>
 
-				<!-- About Me -->
-					<section id="about" class="three">
-						<div class="container">
+		<p>
+			I'm an Aerospace Engineering undergraduate student at Georgia Tech with a passion for learning through rapid
+			prototyping and testing, especially in UAV and mechatronics fields.<br />
+			I have a deep curiosity and a relentless pursuit for mastering skills across many fields so that no matter
+			what dream I have, I know I can make it a reality.
+		</p>
 
-							<header>
-								<h2>About Me</h2>
-							</header>
+		<p>
+			In the makerspace and on my robotics team, I actively engage in teamwork and collaboration by sharing ideas,
+			troubleshooting designs, and co-developing innovative prototypes alongside engineers of many different
+			backgrounds. As a leader in these settings, I mentor others by teaching prototyping techniques, guiding them
+			through the iterative design processes, and fostering a collaborative environment to drive project success.
+		</p>
 
-							<p>
-								I'm an Aerospace Engineering undergraduate student at Georgia Tech with a passion for learning through rapid prototyping and testing, especially in UAV and mechatronics fields.<br />
-								I have a deep curiosity and a relentless pursuit for mastering skills across many fields so that no matter what dream I have, I know I can make it a reality.
-							</p>
+		<p>
+			I am seeking internship opportunities where I can leverage my prototyping skill set while further developing
+			my design and simulation abilities in a dynamic environment that fosters creativity and encourages
+			cutting-edge innovation.
+		</p>
 
-							<p>
-								In the makerspace and on my robotics team, I actively engage in teamwork and collaboration by sharing ideas, troubleshooting designs, and co-developing innovative prototypes alongside engineers of many different backgrounds. As a leader in these settings, I mentor others by teaching prototyping techniques, guiding them through the iterative design processes, and fostering a collaborative environment to drive project success.
-							</p>
+		<a class="image featured"><img src="images/robo4.jpg" width="800" alt="RoboJackets team photo"
+				loading="lazy" /></a>
 
-							<p>
-								I am seeking internship opportunities where I can leverage my prototyping skill set while further developing my design and simulation abilities in a dynamic environment that fosters creativity and encourages cutting-edge innovation.
-							</p>
-
-							<a class="image featured"><img src="images/robo4.jpg" width="800" alt="RoboJackets team photo" loading="lazy"/></a>
-
-						</div>
-					</section>
+	</div>
+</section>

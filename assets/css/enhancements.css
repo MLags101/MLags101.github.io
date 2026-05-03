@@ -640,6 +640,14 @@ model-viewer {
 	width: 100%;
 }
 
+.item-xxl {
+	grid-column: span 3;
+}
+
+.item-xxl .image.fit img {
+	height: 450px;
+}
+
 .item-xl {
 	grid-column: span 2;
 }
@@ -652,8 +660,16 @@ model-viewer {
 	height: 260px;
 }
 
+.item-md .image.fit img {
+	height: 195px;
+}
+
 .item-sm .image.fit img {
 	height: 170px;
+}
+
+.item-xs .image.fit img {
+	height: 140px;
 }
 
 /* ---- Skills Hover Dropdown (Main Page Cards) ---- */
