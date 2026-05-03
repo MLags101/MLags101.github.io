@@ -54,8 +54,14 @@
 			.each(function() {
 
 				var	$this = $(this),
-					id = $this.attr('href'),
-					$section = $(id);
+					href = $this.attr('href') || '',
+					hashIndex = href.indexOf('#'),
+					$section;
+
+				if (hashIndex < 0)
+					return;
+
+				$section = $(href.slice(hashIndex));
 
 				// No section for this link? Bail.
 					if ($section.length < 1)
@@ -123,20 +129,22 @@
 				});
 
 	// Skill Dots Generator
-		$('.skill-tag[data-rating]').each(function() {
-			var rating = parseInt($(this).attr('data-rating')) || 0;
-			var maxDots = 5;
-			var $dotsContainer = $('<span class="dots"></span>');
-			
-			for (var i = 1; i <= maxDots; i++) {
-				var $dot = $('<span class="dot"></span>');
-				if (i <= rating) {
-					$dot.addClass('filled');
+		$(function() {
+			$('.skill-tag[data-rating]').each(function() {
+				var rating = parseInt($(this).attr('data-rating')) || 0;
+				var maxDots = 5;
+				var $dotsContainer = $('<span class="dots"></span>');
+				
+				for (var i = 1; i <= maxDots; i++) {
+					var $dot = $('<span class="dot"></span>');
+					if (i <= rating) {
+						$dot.addClass('filled');
+					}
+					$dotsContainer.append($dot);
 				}
-				$dotsContainer.append($dot);
-			}
-			
-			$(this).append(' ').append($dotsContainer);
+				
+				$(this).append(' ').append($dotsContainer);
+			});
 		});
 
 })(jQuery);

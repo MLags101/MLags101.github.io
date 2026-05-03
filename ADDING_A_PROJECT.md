@@ -18,10 +18,14 @@ Instead of copying the entire website code (with the header, footer, etc.), you 
 layout: default
 title: Your Project Title Here
 hero_image: /MyNewProject/images/hero.jpg
+date_completed: "Month Year"
 skills:
-  - SolidWorks
-  - Python
-  - 3D Printing
+  - name: "SolidWorks"
+    level: 5
+  - name: "Python"
+    level: 4
+  - name: "3D Printing"
+    level: 3
 ---
 
 <!-- Hero Section -->
@@ -68,7 +72,8 @@ skills:
 - `layout: default` — Required. Uses the site-wide template.
 - `title:` — The page title shown in the browser tab.
 - `hero_image:` — Path to the background image for the hero section (optional).
-- `skills:` — A YAML list of skills/tools. These automatically render as tags at the bottom of the project page.
+- `date_completed:` — Shown in the project overview (optional).
+- `skills:` — A YAML list of objects with `name` and `level` (1–5). These render as tags with significance dots at the bottom of the project page. Indent each `level` under its `- name`, as in the example above.
 
 ## Step 3: Add the Project to the Main Page
 To make sure people can actually navigate to your new project, you must add a link to it on your homepage (`index.html` in the root folder).

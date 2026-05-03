@@ -380,6 +380,52 @@ body.header-visible #header {
 	object-fit: cover;
 }
 
+/* Hero slideshow manual controls (home only) */
+.hero-slideshow-btn {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 2;
+	width: 2.75rem;
+	height: 2.75rem;
+	padding: 0;
+	margin: 0;
+	border: 1px solid rgba(255, 255, 255, 0.35);
+	border-radius: 50%;
+	background: rgba(13, 17, 23, 0.45);
+	color: #f0f6fc;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.hero-slideshow-btn:hover {
+	background: rgba(13, 17, 23, 0.7);
+	border-color: rgba(255, 255, 255, 0.5);
+}
+
+.hero-slideshow-btn:focus {
+	outline: 2px solid #E27689;
+	outline-offset: 2px;
+}
+
+.hero-slideshow-btn .icon {
+	font-size: 1.1em;
+	pointer-events: none;
+}
+
+.hero-slideshow-prev {
+	left: 0.75rem;
+}
+
+.hero-slideshow-next {
+	right: 0.75rem;
+}
+
 #main > section.cover > .container {
 	position: relative;
 	z-index: 1;
@@ -737,6 +783,10 @@ model-viewer {
 	border-radius: 50%;
 	background: rgba(226, 118, 137, 0.2);
 	display: inline-block;
+}
+
+.item-skills .dot:not(.filled) {
+	background: rgba(226, 118, 137, 0.35);
 }
 
 .dot.filled {
