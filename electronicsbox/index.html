@@ -4,20 +4,16 @@ title: Electronics Lockbox
 hero_image: /electronicsbox/images/Image.jpg
 date_completed: "November 2023"
 skills:
-  - name: "Arduino"
-    level: 5
-  - name: "RFID (MFRC522)"
-    level: 5
-  - name: "RF Communication"
-    level: 3
-  - name: "MOSFET Circuits"
-    level: 4
-  - name: "SolidWorks"
-    level: 3
-  - name: "3D Printing"
-    level: 3
-  - name: "Laser Cutting"
-    level: 3
+- name: "Arduino"
+level: 5
+- name: "RFID (MFRC522)"
+level: 3
+- name: "SolidWorks"
+level: 3
+- name: "3D Printing"
+level: 3
+- name: "Laser Cutting"
+level: 3
 ---
 <section id="top" class="one dark cover">
 	<div class="container">
@@ -32,47 +28,63 @@ skills:
 <section id="about" class="three">
 	<div class="container">
 
-		<header><h2>Overview</h2></header>
+		<header>
+			<h2>Overview</h2>
+		</header>
 
-		<p>As a Prototyping Instructor (PI) at the Invention Studio, I pursued the role of Electronics Master. The final task was to design and build something to better the space. I decided to make a lockbox to secure the electronics cabinet keys, integrating RFID, RF remote control, a solenoid lock, and a spark gap deterrent.</p>
+		<p>As a Prototyping Instructor (PI) at the Invention Studio, I pursued the role of Electronics Master. The final
+			task was to design and build something to better the space. I decided to make a lockbox to secure the
+			electronics cabinet keys, integrating RFID, RF remote control, a solenoid lock, and a spark gap deterrent.
+		</p>
 
 		<hr>
 
 		<h3>Motivation</h3>
 
-		<p>Being part of the Electronics tool group was greatly rewarding because of the small family of engineers it consisted of. The lockbox would provide a solution usable by all of us via our student ID cards, enabling a way of locking up special equipment without making key access burdensome.</p>
+		<p>Being part of the Electronics tool group was greatly rewarding because of the small family of engineers it
+			consisted of. The lockbox would provide a solution usable by all of us via our student ID cards, enabling a
+			way of locking up special equipment without making key access burdensome.</p>
 
 		<div class="image-container">
-			<img src="images/IMG_6131.jpg" alt="Electronics lockbox interior" width="500" style="transform:rotate(90deg);" loading="lazy"/>
+			<img src="images/IMG_6131.jpg" alt="Electronics lockbox interior" width="500"
+				style="transform:rotate(90deg);" loading="lazy" />
 		</div>
 
 		<hr>
 
 		<h3>Technical Features</h3>
 
-		<p><strong>RFID Sensor:</strong> An MFRC522 RFID module (13.56 MHz) interfaces with university student ID cards using MIFARE protocol. Arduino code reads card UIDs and authenticates against a preprogrammed list stored in EEPROM.</p>
+		<p><strong>RFID Sensor:</strong> An MFRC522 RFID module (13.56 MHz) interfaces with university student ID cards
+			using MIFARE protocol. Arduino code reads card UIDs and authenticates against a preprogrammed list stored in
+			EEPROM.</p>
 
-		<p><strong>MOSFET-Driven Solenoid:</strong> A 12V solenoid controlled by a MOSFET retracts when an authorized ID or RF signal is detected, unlocking the box.</p>
+		<p><strong>MOSFET-Driven Solenoid:</strong> A 12V solenoid controlled by a MOSFET retracts when an authorized ID
+			or RF signal is detected, unlocking the box.</p>
 
-		<p><strong>RF Module:</strong> A 433 MHz RF module enables remote opening from a distance, adding convenience for key access.</p>
+		<p><strong>RF Module:</strong> A 433 MHz RF module enables remote opening from a distance, adding convenience
+			for key access.</p>
 
-		<p><strong>Spark Gap Deterrence:</strong> A spark gap circuit generates a loud arc sound when an incorrect ID is scanned, using a high-voltage transformer driven by a PWM-controlled MOSFET.</p>
+		<p><strong>Spark Gap Deterrence:</strong> A spark gap circuit generates a loud arc sound when an incorrect ID is
+			scanned, using a high-voltage transformer driven by a PWM-controlled MOSFET.</p>
 
 		<hr>
 
 		<h3>Fabrication</h3>
 
-		<p>I used SolidWorks to design a 3D-printed door and laser-cut MDF sides. Iterative prototypes addressed component fit and solenoid alignment, ensuring the lock mechanism operated smoothly.</p>
+		<p>I used SolidWorks to design a 3D-printed door and laser-cut MDF sides. Iterative prototypes addressed
+			component fit and solenoid alignment, ensuring the lock mechanism operated smoothly.</p>
 
 		<div class="image-container">
-			<img src="images/Image.jpg" alt="Completed electronics lockbox" width="800" loading="lazy"/>
+			<img src="images/Image.jpg" alt="Completed electronics lockbox" width="800" loading="lazy" />
 		</div>
 
 		<hr>
 
 		<h3>Results</h3>
 
-		<p>The lockbox successfully secured the electronics cabinet keys, with the RFID system authenticating student IDs and the RF module enabling remote access. The spark gap deterrence activated consistently for unauthorized attempts. The device was adopted by our tool group, earning my spot as Electronics Master.</p>
+		<p>The lockbox successfully secured the electronics cabinet keys, with the RFID system authenticating student
+			IDs and the RF module enabling remote access. The spark gap deterrence activated consistently for
+			unauthorized attempts. The device was adopted by our tool group, earning my spot as Electronics Master.</p>
 
 	</div>
 </section>

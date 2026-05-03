@@ -2,18 +2,18 @@
 layout: default
 title: Mr Toad's Wild Rover
 hero_image: /images/rovercad.png
-date_completed: "Ongoing"
+date_completed: "January 2026"
 skills:
-  - name: "SolidWorks"
-    level: 5
-  - name: "ArduPilot"
-    level: 2
-  - name: "3D Printing"
-    level: 3
-  - name: "CAD"
-    level: 5
-  - name: "Mechanical Design"
-    level: 5
+- name: "SolidWorks"
+level: 5
+- name: "ROS2"
+level: 4
+- name: "Python"
+level: 4
+- name: "Electronics"
+level: 3
+- name: "3D Printing"
+level: 2
 ---
 <section id="top" class="one dark cover">
 	<div class="container">
@@ -28,13 +28,17 @@ skills:
 <section id="about" class="three">
 	<div class="container">
 
-		<header><h2>Overview</h2></header>
+		<header>
+			<h2>Overview</h2>
+		</header>
 
-		<p>Mr Toad's Wild Rover is the third project of mine funded by the Maker Grant program of the Invention Studio. The goal is to develop a durable, autonomous-capable rover similar to the iRobot FirstLook, used by first responders to scout dangerous environments.</p>
+		<p>Mr Toad's Wild Rover is the third project of mine funded by the Maker Grant program of the Invention Studio.
+			The goal is to develop a durable, autonomous-capable rover similar to the iRobot FirstLook, used by first
+			responders to scout dangerous environments.</p>
 
 		<div class="image-container">
 			<figure>
-				<img src="images/irobot.jpg" alt="iRobot FirstLook" width="800px" loading="lazy"/>
+				<img src="images/irobot.jpg" alt="iRobot FirstLook" width="800px" loading="lazy" />
 				<figcaption>iRobot 110 "FirstLook"</figcaption>
 			</figure>
 		</div>
@@ -43,27 +47,40 @@ skills:
 
 		<h3>Inspiration & Goals</h3>
 
-		<p>I discovered the FirstLook while researching harsh-environment rovers for my robotics team. It amazed me how versatile such a small device could be — compact enough to be thrown by hand, durable enough to survive the landing, with a full array of sensors and communications. I'm also using the project to learn ArduRover for autonomous path planning and navigation.</p>
+		<p>I discovered the FirstLook while researching harsh-environment rovers for my robotics team. It amazed me how
+			versatile such a small device could be — compact enough to be thrown by hand, durable enough to survive the
+			landing, with a full array of sensors and communications. I'm also using the project to learn ArduRover for
+			autonomous path planning and navigation.</p>
 
 		<div class="image-container">
-			<img src="images/IMG_7544.jpg" alt="Component layout sketch" width="300" height="300" style="transform: rotate(-90deg);" loading="lazy"/>
-			<img src="images/IMG_7545.jpg" alt="Component layout sketch 2" width="300" height="300" style="transform: rotate(-90deg);" loading="lazy"/>
+			<img src="images/IMG_7544.jpg" alt="Component layout sketch" width="300" height="300"
+				style="transform: rotate(-90deg);" loading="lazy" />
+			<img src="images/IMG_7545.jpg" alt="Component layout sketch 2" width="300" height="300"
+				style="transform: rotate(-90deg);" loading="lazy" />
 		</div>
 
 		<hr>
 
 		<h3>Design Challenges</h3>
 
-		<p>Creating the layout in SolidWorks was fairly straightforward, though due to the motor sizes I acquired, I had to pursue a peculiar motor placement requiring power transmission via gears or rope. The climbing stilts integration presented interesting challenges — their presence meant I could not use a shaft to retain the front wheels, and the long shaft lengths raise shear stress concerns since the stilts must lift the full rover weight.</p>
-
-		<h3>Current Status</h3>
-
-		<p>The project is currently waiting for stage approval from the Studio and revising the CAD to address the mentioned issues. I'm excited to tackle these challenges and get into hands-on prototyping!</p>
+		<p>Creating the layout in SolidWorks was fairly straightforward, though due to the motor sizes I acquired, I had
+			to pursue a peculiar motor placement requiring power transmission via gears or rope. I eventually decided
+			that
+			both would overcomplicate the system, so I opted to change the motors. The climbing stilts
+			integration presented interesting challenges — their presence meant I could not use a shaft to retain the
+			front wheels, and the long shaft lengths raise shear stress concerns since the stilts must lift the full
+			rover weight.</p>
 
 		<div class="image-container">
-			<img src="images/rover_1.png" alt="Rover CAD render" width="500" loading="lazy"/>
-			<img src="images/rovercad.png" alt="Rover CAD model" width="500" loading="lazy"/>
+			<img src="images/rover_1.png" alt="Rover CAD render" width="500" loading="lazy" />
+			<img src="images/rovercad.png" alt="Rover CAD model" width="500" loading="lazy" />
 		</div>
+
+		<h3>Results</h3>
+		<p>The project has been completed, more details on the following website: <a
+				href="https://www.behance.net/gallery/242445025/Mr-Toad-Maker-Grant-Invention-Studio">https://www.behance.net/gallery/242445025/Mr-Toad-Maker-Grant-Invention-Studio</a>
+		</p>
+
 
 	</div>
 </section>

@@ -2,22 +2,16 @@
 layout: default
 title: Typhoon Brushless Gimbal Controller
 hero_image: /images/typhoonbgc.png
-date_completed: "Ongoing"
+date_completed: "February 2026"
 skills:
-  - name: "KiCAD"
-    level: 5
-  - name: "Embedded C"
-    level: 4
-  - name: "PCB Fabrication"
-    level: 4
-  - name: "JLCPCB"
-    level: 3
-  - name: "Brushless Motor Control"
-    level: 5
-  - name: "L6234 Driver"
-    level: 5
-  - name: "ATMega328"
-    level: 4
+- name: "Altium Designer"
+level: 5
+- name: "Arduino"
+level: 4
+- name: "PCB Fabrication"
+level: 4
+- name: "Brushless Motor Control"
+level: 4
 ---
 <section id="top" class="one dark cover">
 	<div class="container">
@@ -32,13 +26,17 @@ skills:
 <section id="about" class="three">
 	<div class="container">
 
-		<header><h2>Overview</h2></header>
+		<header>
+			<h2>Overview</h2>
+		</header>
 
-		<p>I started this project to address a need in small UAV prototyping — a compact, low-cost brushless motor controller designed specifically for camera gimbals. Existing solutions were either too expensive and oversized (ODrive, Moteus) or plagued with software issues (STorM32).</p>
+		<p>I started this project to address a need in small UAV prototyping — a compact, low-cost brushless motor
+			controller designed specifically for camera gimbals. Existing solutions were either too expensive and
+			oversized (ODrive, Moteus) or plagued with software issues (STorM32).</p>
 
 		<div class="image-container">
 			<figure>
-				<img src="images/storm.jpg" alt="STorM32 Board" width="800px" loading="lazy"/>
+				<img src="images/storm.jpg" alt="STorM32 Board" width="800px" loading="lazy" />
 				<figcaption>STorM32 Board — the existing solution I wanted to improve upon</figcaption>
 			</figure>
 		</div>
@@ -47,34 +45,52 @@ skills:
 
 		<h3>V1 — Teensy + L6234</h3>
 
-		<p>I began by researching brushless control principles and studying the open-source schematics of the STorM32, ODrive, and Moteus. My first board tested the L6234 motor driver chip with a Teensy generating control signals. I designed the schematic following the datasheet and had the board fabricated by JLCPCB.</p>
+		<p>I began by researching brushless control principles and studying the open-source schematics of the STorM32,
+			ODrive, and Moteus. My first board tested the L6234 motor driver chip with a Teensy generating control
+			signals. I designed the schematic following the datasheet and had the board fabricated by JLCPCB.</p>
 
 		<div class="image-container">
-			<img src="images/l2634_sch.png" alt="L6234 schematic" width="600px" loading="lazy"/>
-			<img src="images/teensy_2d.png" alt="Teensy board layout" width="600px" loading="lazy"/>
-			<img src="images/teensy_driver.png" alt="Teensy driver board" width="600px" loading="lazy"/>
+			<img src="images/l2634_sch.png" alt="L6234 schematic" width="600px" loading="lazy" />
+			<img src="images/teensy_2d.png" alt="Teensy board layout" width="600px" loading="lazy" />
+			<img src="images/teensy_driver.png" alt="Teensy driver board" width="600px" loading="lazy" />
 		</div>
 
 		<hr>
 
 		<h3>Testing & Setback</h3>
 
-		<p>Assembling was difficult without a reflow oven — I hand-soldered each SMD component. I got promising initial results, but before I could proceed, I accidentally shorted my power supply cable through the microcontroller, destroying my only Teensy. I decided to take the success I had and move forward to a fully integrated design.</p>
+		<p>Assembling was difficult without a reflow oven — I hand-soldered each SMD component. I got promising initial
+			results, but before I could proceed, I accidentally shorted my power supply cable through the
+			microcontroller, destroying my only Teensy. I decided to take the success I had and move forward to a fully
+			integrated design.</p>
 
 		<div class="image-container">
-			<img src="images/IMG_7389.jpg" alt="V1 board assembled" width="600px" loading="lazy"/>
+			<img src="images/IMG_7389.jpg" alt="V1 board assembled" width="600px" loading="lazy" />
 		</div>
 
 		<hr>
 
 		<h3>V2 — ATMega328 Integrated</h3>
 
-		<p>My newest iteration integrates an ATMega328PD microcontroller directly on a double-sided PCB alongside the L6234, maximizing compactness. The schematic was informed by work from ElectroNoobs on YouTube for sensorless slow brushless control. I am currently awaiting the boards and excited to assemble and test.</p>
+		<p>My newest iteration integrates an ATMega328PD microcontroller directly on a double-sided PCB alongside the
+			L6234, maximizing compactness. The schematic was informed by work from ElectroNoobs on YouTube for
+			sensorless slow brushless control.</p>
 
 		<div class="image-container">
-			<img src="images/atm_driver.png" alt="ATMega driver schematic" width="600px" loading="lazy"/>
-			<img src="images/atm_driver_2d.png" alt="ATMega driver layout" width="600px" loading="lazy"/>
+			<img src="images/atm_driver.png" alt="ATMega driver schematic" width="600px" loading="lazy" />
+			<img src="images/atm_driver_2d.png" alt="ATMega driver layout" width="600px" loading="lazy" />
 		</div>
 
+
+		<p>Boards were assembled and tested in the Student Competition Center, after some testing and troubleshooting
+			they proved to be effective in velocity and position control of the gimbal brushless motor. The boards are
+			now
+			integrated into EEVi v3. This project was a great success and helped solidify my understanding of PCB
+			design,
+			AVR microcontroller programming, and brushless motor control. </p>
+
+		<div class="image-container">
+			<img src="images/IMG_7873.jpg" alt="New Board" width="600px" loading="lazy" />
+		</div>
 	</div>
 </section>

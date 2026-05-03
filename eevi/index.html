@@ -4,20 +4,14 @@ title: EEVI
 hero_image: /images/robo2.png
 date_completed: "May 2025"
 skills:
-  - name: "ArduPilot"
-    level: 5
-  - name: "Mission Planner"
-    level: 4
-  - name: "OpenHD"
-    level: 4
-  - name: "Raspberry Pi"
-    level: 4
-  - name: "RFD900x Radio"
-    level: 3
-  - name: "PCB Design"
-    level: 2
-  - name: "Carbon Fiber"
-    level: 3
+- name: "ArduPilot"
+level: 5
+- name: "Mission Planner"
+level: 3
+- name: "OpenHD"
+level: 3
+- name: "Raspberry Pi"
+level: 4
 ---
 <section id="top" class="one dark cover">
 	<div class="container">
@@ -32,30 +26,41 @@ skills:
 <section id="about" class="three">
 	<div class="container">
 
-		<header><h2>URC 2025</h2></header>
+		<header>
+			<h2>URC 2025</h2>
+		</header>
 
-		<img src="/images/IMG_2836.jpg" alt="EEVI drone at URC" width="1000" loading="lazy"/>
+		<img src="/images/IMG_2836.jpg" alt="EEVI drone at URC" width="1000" loading="lazy" />
 
-		<p>As Drone Lead, I overhauled our entire system from scratch, focusing on maintaining communications since that was our point of failure in 2024. I rebuilt the frame using scrapped carbon fiber components from a Tarot frame integrated with a custom 3D-printed shell.</p>
+		<p>As Drone Lead, I overhauled our entire system from scratch, focusing on maintaining communications since that
+			was our point of failure in 2024. I rebuilt the frame using scrapped carbon fiber components from a Tarot
+			frame integrated with a custom 3D-printed shell.</p>
 
 		<hr>
 
 		<h3>Communications System</h3>
 
-		<p>To solve the HAB operational range issue, I designed and built a tracking antenna using an Intel NUC to receive telemetry and video and relay it into the ground station. For telemetry I used RFD900x radios. For high-quality aerial video, I switched from analog to digital using OpenHD with a Raspberry Pi 4, Arducam camera, and ASUS AC56 WiFi adapter powered directly from the PDB.</p>
+		<p>To solve the HAB operational range issue, I designed and built a tracking antenna using an Intel NUC to
+			receive telemetry and video and relay it into the ground station. For telemetry I used RFD900x radios. For
+			high-quality aerial video, I switched from analog to digital using OpenHD with a Raspberry Pi 4, Arducam
+			camera, and ASUS AC56 WiFi adapter powered directly from the PDB.</p>
 
 		<div class="image-container">
-			<img src="/images/robo1.png" width="600px" alt="EEVI system diagram" loading="lazy"/>
+			<img src="/images/robo1.png" width="600px" alt="EEVI system diagram" loading="lazy" />
 		</div>
 
 		<hr>
 
 		<h3>Competition Results</h3>
 
-		<p>EEVI had a successful autonomous takeoff and began a stable flight towards the target. Unfortunately, GPS terrain data was not properly implemented and EEVI collided with a hill between the ground station and target. Despite the crash, the video feed remained stable with only half a second of latency, and all electronics were fully intact. Looking forward, I want to include more distance sensor integration and rework the frame design.</p>
+		<p>EEVI had a successful autonomous takeoff and began a stable flight towards the target. Unfortunately, GPS
+			terrain data was not properly implemented and EEVI collided with a hill between the ground station and
+			target. Despite the crash, the video feed remained stable with only half a second of latency, and all
+			electronics were fully intact. Looking forward, I want to include more distance sensor integration and
+			rework the frame design.</p>
 
 		<div class="image-container">
-			<img src="/images/robo3.png" width="800px" alt="EEVI flight path" loading="lazy"/>
+			<img src="/images/robo3.png" width="800px" alt="EEVI flight path" loading="lazy" />
 			<video width="800" controls="controls">
 				<source src="/media/robo.mp4" type="video/mp4">
 			</video>
@@ -63,37 +68,46 @@ skills:
 
 		<hr>
 
-		<header><h2>URC 2024</h2></header>
+		<header>
+			<h2>URC 2024</h2>
+		</header>
 
 		<div class="image-container">
-			<img src="images/IMG_6048.jpg" alt="URC 2024 team" width="500" loading="lazy"/>
-			<img src="images/IMG_6415.jpg" alt="URC 2024 field" width="500" loading="lazy"/>
+			<img src="images/IMG_6048.jpg" alt="URC 2024 team" width="500" loading="lazy" />
+			<img src="images/IMG_6415.jpg" alt="URC 2024 field" width="500" loading="lazy" />
 		</div>
 
 		<h3>Building the First Drone</h3>
 
-		<p>As part of the RoboNav team at RoboJackets, we competed at the University Rover Challenge in Utah. The drone subteam consisted of just me and one other member. We were given parts from a broken drone from old members and set out to build something capable of assisting the rover.</p>
+		<p>As part of the RoboNav team at RoboJackets, we competed at the University Rover Challenge in Utah. The drone
+			subteam consisted of just me and one other member. We were given parts from a broken drone from old members
+			and set out to build something capable of assisting the rover.</p>
 
 		<div class="image-container">
-			<img src="images/IMG_6074.jpg" alt="EEVI v1 build" width="500" loading="lazy"/>
-			<img src="images/IMG_6075.jpg" alt="EEVI v1 electronics" width="500" loading="lazy"/>
+			<img src="images/IMG_6074.jpg" alt="EEVI v1 build" width="500" loading="lazy" />
+			<img src="images/IMG_6075.jpg" alt="EEVI v1 electronics" width="500" loading="lazy" />
 		</div>
 
 		<hr>
 
 		<h3>Technical Approach</h3>
 
-		<p>The heart was a Pixhawk running ArduPilot. We integrated an end effector for transporting hand-tools, allowing the rover to focus on larger tasks. I handled the electrical and software integration, using a custom PCB from a different project to supply power and PWM to the servos.</p>
+		<p>The heart was a Pixhawk running ArduPilot. We integrated an end effector for transporting hand-tools,
+			allowing the rover to focus on larger tasks. I handled the electrical and software integration, using a
+			custom PCB from a different project to supply power and PWM to the servos.</p>
 
 		<div class="image-container">
-			<img src="images/IMG_6374.jpg" alt="EEVI v1 completed" width="800px" loading="lazy"/>
+			<img src="images/IMG_6374.jpg" alt="EEVI v1 completed" width="800px" loading="lazy" />
 		</div>
 
 		<hr>
 
 		<h3>Lessons Learned</h3>
 
-		<p>Shortly before competition, we realized our telemetry range was too limited. I mounted the receiver on the rover itself and relayed data through its more reliable communications. Unfortunately, a faulty wire connection at competition prevented video, but we were proud of what we accomplished and excited for version 2.</p>
+		<p>Shortly before competition, we realized our telemetry range was too limited. I mounted the receiver on the
+			rover itself and relayed data through its more reliable communications. Unfortunately, a faulty wire
+			connection at competition prevented video, but we were proud of what we accomplished and excited for version
+			2.</p>
 
 	</div>
 </section>
