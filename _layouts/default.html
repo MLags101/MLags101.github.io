@@ -180,24 +180,57 @@
 					// Hero slideshow
 					var slideshow = document.querySelector('.hero-slideshow');
 					if (slideshow) {
-						var slides = slideshow.querySelectorAll('.hero-slide');
-						var current = 0;
+						var slides = Array.from(slideshow.querySelectorAll('.hero-slide'));
 						if (slides.length > 1) {
-							setInterval(function() {
+							// Shuffle slides in DOM
+							for (var i = slides.length - 1; i > 0; i--) {
+								var j = Math.floor(Math.random() * (i + 1));
+								slideshow.appendChild(slides[j]);
+							}
+							
+							// Refresh slides array after shuffle
+							slides = Array.from(slideshow.querySelectorAll('.hero-slide'));
+							var current = 0;
+							
+							// Reset active states
+							slides.forEach(function(s) { s.classList.remove('active'); });
+							slides[0].classList.add('active');
+
+							function nextSlide() {
 								var prev = slides[current];
 								var prevVid = prev.querySelector('video');
 								if (prevVid) prevVid.pause();
 								prev.classList.remove('active');
+
 								current = (current + 1) % slides.length;
 								var next = slides[current];
 								next.classList.add('active');
+
 								var nextVid = next.querySelector('video');
-								if (nextVid) { nextVid.currentTime = 0; nextVid.play(); }
-							}, 5000);
+								var delay = 5000; // Default delay for images (5s)
+
+								if (nextVid) {
+									nextVid.currentTime = 0;
+									nextVid.play();
+									delay = 12000; // Longer delay for videos (12s)
+								}
+
+								setTimeout(nextSlide, delay);
+							}
+
+							// Initial playback for the first slide
+							var firstVid = slides[0].querySelector('video');
+							var initialDelay = 5000;
+							if (firstVid) {
+								firstVid.play();
+								initialDelay = 12000;
+							}
+							setTimeout(nextSlide, initialDelay);
+						} else if (slides.length === 1) {
+							// Auto-play if there's only one slide and it's a video
+							var onlyVid = slides[0].querySelector('video');
+							if (onlyVid) onlyVid.play();
 						}
-						// Auto-play first video if present
-						var firstVid = slides[0] && slides[0].querySelector('video');
-						if (firstVid) firstVid.play();
 					}
 
 					// Welcome box collapse/expand
