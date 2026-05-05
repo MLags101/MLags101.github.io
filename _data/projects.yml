@@ -1,0 +1,204 @@
+- title: "Kermit V3"
+  url: "https://www.behance.net/gallery/248209671/Kermit-V3-Invention-Studio"
+  image: "/images/IMG_8094.jpg"
+  alt: "Kermit V3 quadcopter"
+  date_completed: "April 2026"
+  importance: 9
+  card_size: "featured"
+  external: true
+  skills:
+    - name: "SolidWorks"
+      level: 5
+    - name: "ArduPilot"
+      level: 3
+    - name: "3D Printing"
+      level: 4
+
+- title: "Kermit V2"
+  url: "https://www.behance.net/gallery/227630087/Kermit-V2-Maker-Grant-Invention-Studio"
+  image: "/images/IMG_7406.jpg"
+  alt: "Kermit V2 quadcopter"
+  date_completed: "June 2025"
+  importance: 9
+  card_size: "wide"
+  external: true
+  skills:
+    - name: "SolidWorks"
+      level: 5
+    - name: "ArduPilot"
+      level: 3
+    - name: "3D Printing"
+      level: 4
+
+- title: "RoboJackets URC Drone"
+  url: "/eevi/"
+  image: "/images/robo2.png"
+  alt: "URC Drone"
+  date_completed: "May 2025"
+  importance: 9
+  card_size: "large"
+  skills:
+    - name: "ArduPilot"
+      level: 5
+    - name: "OpenHD"
+      level: 4
+    - name: "ROS2"
+      level: 3
+
+- title: "DUM-I(S)"
+  url: "https://www.behance.net/gallery/221851771/DUM-I-Maker-Grant-Invention-Studio"
+  image: "/images/main.png"
+  alt: "DUM-I robot arm"
+  date_completed: "March 2025"
+  importance: 8
+  card_size: "medium"
+  external: true
+  skills:
+    - name: "SolidWorks"
+      level: 5
+    - name: "Arduino"
+      level: 4
+    - name: "3D Printing"
+      level: 4
+
+- title: "Kermit (QuadFrog)"
+  url: "/Quadfrog/"
+  image: "/Quadfrog/images/IMG_6257.jpg"
+  alt: "QuadFrog drone"
+  date_completed: "May 2023"
+  importance: 8
+  card_size: "large"
+  skills:
+    - name: "Fusion 360"
+      level: 5
+    - name: "Python"
+      level: 4
+    - name: "Raspberry Pi"
+      level: 4
+
+- title: "Mr Toad"
+  url: "/MrToad/"
+  image: "/images/rover2.jpg"
+  alt: "Mr Toad Rover"
+  date_completed: "January 2026"
+  importance: 7
+  card_size: "large"
+  skills:
+    - name: "SolidWorks"
+      level: 5
+    - name: "ROS2"
+      level: 4
+    - name: "Python"
+      level: 4
+    - name: "Electronics"
+      level: 3
+
+- title: "AE 3030 Plane"
+  url: "/Marlin/"
+  image: "/Marlin/images/IMG_6210.jpg"
+  alt: "Marlin RC plane"
+  date_completed: "December 2024"
+  importance: 7
+  card_size: "large"
+  skills:
+    - name: "SolidWorks"
+      level: 5
+    - name: "KiCAD"
+      level: 4
+    - name: "Arduino"
+      level: 4
+    - name: "PCB Milling"
+      level: 3
+
+- title: "Robin"
+  url: "/robin/"
+  image: "/robin/images/IMG_6511.jpg"
+  alt: "Robin drone"
+  date_completed: "August 2024"
+  importance: 6
+  card_size: "standard"
+  skills:
+    - name: "BetaFlight"
+      level: 4
+    - name: "Fusion 360"
+      level: 5
+
+- title: "STM Remote"
+  url: "/STMRemote/"
+  image: "/images/stmremote.png"
+  alt: "STM Remote PCB"
+  date_completed: "April 2024"
+  importance: 6
+  card_size: "compact"
+  skills:
+    - name: "KiCAD"
+      level: 5
+    - name: "STM32"
+      level: 5
+    - name: "Embedded C"
+      level: 4
+
+- title: "Typhoon Gimbal Controller"
+  url: "/TyphoonBGC/"
+  image: "/images/typhoonbgc.png"
+  alt: "Typhoon gimbal controller"
+  date_completed: "February 2026"
+  importance: 5
+  card_size: "medium"
+  skills:
+    - name: "Altium"
+      level: 5
+    - name: "Arduino"
+      level: 4
+
+- title: "Custom Remote"
+  url: "/Remote/"
+  image: "/Remote/images/IMG_6510.jpg"
+  alt: "Custom RF remote"
+  date_completed: "March 2024"
+  importance: 5
+  card_size: "standard"
+  skills:
+    - name: "KiCAD"
+      level: 5
+    - name: "PCB Milling"
+      level: 5
+    - name: "RF Comms"
+      level: 4
+
+- title: "Electronics Box"
+  url: "/electronicsbox/"
+  image: "/electronicsbox/images/Image.jpg"
+  alt: "Electronics lockbox"
+  date_completed: "November 2023"
+  importance: 5
+  card_size: "compact"
+  skills:
+    - name: "Arduino"
+      level: 5
+    - name: "RFID"
+      level: 3
+
+- title: "Space Shuttle Model"
+  url: "/Shuttle_Model/"
+  image: "/Shuttle_Model/images/IMG_5869.jpg"
+  alt: "Space shuttle model"
+  date_completed: "April 2023"
+  importance: 3
+  card_size: "small"
+  skills:
+    - name: "SolidWorks"
+      level: 5
+
+- title: "AE 1601 Glider"
+  url: "/Glider/"
+  image: "/Glider/images/IMG_4780.jpg"
+  alt: "AE 1601 Glider"
+  date_completed: "December 2022"
+  importance: 3
+  card_size: "compact"
+  skills:
+    - name: "Laser Cutting"
+      level: 4
+    - name: "CAD"
+      level: 2

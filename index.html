@@ -68,243 +68,62 @@ title: Michael Lagana's Portfolio
 			<h2>My Projects</h2>
 		</header>
 
+		{% assign importance_levels = "10,9,8,7,6,5,4,3,2,1" | split: "," %}
 		<div class="project-grid">
-
-			<!-- Kermit V3 — Importance: 9 -->
-			<article class="item item-xxl">
-				<a href="https://www.behance.net/gallery/248209671/Kermit-V3-Invention-Studio" class="image fit"><img
-						src="/images/IMG_8094.jpg" alt="Kermit V3 quadcopter" loading="lazy" /></a>
-				<header>
-					<h3>Kermit V3</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> April 2026</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">SolidWorks</span>
-						<span class="skill-tag" data-rating="3">ArduPilot</span>
-						<span class="skill-tag" data-rating="4">3D Printing</span>
-
+			{% for importance_level in importance_levels %}
+				{% assign level = importance_level | plus: 0 %}
+				{% assign projects_at_level = site.data.projects | where: "importance", level %}
+				{% for project in projects_at_level %}
+				{% assign card_size = project.card_size | default: "" %}
+				{% assign size_class = "" %}
+				{% case card_size %}
+					{% when "featured" %}
+						{% assign size_class = " item-xxl" %}
+					{% when "wide" %}
+						{% assign size_class = " item-xl" %}
+					{% when "large" %}
+						{% assign size_class = " item-lg" %}
+					{% when "medium" %}
+						{% assign size_class = " item-md" %}
+					{% when "small" %}
+						{% assign size_class = " item-sm" %}
+					{% when "compact" %}
+						{% assign size_class = " item-xs" %}
+					{% when "standard" %}
+						{% assign size_class = "" %}
+					{% else %}
+						{% if project.importance >= 9 %}
+							{% assign size_class = " item-xl" %}
+						{% elsif project.importance >= 7 %}
+							{% assign size_class = " item-lg" %}
+						{% elsif project.importance >= 5 %}
+							{% assign size_class = " item-md" %}
+						{% elsif project.importance <= 3 %}
+							{% assign size_class = " item-xs" %}
+						{% endif %}
+				{% endcase %}
+				<article class="item{{ size_class }}">
+					<a href="{% if project.external %}{{ project.url }}{% else %}{{ project.url | relative_url }}{% endif %}" class="image fit"{% if project.external %} target="_blank" rel="noopener"{% endif %}>
+						<img src="{{ project.image | relative_url }}" alt="{{ project.alt | escape }}" loading="lazy" />
+					</a>
+					<header>
+						<h3>{{ project.title | escape }}</h3>
+					</header>
+					<div class="item-skills">
+						{% if project.date_completed %}
+						<span class="item-date"><span class="icon solid fa-calendar"></span> {{ project.date_completed }}</span>
+						{% endif %}
+						{% if project.skills %}
+						<div class="item-skills-list">
+							{% for skill in project.skills %}
+							<span class="skill-tag" data-rating="{{ skill.level | default: 1 }}">{{ skill.name }}</span>
+							{% endfor %}
+						</div>
+						{% endif %}
 					</div>
-				</div>
-			</article>
-
-			<!-- Kermit V2 — Importance: 9 -->
-			<article class="item item-xl">
-				<a href="https://www.behance.net/gallery/227630087/Kermit-V2-Maker-Grant-Invention-Studio"
-					class="image fit"><img src="/images/IMG_7406.jpg" alt="Kermit V2 quadcopter" loading="lazy" /></a>
-				<header>
-					<h3>Kermit V2</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> June 2025</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">SolidWorks</span>
-						<span class="skill-tag" data-rating="3">ArduPilot</span>
-						<span class="skill-tag" data-rating="4">3D Printing</span>
-
-					</div>
-				</div>
-			</article>
-
-			<!-- URC Drone — Importance: 9 -->
-			<article class="item item-lg">
-				<a href="/eevi/" class="image fit"><img src="/images/robo2.png" alt="URC Drone" loading="lazy" /></a>
-				<header>
-					<h3>RoboJackets URC Drone</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> May 2025</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">ArduPilot</span>
-						<span class="skill-tag" data-rating="4">OpenHD</span>
-						<span class="skill-tag" data-rating="3">ROS2</span>
-					</div>
-				</div>
-			</article>
-
-			<!-- DUM-I(S) — Importance: 8 -->
-			<article class="item item-md">
-				<a href="https://www.behance.net/gallery/221851771/DUM-I-Maker-Grant-Invention-Studio"
-					class="image fit"><img src="/images/main.png" alt="DUM-I robot arm" loading="lazy" /></a>
-				<header>
-					<h3>DUM-I(S)</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> March 2025</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">SolidWorks</span>
-						<span class="skill-tag" data-rating="4">Arduino</span>
-						<span class="skill-tag" data-rating="4">3D Printing</span>
-					</div>
-				</div>
-			</article>
-
-			<!-- QuadFrog — Importance: 8 -->
-			<article class="item item-lg">
-				<a href="/Quadfrog/" class="image fit"><img src="/Quadfrog/images/IMG_6257.jpg" alt="QuadFrog drone"
-						loading="lazy" /></a>
-				<header>
-					<h3>Kermit (QuadFrog)</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> May 2023</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">Fusion 360</span>
-						<span class="skill-tag" data-rating="4">Python</span>
-						<span class="skill-tag" data-rating="4">Raspberry Pi</span>
-					</div>
-				</div>
-			</article>
-
-			<!-- Mr Toad — Importance: 7 -->
-			<article class="item item-lg">
-				<a href="/MrToad/" class="image fit"><img src="/images/rover2.jpg" alt="Mr Toad Rover"
-						loading="lazy" /></a>
-				<header>
-					<h3>Mr Toad</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> January 2026</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">SolidWorks</span>
-						<span class="skill-tag" data-rating="4">ROS2</span>
-						<span class="skill-tag" data-rating="4">Python</span>
-						<span class="skill-tag" data-rating="3">Electronics</span>
-					</div>
-				</div>
-			</article>
-
-			<!-- Marlin/Nemo — Importance: 7 -->
-			<article class="item item-lg">
-				<a href="/Marlin/" class="image fit"><img src="/Marlin/images/IMG_6210.jpg" alt="Marlin RC plane"
-						loading="lazy" /></a>
-				<header>
-					<h3>AE 3030 Plane</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> December 2024</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">SolidWorks</span>
-						<span class="skill-tag" data-rating="4">KiCAD</span>
-						<span class="skill-tag" data-rating="4">Arduino</span>
-						<span class="skill-tag" data-rating="3">PCB Milling</span>
-					</div>
-				</div>
-			</article>
-
-			<!-- Robin — Importance: 6 -->
-			<article class="item item">
-				<a href="/robin/" class="image fit"><img src="/robin/images/IMG_6511.jpg" alt="Robin drone"
-						loading="lazy" /></a>
-				<header>
-					<h3>Robin</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> August 2024</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="4">BetaFlight</span>
-						<span class="skill-tag" data-rating="5">Fusion 360</span>
-					</div>
-				</div>
-			</article>
-
-			<!-- STM Remote — Importance: 6 -->
-			<article class="item item-xs">
-				<a href="/STMRemote/" class="image fit"><img src="/images/stmremote.png" alt="STM Remote PCB"
-						loading="lazy" /></a>
-				<header>
-					<h3>STM Remote</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> April 2024</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">KiCAD</span>
-						<span class="skill-tag" data-rating="5">STM32</span>
-						<span class="skill-tag" data-rating="4">Embedded C</span>
-					</div>
-				</div>
-			</article>
-
-			<!-- Typhoon BGC — Importance: 5 -->
-			<article class="item item-md">
-				<a href="/TyphoonBGC/" class="image fit"><img src="/images/typhoonbgc.png"
-						alt="Typhoon gimbal controller" loading="lazy" /></a>
-				<header>
-					<h3>Typhoon Gimbal Controller</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> Feburary 2026</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">Altium</span>
-						<span class="skill-tag" data-rating="4">Arduino</span>
-					</div>
-				</div>
-			</article>
-
-			<!-- Custom Remote — Importance: 5 -->
-			<article class="item">
-				<a href="/Remote/" class="image fit"><img src="/Remote/images/IMG_6510.jpg" alt="Custom RF remote"
-						loading="lazy" /></a>
-				<header>
-					<h3>Custom Remote</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> March 2024</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">KiCAD</span>
-						<span class="skill-tag" data-rating="5">PCB Milling</span>
-						<span class="skill-tag" data-rating="4">RF Comms</span>
-					</div>
-				</div>
-			</article>
-
-			<!-- Electronics Box — Importance: 5 -->
-			<article class="item item-xs">
-				<a href="/electronicsbox/" class="image fit"><img src="/electronicsbox/images/Image.jpg"
-						alt="Electronics lockbox" loading="lazy" /></a>
-				<header>
-					<h3>Electronics Box</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> November 2023</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">Arduino</span>
-						<span class="skill-tag" data-rating="3">RFID</span>
-					</div>
-				</div>
-			</article>
-
-			<!-- Shuttle Model — Importance: 3 -->
-			<article class="item item-sm">
-				<a href="/Shuttle_Model/" class="image fit"><img src="/Shuttle_Model/images/IMG_5869.jpg"
-						alt="Space shuttle model" loading="lazy" /></a>
-				<header>
-					<h3>Space Shuttle Model</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> April 2023</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="5">SolidWorks</span>
-					</div>
-				</div>
-			</article>
-
-			<!-- Glider — Importance: 3 -->
-			<article class="item item-xs">
-				<a href="/Glider/" class="image fit"><img src="/Glider/images/IMG_4780.jpg" alt="AE 1601 Glider"
-						loading="lazy" /></a>
-				<header>
-					<h3>AE 1601 Glider</h3>
-				</header>
-				<div class="item-skills">
-					<span class="item-date"><span class="icon solid fa-calendar"></span> December 2022</span>
-					<div class="item-skills-list">
-						<span class="skill-tag" data-rating="4">Laser Cutting</span>
-						<span class="skill-tag" data-rating="2">CAD</span>
-					</div>
-				</div>
-			</article>
-
+				</article>
+				{% endfor %}
+			{% endfor %}
 		</div>
 
 	</div>
