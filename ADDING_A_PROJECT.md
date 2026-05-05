@@ -76,21 +76,24 @@ skills:
 - `skills:` — A YAML list of objects with `name` and `level` (1–5). These render as tags with significance dots at the bottom of the project page. Indent each `level` under its `- name`, as in the example above.
 
 ## Step 3: Add the Project to the Main Page
-To make sure people can actually navigate to your new project, you must add a link to it on your homepage (`index.html` in the root folder).
+The homepage project grid is generated from `_data/projects.yml`. To add a project card, add a new entry to that file instead of editing `index.html`.
 
-1. Open the main `index.html` file.
-2. Scroll down to the `<section id="portfolio" class="two">` section.
-3. Find the column (`<div class="col-6 col-12-mobile">`) where you want the new project to appear.
-4. Add the following HTML snippet, adjusting the `href`, image `src`, and `<h3>` text:
-
-```html
-<article class="item">
-    <a href="/MyNewProject/" class="image fit"><img src="/MyNewProject/images/cover_image.jpg" alt="" loading="lazy"/></a>
-    <header>
-        <h3>Your Project Title Here</h3>
-    </header>
-</article>
+```yaml
+- title: "Your Project Title Here"
+  url: "/MyNewProject/"
+  image: "/MyNewProject/images/cover_image.jpg"
+  alt: "Short image description"
+  date_completed: "Month Year"
+  importance: 7
+  card_size: "large"
+  skills:
+    - name: "SolidWorks"
+      level: 5
+    - name: "Python"
+      level: 4
 ```
+
+Homepage projects are sorted by `importance` from highest to lowest; use a value from 1 to 10. Use `card_size` when you want to override the automatic importance-based sizing. Supported values are `featured`, `wide`, `large`, `medium`, `small`, `compact`, and `standard`. For external project links, add `external: true`.
 
 ## Step 4: Push to GitHub!
 Once you commit and push your changes to GitHub, GitHub Pages will automatically wrap your project's content inside the main layout (adding the sidebar and footer) and publish it live!

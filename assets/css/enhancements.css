@@ -884,6 +884,7 @@ model-viewer {
 		grid-template-columns: repeat(2, 1fr);
 	}
 
+	.item-xxl,
 	.item-xl {
 		grid-column: span 2;
 	}
@@ -913,10 +914,12 @@ model-viewer {
 		grid-template-columns: 1fr;
 	}
 
+	.item-xxl,
 	.item-xl {
 		grid-column: span 1;
 	}
 
+	.item-xxl .image.fit img,
 	.item-xl .image.fit img,
 	.item-lg .image.fit img {
 		height: 220px;
