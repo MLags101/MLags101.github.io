@@ -1,0 +1,20 @@
+{
+ "generated": "2026-10-01T21:25:32.077Z",
+ "motions": [
+  {
+   "id": "explode",
+   "type": "explode",
+   "animation": "motion:explode",
+   "config": "73fd985d",
+   "moved": 3,
+   "parts": 4,
+   "seconds": 1.6,
+   "center": [
+    -0.0025,
+    -0.0003,
+    0.0188
+   ],
+   "extent": 0.0863
+  }
+ ]
+}

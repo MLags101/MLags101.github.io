@@ -27,3 +27,13 @@ appearance:
   defaultColor: '#e9e7e2'
   parts:
     - { match: ['*'], color: '#e9e7e2', roughness: 0.75 }
+
+# Predefined motions, baked into the GLB: npm run model:motions -- shuttle-model
+motions:
+  - id: explode
+    type: explode
+    label: Exploded view
+    mode: planar          # spread sideways only (no vertical travel)
+    axis: +y
+    distance: 1.6
+    fixed: ['*ExternalTank*']   # the tank stays put; orbiter and boosters move off it

@@ -3,8 +3,26 @@
 urdf: /robots/dum-i/dum-i.urdf
 alt: DUM-I(S) robot arm with a stacked base, two-link arm and a gimbaled lidar head
 up: +z
+# Joint values in radians. Joints: main_yaw (±180°), bicep (-125°…100°), forearm (±120°),
+# wrist (-15°…115°), gimbal (±180°), optic (±180°).
 poses:
   - { id: home, label: Home, joints: { main_yaw_link_joint: 0, bicep_link_joint: 0, forearm_link_joint: 0, wrist_link_joint: 0, gimbal_link_joint: 0, optic_link_joint: 0 } }
+  - { id: reach, label: Reach, joints: { main_yaw_link_joint: 0.5, bicep_link_joint: 0.35, forearm_link_joint: -0.5, wrist_link_joint: 0.6, gimbal_link_joint: 0, optic_link_joint: 0 } }
+  - { id: scan-left, label: Scan left, joints: { main_yaw_link_joint: 1.3, bicep_link_joint: 0.1, forearm_link_joint: -0.3, wrist_link_joint: 0.9, gimbal_link_joint: 0.7, optic_link_joint: 0.3 } }
+  - { id: scan-right, label: Scan right, joints: { main_yaw_link_joint: -0.5, bicep_link_joint: 0.1, forearm_link_joint: -0.3, wrist_link_joint: 0.9, gimbal_link_joint: -0.7, optic_link_joint: -0.3 } }
+  - { id: stow, label: Stow, joints: { main_yaw_link_joint: 0, bicep_link_joint: -1.6, forearm_link_joint: 1.8, wrist_link_joint: 1.6, gimbal_link_joint: 0, optic_link_joint: 0 } }
+
+# Predefined motions (buttons above the poses). The first with autoplay starts on its own.
+motions:
+  - { id: demo, type: sequence, label: Demo, poses: [home, reach, scan-left, scan-right, stow, home], seconds: 1.6, hold: 0.4, loop: true, autoplay: true }
+  - { id: fold, type: sequence, label: Fold to stow, poses: [home, stow], seconds: 1.8, hold: 0, loop: false }
+  - id: explode
+    type: explode
+    label: Exploded view
+    mode: axis        # the base is a stack of cylinders, so spread the links vertically
+    axis: +z          # URDF up
+    anchor: min       # the base plate stays on the table
+    distance: 0.9
 
 # Colors per link, baked in by `npm run robot:import` (matched to the built arm).
 appearance:

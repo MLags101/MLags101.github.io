@@ -1,14 +1,17 @@
 ---
 /**
- * Articulated robot from a URDF — orbit it, drag joint sliders, and play named poses.
- * Data: src/data/robots/<id>.yaml · files: public/robots/<id>/ (urdf/ + meshes/).
+ * Articulated robot from a URDF — orbit it, drag joint sliders, jump to named poses, and
+ * play predefined motions (src/data/robots/<id>.yaml → motions:):
+ *   sequence  eases through poses in order (once or looping) — demos, folding
+ *   explode   pulls the links apart (radial / along an axis / outward in a plane) and back
+ *   path      drives the whole robot along a figure 8 or circle, spinning wheel joints
  *
  *   <RobotViewer id="dum-i" caption="…" />
  *
  * Built on three.js + urdf-loader, lazy-loaded when the viewer scrolls into view (nothing
- * downloads on pages without one). Meshes can be STL / DAE (what the SolidWorks URDF
- * exporter writes) or GLB. Respects prefers-reduced-motion: poses jump instead of easing,
- * and sequences don't autoplay. Guide: docs/3D-MODELS.md → "Robots (URDF)".
+ * downloads on pages without one). Meshes: GLB (npm run robot:import), STL or DAE.
+ * Reduced motion: poses jump instead of easing and nothing autoplays.
+ * Motion math is shared with the GLB baker: src/lib/motion.ts. Guide: docs/3D-MODELS.md.
  */
 import '../../styles/parts.css';
 import { getEntry } from 'astro:content';
@@ -23,14 +26,19 @@ const { id, caption } = Astro.props;
 const entry = await getEntry('robots', id);
 if (!entry) throw new Error(`<RobotViewer id="${id}">: no src/data/robots/${id}.yaml`);
 const r = entry.data;
+for (const mo of r.motions)
+  if (mo.type === 'sequence')
+    for (const p of mo.poses)
+      if (!r.poses.some((x) => x.id === p)) throw new Error(`src/data/robots/${id}.yaml → motion "${mo.id}": no pose "${p}" in poses:`);
 const config = JSON.stringify({
   urdf: r.urdf,
   packages: r.packages,
   up: r.up,
+  forward: r.forward,
   cameraDistance: r.cameraDistance,
   sliders: r.sliders,
   poses: r.poses,
-  sequence: r.sequence,
+  motions: r.motions,
 });
 ---
 
@@ -41,17 +49,34 @@ const config = JSON.stringify({
       <canvas class="robot__canvas" aria-hidden="true"></canvas>
       <div class="parts__hud">
         <span class="parts__btn" aria-hidden="true"><Icon name="cube" size={14} /> URDF · drag to orbit</span>
-        <button type="button" class="parts__btn" data-play hidden aria-pressed="false">▶ Play sequence</button>
+        <button type="button" class="parts__btn" data-reset disabled><Icon name="reset" size={14} /> Reset</button>
       </div>
       <p class="robot__status label" data-status>Loading robot…</p>
     </div>
 
     <div class="robot__panel">
       {
+        r.motions.length > 0 && (
+          <div class="robot__group" role="group" aria-label="Motions">
+            <p class="label">Motions</p>
+            <div class="robot__btns">
+              {r.motions.map((mo) => (
+                <button type="button" class="parts__btn" data-motion={mo.id} data-kind={mo.type} aria-pressed="false" disabled>
+                  <span class="robot__glyph" aria-hidden="true">
+                    {mo.type === 'explode' ? '⇄' : '▶'}
+                  </span>{' '}
+                  {mo.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )
+      }
+      {
         r.poses.length > 0 && (
-          <div class="robot__poses" role="group" aria-label="Poses">
+          <div class="robot__group" role="group" aria-label="Poses">
             <p class="label">Poses</p>
-            <div class="robot__pose-list">
+            <div class="robot__btns">
               {r.poses.map((p) => (
                 <button type="button" class="parts__btn" data-pose={p.id} aria-pressed="false" disabled>
                   {p.label}
@@ -116,16 +141,26 @@ const config = JSON.stringify({
     gap: var(--s-5);
   }
 
-  .robot__pose-list {
+  .robot__btns {
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-2);
     margin-top: var(--s-3);
   }
 
-  .robot__pose-list [aria-pressed='true'] {
+  .robot__btns [aria-pressed='true'] {
     border-color: var(--accent);
     color: var(--accent);
+  }
+
+  /* Playing sequences/paths show a pause glyph; explode keeps its ⇄. */
+  [data-kind]:not([data-kind='explode'])[aria-pressed='true'] .robot__glyph {
+    font-size: 0;
+  }
+
+  [data-kind]:not([data-kind='explode'])[aria-pressed='true'] .robot__glyph::before {
+    content: '❚❚';
+    font-size: 0.7rem;
   }
 
   .robot__joints :global(label) {
@@ -152,26 +187,28 @@ const config = JSON.stringify({
   .robot__joints > .label {
     margin-bottom: var(--s-1);
   }
-
-  [data-play][aria-pressed='true'] {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
 </style>
 
 <script>
+  import { explodeOffsets, explodeProgress, ease, parseAxis, pathPose, pathCenter, spinAngle, cross, type Vec3, type ExplodeConfig, type PathConfig } from '../../lib/motion';
+
+  type Pose = { id: string; label: string; joints: Record<string, number> };
+  type Motion =
+    | { type: 'sequence'; id: string; label: string; autoplay: boolean; poses: string[]; seconds: number; hold: number; loop: boolean }
+    | ({ type: 'explode'; id: string; label: string; autoplay: boolean; seconds: number } & ExplodeConfig)
+    | ({ type: 'path'; id: string; label: string; autoplay: boolean; seconds: number; spin: { joint?: string; rpm: number }[] } & PathConfig);
   type Config = {
     urdf: string;
     packages: Record<string, string>;
     up: '+z' | '+y';
+    forward: string;
     cameraDistance?: number;
     sliders: boolean;
-    poses: { id: string; label: string; joints: Record<string, number> }[];
-    sequence?: { poses: string[]; seconds: number; hold: number; autoplay: boolean };
+    poses: Pose[];
+    motions: Motion[];
   };
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
   async function mount(root: HTMLElement) {
     const cfg = JSON.parse(root.dataset.config!) as Config;
@@ -179,7 +216,8 @@ const config = JSON.stringify({
     const status = root.querySelector<HTMLElement>('[data-status]')!;
     const jointsEl = root.querySelector<HTMLElement>('[data-joints]');
     const poseBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-pose]')];
-    const playBtn = root.querySelector<HTMLButtonElement>('[data-play]')!;
+    const motionBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-motion]')];
+    const resetBtn = root.querySelector<HTMLButtonElement>('[data-reset]')!;
 
     const [THREE, { OrbitControls }, { GLTFLoader }, { MeshoptDecoder }, { default: URDFLoader }] = await Promise.all([
       import('three'),
@@ -212,8 +250,8 @@ const config = JSON.stringify({
     manager.onError = (url) => console.warn('[robot] failed to load', url);
     const loader = new URDFLoader(manager);
     loader.packages = cfg.packages;
-    // npm run robot:import writes meshopt-compressed GLBs.
-    const gltf = new GLTFLoader(manager).setMeshoptDecoder(MeshoptDecoder); // same manager, so onLoad waits for the meshes
+    // npm run robot:import writes meshopt-compressed GLBs; same manager, so onLoad waits for them.
+    const gltf = new GLTFLoader(manager).setMeshoptDecoder(MeshoptDecoder);
     const defaultLoad = loader.defaultMeshLoader.bind(loader);
     loader.loadMeshCb = (url, manager, material, done) => {
       if (/\.(glb|gltf)$/i.test(url)) gltf.load(url, (g) => done(g.scene), undefined, (e) => done(new THREE.Object3D(), e as Error));
@@ -228,21 +266,32 @@ const config = JSON.stringify({
       throw e;
     }
     if (cfg.up === '+z') robot.rotation.x = -Math.PI / 2;
-    scene.add(robot);
-
-    // Frame the camera once the meshes are in.
+    // The rig carries the robot along paths; the robot itself only gets its upright rotation.
+    const rig = new THREE.Group();
+    rig.add(robot);
+    scene.add(rig);
     await meshesLoaded;
 
+    // ── camera ──
+    robot.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(robot);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
-    const dist = cfg.cameraDistance ?? Math.max(size.x, size.y, size.z) * 2.4;
-    controls.target.copy(center);
-    camera.position.copy(center).add(new THREE.Vector3(dist * 0.75, dist * 0.45, dist * 0.75));
-    controls.update();
+    const modelSize = Math.max(size.x, size.y, size.z);
+    const dist = cfg.cameraDistance ?? modelSize * 2.4;
+    const view = new THREE.Vector3(0.75, 0.45, 0.75).normalize();
+    /** Aim at target from distance d, keeping the visitor's current viewing angle. */
+    const frame = (target: InstanceType<typeof THREE.Vector3>, d: number, dir?: InstanceType<typeof THREE.Vector3>) => {
+      const look = dir ?? camera.position.clone().sub(controls.target).normalize();
+      controls.target.copy(target);
+      camera.position.copy(target).addScaledVector(look, d);
+      controls.update();
+      dirty = true;
+    };
+    let dirty = true;
+    frame(center, dist, view);
 
     // ── render on demand ──
-    let dirty = true;
     const resize = () => {
       const { clientWidth: w, clientHeight: h } = canvas;
       renderer.setSize(w, h, false);
@@ -282,7 +331,7 @@ const config = JSON.stringify({
         input.value = String(j.angle ?? 0);
         out.textContent = fmt(j, Number(input.value));
         input.addEventListener('input', () => {
-          stop();
+          stopAll();
           setJoint(j.name, Number(input.value));
           poseBtns.forEach((b) => b.setAttribute('aria-pressed', 'false'));
         });
@@ -290,50 +339,188 @@ const config = JSON.stringify({
         jointsEl.append(label);
         sliders.set(j.name, { input, out });
       }
+    const restPose = Object.fromEntries(movable.map((j) => [j.name, Number(j.angle ?? 0)]));
 
-    // ── poses & sequence ──
+    // ── poses ──
     let tween: { from: Record<string, number>; to: Record<string, number>; t0: number; dur: number; done?: () => void } | null = null;
     const current = () => Object.fromEntries(movable.map((j) => [j.name, Number(j.angle ?? 0)]));
-    const goTo = (pose: Config['poses'][number], seconds = 1.2) =>
+    const goTo = (joints: Record<string, number>, seconds = 1.2) =>
       new Promise<void>((done) => {
-        poseBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pose === pose.id)));
         if (reduceMotion || seconds <= 0) {
-          for (const [n, v] of Object.entries(pose.joints)) setJoint(n, v);
+          for (const [n, v] of Object.entries(joints)) setJoint(n, v);
           return done();
         }
-        tween = { from: current(), to: pose.joints, t0: performance.now(), dur: seconds * 1000, done };
+        tween = { from: current(), to: joints, t0: performance.now(), dur: seconds * 1000, done };
       });
-    let playing = false;
-    const stop = () => {
-      playing = false;
-      playBtn.setAttribute('aria-pressed', 'false');
-      playBtn.textContent = '▶ Play sequence';
+    const markPose = (id?: string) => poseBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pose === id)));
+
+    // ── motions ──
+    let running: { id: string; stop: () => void } | null = null;
+    const press = (id: string | null) => motionBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.motion === id)));
+    const stopAll = () => {
+      running?.stop();
+      running = null;
+      press(null);
     };
-    const play = async () => {
-      const seq = cfg.sequence!;
-      playing = true;
-      playBtn.setAttribute('aria-pressed', 'true');
-      playBtn.textContent = '❚❚ Pause';
-      for (let i = 0; playing; i = (i + 1) % seq.poses.length) {
-        const pose = cfg.poses.find((p) => p.id === seq.poses[i]);
-        if (!pose) break;
-        await goTo(pose, seq.seconds);
-        await new Promise((r) => setTimeout(r, seq.hold * 1000));
+
+    // Explode: links' visuals slide apart; joints keep their frames, so poses still apply after.
+    type Piece = { obj: InstanceType<typeof THREE.Object3D>; rest: InstanceType<typeof THREE.Vector3>; target: InstanceType<typeof THREE.Vector3>; delay: number };
+    let exploded: { pieces: Piece[]; u: number; stagger: number; center: InstanceType<typeof THREE.Vector3>; dist: number } | null = null;
+    let explodeAnim: { from: number; to: number; t0: number; dur: number; done: () => void } | null = null;
+    const applyExplode = (u: number) => {
+      if (!exploded) return;
+      exploded.u = u;
+      for (const p of exploded.pieces) p.obj.position.lerpVectors(p.rest, p.target, explodeProgress(u, p.delay, exploded.stagger));
+      const k = ease(u);
+      frame(center.clone().lerp(exploded.center, k), dist + (exploded.dist - dist) * k);
+      dirty = true;
+    };
+    const buildExplode = (mo: Extract<Motion, { type: 'explode' }>) => {
+      robot.updateMatrixWorld(true);
+      const links = Object.values(robot.links);
+      const groups = links
+        .map((link) => ({ link, visuals: link.children.filter((c) => (c as { isURDFVisual?: boolean }).isURDFVisual) }))
+        .filter((g) => g.visuals.length);
+      const toUrdf = new THREE.Matrix4().copy(robot.matrixWorld).invert();
+      const parts = groups.map((g) => {
+        const b = new THREE.Box3();
+        g.visuals.forEach((v) => b.expandByObject(v));
+        return { name: g.link.name, center: b.getCenter(new THREE.Vector3()).applyMatrix4(toUrdf).toArray() as Vec3 };
+      });
+      const offs = explodeOffsets(parts, mo, modelSize);
+      const pieces: Piece[] = [];
+      groups.forEach((g, i) => {
+        const off = new THREE.Vector3(...offs[i]!.offset).transformDirection(robot.matrixWorld).multiplyScalar(new THREE.Vector3(...offs[i]!.offset).length());
+        for (const v of g.visuals) {
+          const world = v.getWorldPosition(new THREE.Vector3()).add(off);
+          pieces.push({ obj: v, rest: v.position.clone(), target: v.parent!.worldToLocal(world), delay: offs[i]!.delay });
+        }
+      });
+      // Camera framing for the fully exploded robot, eased in with the explode.
+      pieces.forEach((p) => p.obj.position.copy(p.target));
+      robot.updateMatrixWorld(true);
+      const big = new THREE.Box3().setFromObject(robot);
+      pieces.forEach((p) => p.obj.position.copy(p.rest));
+      robot.updateMatrixWorld(true);
+      const bs = big.getSize(new THREE.Vector3());
+      exploded = { pieces, u: 0, stagger: mo.stagger ?? 0.25, center: big.getCenter(new THREE.Vector3()), dist: Math.max(dist, Math.max(bs.x, bs.y, bs.z) * 2.2) };
+    };
+    const animateExplode = (to: number, seconds: number) =>
+      new Promise<void>((done) => {
+        if (!exploded) return done();
+        if (reduceMotion) {
+          applyExplode(to);
+          return done();
+        }
+        explodeAnim = { from: exploded.u, to, t0: performance.now(), dur: Math.abs(to - exploded.u) * seconds * 1000, done };
+      });
+    const assembleNow = () => {
+      if (!exploded) return;
+      explodeAnim = null;
+      applyExplode(0);
+      exploded = null;
+    };
+
+    // Path: the rig moves; wheel joints spin.
+    let path: { mo: Extract<Motion, { type: 'path' }>; t0: number; frame: { forward: Vec3; right: Vec3; up: Vec3 } } | null = null;
+    const applyPath = (u: number) => {
+      if (!path) return;
+      const pose = pathPose(u, path.mo, path.frame, modelSize);
+      const q = new THREE.Quaternion()
+        .setFromAxisAngle(new THREE.Vector3(...path.frame.up), pose.yaw)
+        .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(...path.frame.forward), pose.roll));
+      rig.quaternion.copy(q);
+      rig.position.copy(center).sub(center.clone().applyQuaternion(q)).add(new THREE.Vector3(...pose.position));
+      for (const s of path.mo.spin) if (s.joint && robot.joints[s.joint]) setJoint(s.joint, spinAngle(u, s.rpm, path.mo.seconds));
+      dirty = true;
+    };
+    const parkRig = () => {
+      rig.position.set(0, 0, 0);
+      rig.quaternion.identity();
+      dirty = true;
+    };
+
+    const runMotion = async (mo: Motion) => {
+      const on = running?.id !== mo.id || mo.type === 'explode';
+      if (mo.type !== 'explode' || running?.id !== mo.id) stopAll();
+      if (!on) return;
+
+      if (mo.type === 'explode') {
+        const out = !exploded || exploded.u < 0.5;
+        if (out) {
+          path = null;
+          parkRig();
+          buildExplode(mo);
+        }
+        running = { id: mo.id, stop: () => assembleNow() };
+        press(mo.id);
+        await animateExplode(out ? 1 : 0, mo.seconds);
+        if (!out) {
+          exploded = null;
+          running = null;
+          press(null);
+        }
+        return;
       }
+
+      assembleNow();
+      press(mo.id);
+      if (mo.type === 'sequence') {
+        let alive = true;
+        running = { id: mo.id, stop: () => ((alive = false), (tween = null)) };
+        const poses = mo.poses.map((p) => cfg.poses.find((x) => x.id === p)!);
+        do {
+          for (const p of poses) {
+            if (!alive) return;
+            markPose(p.id);
+            await goTo(p.joints, mo.seconds);
+            await new Promise((r) => setTimeout(r, mo.hold * 1000));
+          }
+        } while (alive && mo.loop);
+        if (alive) stopAll();
+        return;
+      }
+
+      // path
+      const fwd = new THREE.Vector3(...parseAxis(cfg.forward, [1, 0, 0])).applyQuaternion(robot.quaternion).toArray() as Vec3;
+      const up: Vec3 = [0, 1, 0];
+      path = { mo, t0: performance.now(), frame: { forward: fwd, right: cross(fwd, up), up } };
+      running = {
+        id: mo.id,
+        stop: () => {
+          path = null;
+          parkRig();
+          frame(center, dist);
+        },
+      };
+      // Pull back so the whole path stays in view.
+      const pc = new THREE.Vector3(...pathCenter(mo, path.frame, modelSize)).add(center);
+      frame(pc, dist * (1 + (mo.size ?? 2.5)) * 0.75);
+      if (reduceMotion) applyPath(0);
     };
+
+    motionBtns.forEach((b) => {
+      b.disabled = false;
+      b.addEventListener('click', () => void runMotion(cfg.motions.find((m) => m.id === b.dataset.motion)!));
+    });
     poseBtns.forEach((b) => {
       b.disabled = false;
       b.addEventListener('click', () => {
-        stop();
+        stopAll();
         const p = cfg.poses.find((x) => x.id === b.dataset.pose);
-        if (p) void goTo(p);
+        if (p) {
+          markPose(p.id);
+          void goTo(p.joints);
+        }
       });
     });
-    if (cfg.sequence) {
-      playBtn.hidden = false;
-      playBtn.addEventListener('click', () => (playing ? stop() : void play()));
-      if (cfg.sequence.autoplay && !reduceMotion) void play();
-    }
+    resetBtn.disabled = false;
+    resetBtn.addEventListener('click', () => {
+      stopAll();
+      markPose();
+      void goTo(restPose, 0.8);
+      frame(center, dist, view);
+    });
 
     const loop = (now: number) => {
       requestAnimationFrame(loop);
@@ -347,6 +534,16 @@ const config = JSON.stringify({
           d?.();
         }
       }
+      if (explodeAnim) {
+        const k = explodeAnim.dur ? Math.min(1, (now - explodeAnim.t0) / explodeAnim.dur) : 1;
+        applyExplode(explodeAnim.from + (explodeAnim.to - explodeAnim.from) * k);
+        if (k >= 1) {
+          const d = explodeAnim.done;
+          explodeAnim = null;
+          d();
+        }
+      }
+      if (path && !reduceMotion && visible) applyPath((((now - path.t0) / 1000) % path.mo.seconds) / path.mo.seconds);
       if (controls.enableDamping) dirty = controls.update() || dirty;
       if (dirty && visible) {
         renderer.render(scene, camera);
@@ -355,6 +552,13 @@ const config = JSON.stringify({
     };
     requestAnimationFrame(loop);
     root.toggleAttribute('data-loaded', true);
+
+    // Autoplay the first motion that asks for it (never under reduced motion).
+    const auto = cfg.motions.find((m) => m.autoplay);
+    if (auto && !reduceMotion) {
+      void runMotion(auto);
+      // The visitor taking over (dragging, a slider, a pose) stops it via stopAll().
+    }
   }
 
   for (const root of document.querySelectorAll<HTMLElement>('[data-robot]')) {

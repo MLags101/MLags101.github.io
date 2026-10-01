@@ -11,7 +11,9 @@
  *    textures) → public/models/<id>/model.glb. Part names and animations are kept.
  * 2. Writes public/models/<id>/parts.json — every CAD part's surface points, so a hotspot
  *    can just say `part: "Here4-1"` (list them with `npm run model:parts -- <id>`).
- * 3. Creates src/data/models/<id>.yaml (or updates sizeMB if it exists).
+ * 3. Bakes `motions:` from the YAML (exploded views, folds, paths) into the GLB as
+ *    animations, plus public/models/<id>/motions.json. Re-bake alone: npm run model:motions.
+ * 4. Creates src/data/models/<id>.yaml (or updates sizeMB if it exists).
  *
  * Full walkthrough (export settings, colors, hotspots, animations): docs/3D-MODELS.md
  */
@@ -24,6 +26,7 @@ import { MeshoptEncoder, MeshoptSimplifier } from 'meshoptimizer';
 import sharp from 'sharp';
 import * as yaml from 'js-yaml';
 import { buildPartsMap } from './lib/parts.mjs';
+import { bakeMotions, writeMotionsJson } from './lib/motions.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const BUDGET_MB = 5;
@@ -121,6 +124,9 @@ await doc.transform(dedup(), resample(), prune(), weld(), simplify({ simplifier:
 const parts = buildPartsMap(doc);
 const animations = doc.getRoot().listAnimations().map((a) => a.getName() || '(unnamed)');
 
+// Motions from the YAML (exploded views, folds, paths) → glTF animations. See lib/motions.mjs.
+const motionMeta = bakeMotions(doc, cfg.motions ?? [], { forward: cfg.forward });
+
 // Stage 2 — compression.
 await doc.transform(
   textureCompress({ encoder: sharp, targetFormat: 'webp', resize: [2048, 2048] }),
@@ -133,6 +139,7 @@ fs.mkdirSync(outDir, { recursive: true });
 const out = path.join(outDir, 'model.glb');
 await io.write(out, doc);
 fs.writeFileSync(path.join(outDir, 'parts.json'), JSON.stringify({ generated: new Date().toISOString(), animations, parts }));
+writeMotionsJson(outDir, motionMeta);
 const after = fs.statSync(out).size / 1e6;
 const sizeMB = Math.max(0.1, after).toFixed(1);
 
@@ -178,5 +185,6 @@ console.log(`\n✓ ${path.relative(ROOT, out)}  ${before.toFixed(2)} MB → ${af
 if (after > BUDGET_MB)
   console.warn(`! Over the ${BUDGET_MB} MB budget. Re-run with a lower --ratio (e.g. --ratio 0.25) or reduce detail in CAD.`);
 console.log(`✓ parts.json — ${Object.keys(parts).length} named parts${animations.length ? `; animations: ${animations.join(', ')}` : ''}`);
+if (motionMeta.length) console.log(`✓ motions: ${motionMeta.map((m) => `${m.id} (${m.type})`).join(', ')}`);
 console.log(`✓ ${path.relative(ROOT, yamlPath)}`);
 console.log(`\nNext: npm run model:parts -- ${id}   (part names for hotspots) · guide: docs/3D-MODELS.md`);

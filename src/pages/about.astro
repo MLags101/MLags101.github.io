@@ -1,6 +1,7 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import PageLayout from '../layouts/PageLayout.astro';
+import Lightbox from '../components/media/Lightbox.astro';
 import Icon from '../components/ui/Icon.astro';
 import { site } from '../site.config';
 import portrait from '../assets/site/portrait.jpg';
@@ -9,6 +10,28 @@ import studio from '../assets/site/invention-studio.jpg';
 import shop from '../assets/site/machine-shop.jpg';
 import rook from '../assets/site/lathe-rook.jpg';
 import field from '../assets/site/urc-selfie.jpg';
+import jpl from '../assets/site/personal-jpl.jpg';
+import desert from '../assets/site/personal-desert.jpg';
+import hike from '../assets/site/personal-hike.jpg';
+import intrepid from '../assets/site/personal-intrepid.jpg';
+import robonav from '../assets/site/personal-robonav.jpg';
+import urcFriends from '../assets/site/personal-urc-friends.jpg';
+import reagan from '../assets/site/personal-reagan-library.jpg';
+import vr from '../assets/site/personal-vr.jpg';
+
+// "Outside the lab" grid, in order. wide = landscape photo spanning two columns.
+const personal = await Promise.all(
+  [
+    { src: jpl, alt: 'Michael standing in front of the NASA Jet Propulsion Laboratory sign during a tour', caption: 'Touring NASA JPL', wide: true },
+    { src: desert, alt: 'Selfie in a NASA cap and orange hood in the Utah desert', caption: 'URC · Utah desert' },
+    { src: hike, alt: 'Michael standing on a granite outcrop on a hike, with trees and hills behind', caption: 'On a hike' },
+    { src: intrepid, alt: 'Selfie on the flight deck of the USS Intrepid with jets and the Manhattan skyline behind', caption: 'USS Intrepid · New York' },
+    { src: robonav, alt: 'Michael giving a shaka among RoboNav teammates in red shirts at the competition', caption: 'RoboNav at URC', wide: true },
+    { src: urcFriends, alt: 'Michael and a friend in sun hats and competition lanyards at URC', caption: 'Friends at URC' },
+    { src: reagan, alt: 'Selfie in the Air Force One pavilion at the Reagan Presidential Library', caption: 'Reagan Library' },
+    { src: vr, alt: 'Michael wearing a mixed-reality headset in a lab', caption: 'Trying out VR' },
+  ].map(async (p) => ({ ...p, full: await getImage({ src: p.src, width: Math.min(p.src.width, 2000), quality: 80 }) })),
+);
 ---
 
 <PageLayout
@@ -96,10 +119,96 @@ import field from '../assets/site/urc-selfie.jpg';
         <figcaption class="label">Out in the field</figcaption>
       </figure>
     </section>
+
+    <section class="personal" aria-labelledby="personal-title">
+      <h2 id="personal-title" class="personal__title">Outside the lab</h2>
+      <div class="personal__grid" data-gallery>
+        {
+          personal.map((p) => (
+            <figure class:list={['personal__item', p.wide && 'is-wide']}>
+              <a href={p.full.src} data-pswp-width={p.full.attributes.width ?? p.src.width} data-pswp-height={p.full.attributes.height ?? p.src.height} data-caption={p.caption}>
+                <Image src={p.src} alt={p.alt} widths={p.wide ? [480, 800, 1100] : [300, 500, 700]} sizes={p.wide ? '(min-width: 900px) 40vw, 100vw' : '(min-width: 900px) 20vw, 50vw'} />
+              </a>
+              <figcaption class="label">{p.caption}</figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </section>
   </div>
+  <Lightbox />
 </PageLayout>
 
 <style>
+  .personal {
+    margin-top: var(--s-9);
+  }
+
+  .personal__title {
+    font-size: var(--step-3);
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  /* Five columns: portraits take one, landscape photos two, so rows line up at 3:4 / 3:2. */
+  .personal__grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--s-4);
+    margin-top: var(--s-5);
+  }
+
+  .personal__item.is-wide {
+    grid-column: span 2;
+  }
+
+  .personal__item a {
+    display: block;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    cursor: zoom-in;
+  }
+
+  .personal__item :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    transition: transform var(--dur-3) var(--ease);
+  }
+
+  /* Wide photos fill whatever height the portraits in their row set. */
+  .personal__item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .personal__item.is-wide a {
+    position: relative;
+    flex: 1;
+  }
+
+  .personal__item.is-wide :global(img) {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+
+  .personal__item a:hover :global(img) {
+    transform: scale(1.03);
+  }
+
+  @media (max-width: 900px) {
+    .personal__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .personal__item.is-wide a {
+      aspect-ratio: 3 / 2;
+    }
+  }
+
   .about {
     padding-block: var(--s-8) var(--section);
   }

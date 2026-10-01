@@ -14,6 +14,8 @@ maccready-works:
   org: AV · MacCready Works
   mark: AV
   logo: av.png
+  photo: av-flightline.jpg
+  photoAlt: Michael kneeling on the runway beside a fixed-wing VTOL drone, with the team and vans behind
   orgUrl: https://www.avinc.com
   location: Moorpark, CA
   type: internship
@@ -138,6 +140,7 @@ area-lab:
   mark: AREAL
   logo: georgia-tech.png
   photo: area-pendulum-rig.jpg
+  photoAlt: AREAL's caged flight space, where the tri-point pendulum rig was set up
   location: Atlanta, GA
   type: research
   start: 2024-09
@@ -169,6 +172,11 @@ zinn-combustion-lab:
   org: Ben T. Zinn Combustion Laboratory · Georgia Tech
   mark: BTZ
   logo: georgia-tech.png
+  photo: zinn-optical-system.jpg
+  photoAlt: The optical diagnostic setup on an optics table beside the combustion rig, with a high-speed camera
+  gallery:
+    - { src: zinn-optics-bench.jpg, alt: "Optics bench with mounted lenses and mirrors being aligned next to the rig" }
+    - { src: zinn-chamber-calibration.jpg, alt: "Looking through a viewport into the combustion chamber during calibration" }
   location: Atlanta, GA
   type: research
   start: 2023-09
@@ -186,6 +194,8 @@ vip-nasa-uli:
   org: Georgia Tech VIP Program · NASA ULI
   mark: VIP
   logo: georgia-tech.png
+  photo: vip-uli-drone.jpg
+  photoAlt: One of the team's quadcopters with white prop guards, on the lab floor
   location: Atlanta, GA
   type: research
   start: 2023-01

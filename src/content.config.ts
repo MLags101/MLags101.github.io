@@ -94,11 +94,16 @@ const experience = defineCollection({
     logo: z.string().optional(),
     /** Optional photo, file name in src/assets/site/. */
     photo: z.string().optional(),
+    /** Alt text for the photo (defaults to the org name). */
+    photoAlt: z.string().optional(),
     /** Research: show this lab as the large feature on /research. */
     featured: z.boolean().default(false),
     /** Research: PI / advisor shown with the lab. */
     advisor: z.string().optional(),
-    /** Extra media for the Research page: project images as "project-slug/file.jpg". */
+    /**
+     * Extra photos (Research page): a file in src/assets/site/ ("zinn-optics.jpg") or a
+     * project image as "project-slug/file.jpg".
+     */
     gallery: list(z.object({ src: z.string(), alt: z.string() })),
     /** A video (public/ path) shown with the lab on /research. */
     video: z.string().optional(),
@@ -133,6 +138,82 @@ const research = defineCollection({
     experience: reference('experience').optional(),
     project: reference('projects').optional(),
   }),
+});
+
+// ── motions (docs/3D-MODELS.md → "Motions"); math in src/lib/motion.ts ────────
+/** "+y", "-z" or a vector "0 1 0.3". */
+const axis = z.union([z.enum(['+x', '-x', '+y', '-y', '+z', '-z']), vec3]);
+const match = z.union([z.string(), z.array(z.string())]);
+const motionBase = {
+  /** Unique within the model; also the baked animation's name ("motion:<id>"). */
+  id: z.string().regex(/^[a-z0-9-]+$/, 'kebab-case id, e.g. explode'),
+  label: z.string(),
+  /** Start on its own when the viewer scrolls into view (never with reduced motion). */
+  autoplay: z.boolean().default(false),
+};
+/** Parts move apart and back. Works on GLB parts and URDF links. */
+const explodeMotion = z.object({
+  ...motionBase,
+  type: z.literal('explode'),
+  mode: z.enum(['radial', 'axis', 'planar']).default('radial'),
+  axis: axis.default('+y'),
+  distance: z.number().positive().default(0.6),
+  anchor: z.enum(['min', 'center', 'max']).default('min'),
+  stagger: z.number().min(0).max(0.9).default(0.25),
+  seconds: z.number().positive().default(1.6),
+  /** GLB: 1 = the assembly's top-level parts; 2 = parts inside sub-assemblies. */
+  level: z.number().int().min(1).default(1),
+  fixed: list(z.string()),
+  parts: list(z.object({ match, direction: axis.optional(), distance: z.number().optional() })),
+});
+/** The whole vehicle drives / flies a loop; props or wheels can spin. */
+const pathMotion = z.object({
+  ...motionBase,
+  type: z.literal('path'),
+  shape: z.enum(['figure8', 'circle']).default('figure8'),
+  size: z.number().positive().default(2.5),
+  laps: z.number().int().positive().default(1),
+  seconds: z.number().positive().default(8),
+  height: z.number().default(0),
+  takeoff: z.boolean().default(false),
+  bob: z.number().default(0),
+  bank: z.number().default(0),
+  /** GLB: { match: "Prop*", axis: "+y", rpm } · URDF: { joint: wheel_joint, rpm }. */
+  spin: list(z.object({ match: match.optional(), joint: z.string().optional(), axis: axis.optional(), rpm: z.number().default(600) })),
+  /** Camera while it plays (defaults to pulling back to fit the path). */
+  cameraOrbit: z.string().optional(),
+});
+/** GLB only: parts rotate about a hinge and/or slide — folding arms, landing gear, doors. */
+const foldMotion = z.object({
+  ...motionBase,
+  type: z.literal('fold'),
+  seconds: z.number().positive().default(1.4),
+  stagger: z.number().min(0).max(0.9).default(0),
+  joints: z
+    .array(
+      z
+        .object({
+          match,
+          /** Hinge point: "x y z" (model coords — Shift+click in ?author mode), "center", or { part }. */
+          pivot: z.union([vec3, z.literal('center'), z.object({ part: z.string() })]).default('center'),
+          axis: axis.default('+y'),
+          /** Degrees about the axis (right-hand rule). */
+          angle: z.number().optional(),
+          /** Slide "x y z" in meters. */
+          translate: vec3.optional(),
+        })
+        .refine((j) => j.angle !== undefined || j.translate, { message: 'a fold joint needs angle and/or translate' }),
+    )
+    .min(1),
+});
+/** URDF only: ease through named poses in order (once, or looping). */
+const sequenceMotion = z.object({
+  ...motionBase,
+  type: z.literal('sequence'),
+  poses: z.array(z.string()).min(2),
+  seconds: z.number().positive().default(1.4),
+  hold: z.number().min(0).default(0.5),
+  loop: z.boolean().default(true),
 });
 
 /** Which face of a part a hotspot marker sits on (see docs/3D-MODELS.md). */
@@ -184,6 +265,11 @@ const models = defineCollection({
         scrub: z.boolean().default(false),
       }),
     ),
+    /**
+     * Motions baked into the GLB as animations by `npm run model:motions -- <id>` (or
+     * model:optimize): exploded views, folds and vehicle paths. Each becomes a button.
+     */
+    motions: list(z.discriminatedUnion('type', [explodeMotion, foldMotion, pathMotion])),
     /** Color overrides baked in by `npm run model:optimize` (not read at runtime). */
     appearance: z
       .object({
@@ -218,10 +304,10 @@ const robots = defineCollection({
     sliders: z.boolean().default(true),
     /** Named joint configurations, in radians (or meters for prismatic joints). */
     poses: list(z.object({ id: z.string(), label: z.string(), joints: z.record(z.string(), z.number()) })),
-    /** A looping demo that eases through poses in order. */
-    sequence: z
-      .object({ poses: z.array(z.string()).min(2), seconds: z.number().default(1.6), hold: z.number().default(0.6), autoplay: z.boolean().default(false) })
-      .optional(),
+    /** The robot's forward axis in URDF coordinates (ROS convention: +x). Used by path motions. */
+    forward: z.enum(['+x', '-x', '+y', '-y']).default('+x'),
+    /** Predefined motions: pose sequences, exploded view, driving a path. Each becomes a button. */
+    motions: list(z.discriminatedUnion('type', [sequenceMotion, explodeMotion, pathMotion])),
     /** Link colors baked in by `npm run robot:import` (not read at runtime). */
     appearance: z.object({ default: z.string().optional(), links: z.record(z.string(), z.string()).default({}) }).optional(),
   }),

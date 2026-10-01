@@ -10,6 +10,8 @@
  * - Hotspots can name a CAD `part` — the marker position is looked up in parts.json.
  * - Selecting a part (on the model or in the list) flies the camera to it.
  * - Animations baked into the GLB get play buttons; `scrub: true` drives one by scroll.
+ * - `motions:` (exploded views, folds, vehicle paths) are baked into the GLB by
+ *   `npm run model:motions -- <id>`; explode/fold buttons toggle out and back, paths loop.
  * - Authoring: `npm run dev`, open the page with `?author` — Shift+click copies a hotspot,
  *   "Save poster" exports the current view. See docs/3D-MODELS.md.
  */
@@ -68,6 +70,23 @@ const hotspots = m.hotspots.map((h) => {
   return { ...h, position: fmt(s.position), normal: fmtN(s.normal) };
 });
 const scrub = m.animations.find((a) => a.scrub);
+
+// ── motions: config from the YAML + what the baker recorded (durations, camera hints) ──
+type Baked = { id: string; type: string; animation: string; seconds: number; center?: number[]; extent?: number };
+const motionsFile = path.join(process.cwd(), 'public', path.dirname(m.src), 'motions.json');
+const baked: Baked[] = fs.existsSync(motionsFile) ? JSON.parse(fs.readFileSync(motionsFile, 'utf8')).motions : [];
+const motions = m.motions.map((mo) => {
+  const b = baked.find((x) => x.id === mo.id && x.type === mo.type);
+  if (!b) throw new Error(`src/data/models/${id}.yaml → motion "${mo.id}" isn't baked into the GLB yet. Run: npm run model:motions -- ${id}`);
+  // Camera while moved, at a fixed 30° field of view: distance ≈ bounding-sphere radius / sin(15°),
+  // with the sphere ≈ 0.62 × the largest extent → 2.4 ×. Paths fit the loop; explodes the parts.
+  const fit = b.extent ? +(b.extent * 2.4).toFixed(4) : undefined;
+  const cameraOrbit = mo.type === 'path' ? (mo.cameraOrbit ?? `30deg 60deg ${fit ?? 1}m`) : undefined;
+  const radius = mo.type !== 'path' ? fit : undefined;
+  const cameraTarget = b.center ? b.center.map((x) => `${x}m`).join(' ') : undefined;
+  return { ...mo, animation: b.animation, seconds: b.seconds, cameraOrbit, cameraTarget, radius, toggle: mo.type !== 'path' };
+});
+const clips = m.animations.filter((a) => !a.scrub);
 ---
 
 <figure
@@ -134,15 +153,32 @@ const scrub = m.animations.find((a) => a.scrub);
         <button type="button" class="parts__btn" data-reset hidden><Icon name="reset" size={14} /> Reset</button>
       </div>
       {
-        m.animations.filter((a) => !a.scrub).length > 0 && (
+        clips.length + motions.length > 0 && (
           <div class="model__anims" role="group" aria-label="Animations" data-anims hidden>
-            {m.animations
-              .filter((a) => !a.scrub)
-              .map((a) => (
-                <button type="button" class="parts__btn" data-anim={a.name} data-loop={a.loop ? '' : undefined} aria-pressed="false">
-                  <span class="model__play" aria-hidden="true">▶</span> {a.label}
-                </button>
-              ))}
+            {motions.map((mo) => (
+              <button
+                type="button"
+                class="parts__btn"
+                data-motion={mo.animation}
+                data-kind={mo.toggle ? 'toggle' : 'loop'}
+                data-seconds={mo.seconds}
+                data-autoplay={mo.autoplay ? '' : undefined}
+                data-orbit={mo.cameraOrbit}
+                data-radius={mo.radius}
+                data-target={mo.cameraTarget}
+                aria-pressed="false"
+              >
+                <span class:list={['model__play', mo.toggle && 'model__play--toggle']} aria-hidden="true">
+                  {mo.toggle ? '⇄' : '▶'}
+                </span>{' '}
+                {mo.label}
+              </button>
+            ))}
+            {clips.map((a) => (
+              <button type="button" class="parts__btn" data-anim={a.name} data-loop={a.loop ? '' : undefined} aria-pressed="false">
+                <span class="model__play" aria-hidden="true">▶</span> {a.label}
+              </button>
+            ))}
           </div>
         )
       }
@@ -259,6 +295,20 @@ const scrub = m.animations.find((a) => a.scrub);
     color: var(--accent);
   }
 
+  .model__anims [aria-pressed='true'] .model__play.model__play--toggle {
+    font-size: inherit;
+  }
+
+  .model__anims [aria-pressed='true'] .model__play.model__play--toggle::before {
+    content: none;
+  }
+
+  /* Hotspots are fixed in model space, so they hide while parts are moved. */
+  .model[data-moving] .model__mv :global(.parts__marker) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .model__anims [aria-pressed='true'] .model__play::before {
     content: '❚❚';
     font-size: 0.7em;
@@ -301,6 +351,7 @@ const scrub = m.animations.find((a) => a.scrub);
     src: string | null;
     cameraOrbit: string;
     cameraTarget: string;
+    maxCameraOrbit: string;
     fieldOfView: string;
     animationName: string | undefined;
     currentTime: number;
@@ -355,7 +406,7 @@ const scrub = m.animations.find((a) => a.scrub);
         bar.style.opacity = '0';
         if (anims && mv.availableAnimations.length) anims.hidden = false;
         if (scrubName && mv.availableAnimations.includes(scrubName)) setupScrub();
-        else if (!reduceMotion) mv.setAttribute('auto-rotate', '');
+        else if (!autoplay() && !reduceMotion) mv.setAttribute('auto-rotate', '');
       });
       mv.addEventListener('camera-change', (e) => {
         if ((e as unknown as CustomEvent<{ source: string }>).detail.source === 'user-interaction') mv.removeAttribute('auto-rotate');
@@ -379,6 +430,116 @@ const scrub = m.animations.find((a) => a.scrub);
       io.observe(root);
     } else void start();
 
+    // ── motions (baked: explode / fold toggle out and back; paths loop) ──
+    const motionBtns = [...(anims?.querySelectorAll<HTMLButtonElement>('[data-motion]') ?? [])];
+    let tween = 0;
+    let autoTimer = 0;
+    const stopTween = () => {
+      cancelAnimationFrame(tween);
+      tween = 0;
+    };
+    /** Ease the paused animation's time to `to` seconds (model-viewer can't play backwards). */
+    const seek = (to: number, seconds: number) =>
+      new Promise<void>((done) => {
+        stopTween();
+        const from = mv.currentTime;
+        const span = Math.abs(to - from);
+        if (reduceMotion || span < 1e-3) {
+          mv.currentTime = to;
+          return done();
+        }
+        const t0 = performance.now();
+        const dur = (span / seconds) * Math.max(0.6, seconds) * 1000; // full travel takes the motion's length
+        const step = (now: number) => {
+          const k = Math.min(1, (now - t0) / dur);
+          mv.currentTime = from + (to - from) * k;
+          if (k < 1) tween = requestAnimationFrame(step);
+          else done();
+        };
+        tween = requestAnimationFrame(step);
+      });
+    const selectClip = (name: string) => {
+      if (mv.animationName !== name) {
+        mv.animationName = name;
+        mv.currentTime = 0;
+      }
+    };
+    /** Put every motion back at rest (assembled / at the start point). */
+    const restMotions = () => {
+      clearTimeout(autoTimer);
+      stopTween();
+      if (motionBtns.some((b) => b.dataset.motion === mv.animationName)) {
+        mv.pause();
+        mv.currentTime = 0;
+      }
+      motionBtns.forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      root.removeAttribute('data-moving');
+      mv.maxCameraOrbit = 'auto auto auto';
+    };
+    const runMotion = async (btn: HTMLButtonElement, user = true) => {
+      if (user) clearTimeout(autoTimer);
+      const name = btn.dataset.motion!;
+      const seconds = Number(btn.dataset.seconds) || 1.6;
+      const on = btn.getAttribute('aria-pressed') !== 'true';
+      animBtns.forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      motionBtns.forEach((b) => b !== btn && b.setAttribute('aria-pressed', 'false'));
+      mv.removeAttribute('auto-rotate');
+      if (mv.animationName !== name) {
+        stopTween();
+        mv.pause();
+        selectClip(name);
+      }
+      btn.setAttribute('aria-pressed', String(on));
+      // model-viewer won't zoom out past the assembled model's framing; lift that while parts are
+      // displaced — only to twice the fitted distance, since it also sets the camera's clip planes.
+      const fitM = parseFloat(btn.dataset.radius ?? btn.dataset.orbit?.split(/\s+/)[2] ?? '');
+      if (on && fitM) mv.maxCameraOrbit = `auto auto ${(fitM * 2).toFixed(4)}m`;
+      if (btn.dataset.kind === 'toggle') {
+        mv.pause();
+        root.toggleAttribute('data-moving', true);
+        // Fit the exploded parts in view (keeping the visitor's angle); back to auto when assembled.
+        if (btn.dataset.radius && active < 0) {
+          const o = mv.getCameraOrbit() as unknown as { theta: number; phi: number; radius: number };
+          mv.cameraTarget = on && btn.dataset.target ? btn.dataset.target : root.dataset.target!;
+          mv.cameraOrbit = `${o.theta}rad ${o.phi}rad ${on ? `${Math.max(o.radius, Number(btn.dataset.radius))}m` : 'auto'}`;
+          mv.fieldOfView = on ? '30deg' : 'auto';
+        }
+        await seek(on ? seconds : 0, seconds);
+        if (!on && mv.currentTime < 1e-3) {
+          root.removeAttribute('data-moving');
+          mv.maxCameraOrbit = 'auto auto auto';
+        }
+        return;
+      }
+      // Loop (vehicle path): pull the camera back to fit the path while it plays.
+      if (on) {
+        root.toggleAttribute('data-moving', true);
+        if (btn.dataset.target) mv.cameraTarget = btn.dataset.target;
+        if (btn.dataset.orbit) mv.cameraOrbit = btn.dataset.orbit;
+        mv.fieldOfView = '30deg';
+        if (reduceMotion) return; // stays at the start pose
+        mv.play();
+      } else mv.pause();
+    };
+    motionBtns.forEach((b) => b.addEventListener('click', () => void runMotion(b)));
+
+    /** autoplay: paths loop; toggles go out, hold, come back, hold, repeat — until the visitor takes over. */
+    const autoplay = () => {
+      const btn = motionBtns.find((b) => b.hasAttribute('data-autoplay'));
+      if (!btn || reduceMotion) return false;
+      if (btn.dataset.kind !== 'toggle') {
+        void runMotion(btn, false);
+        return true;
+      }
+      const cycle = async () => {
+        await runMotion(btn, false);
+        autoTimer = window.setTimeout(cycle, 1800);
+      };
+      void cycle();
+      ['pointerdown', 'wheel', 'keydown'].forEach((ev) => mv.addEventListener(ev, () => clearTimeout(autoTimer), { once: true }));
+      return true;
+    };
+
     // ── animations ──
     const animBtns = [...(anims?.querySelectorAll<HTMLButtonElement>('[data-anim]') ?? [])];
     for (const btn of animBtns) {
@@ -387,6 +548,7 @@ const scrub = m.animations.find((a) => a.scrub);
         const playing = btn.getAttribute('aria-pressed') === 'true';
         animBtns.forEach((b) => b.setAttribute('aria-pressed', 'false'));
         if (playing) return mv.pause();
+        restMotions();
         mv.removeAttribute('auto-rotate');
         if (mv.animationName !== name) {
           mv.animationName = name;
@@ -425,6 +587,7 @@ const scrub = m.animations.find((a) => a.scrub);
     };
 
     const reset = () => {
+      restMotions();
       active = -1;
       mv.cameraTarget = root.dataset.target!;
       mv.cameraOrbit = root.dataset.orbit!;

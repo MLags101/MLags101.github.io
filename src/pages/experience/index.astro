@@ -95,7 +95,7 @@ const gtLogo = (await import('../../assets/logos/georgia-tech.png')).default;
               {e.data.photo && (
                 <Image
                   src={e.data.photo}
-                  alt={`${e.data.org}`}
+                  alt={e.data.photoAlt ?? e.data.org}
                   class="tl__photo"
                   widths={[480, 800, 1100]}
                   sizes="(min-width: 1000px) 640px, 100vw"

@@ -19,6 +19,7 @@
     "media:videos": "node scripts/encode-videos.mjs",
     "model:optimize": "node scripts/optimize-model.mjs",
     "model:parts": "node scripts/model-parts.mjs",
+    "model:motions": "node scripts/model-motions.mjs",
     "robot:import": "node scripts/import-robot.mjs",
     "pcb:import": "node scripts/import-pcb.mjs"
   },

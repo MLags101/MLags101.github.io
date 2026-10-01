@@ -4,9 +4,9 @@ The site has two 3D viewers (plus a PCB viewer, Part 3). Both download nothing u
 
 | Viewer          | Use it for                                                                 | Data                               | Files                         |
 | --------------- | -------------------------------------------------------------------------- | ---------------------------------- | ----------------------------- |
-| `<ModelViewer>` | A CAD assembly (GLB): orbit it, labeled parts, baked animations            | `src/data/models/<id>.yaml`        | `public/models/<id>/`         |
-| `<RobotViewer>` | An articulated robot (URDF): joint sliders, named poses, looping sequences | `src/data/robots/<id>.yaml`        | `public/robots/<id>/`         |
-| `<PcbViewer>`   | A circuit board from its Gerbers: top/bottom, layer toggles, 3D from STEP   | `src/data/pcbs/<id>.yaml`          | `public/pcbs/<id>/`           |
+| `<ModelViewer>` | A CAD assembly (GLB): labeled parts, exploded views, folds, vehicle paths  | `src/data/models/<id>.yaml`        | `public/models/<id>/`         |
+| `<RobotViewer>` | An articulated robot (URDF): sliders, poses, auto demos, explode, paths    | `src/data/robots/<id>.yaml`        | `public/robots/<id>/`         |
+| `<PcbViewer>`   | A circuit board from its Gerbers: each layer on its own, 3D from STEP       | `src/data/pcbs/<id>.yaml`          | `public/pcbs/<id>/`           |
 
 ---
 
@@ -83,9 +83,90 @@ appearance:                 # baked in by model:optimize — re-run it after edi
 - In a write-up: `<ModelViewer id="kermit-v3" caption="…" />`
 - As the page hero: `model: kermit-v3` under the project in `src/data/projects.yaml`
 
-### 6. Animations (folding arms, exploded views…)
+### 6. Motions: exploded views, folds, vehicle paths
 
-`<ModelViewer>` plays animations stored in the GLB; `npm run model:parts` lists any it finds. To make them:
+Predefined motions are written in the model YAML and **baked into the GLB** as real animations. `<model-viewer>` can play animations but can't move parts on its own. Each motion becomes a button on the viewer:
+- **Explode and fold** toggle out and back.
+- **Paths** loop until pressed again.
+- Hotspots hide while parts are moved.
+- **Reset** puts everything back.
+
+```yaml
+motions:
+  # Exploded view. mode: radial (away from the center) | axis (spread along one axis,
+  # in order — stacks and cylinders) | planar (outward in the plane ⟂ axis, no vertical travel)
+  - id: explode
+    type: explode
+    label: Exploded view
+    mode: planar
+    axis: +y
+    distance: 1.6               # spread factor: 1 = parts move as far again as they are from the center
+    fixed: ['*ExternalTank*']   # parts that stay put (* wildcards)
+    stagger: 0.25               # outermost part starts first
+    # anchor: min               # axis mode: the lowest part stays (min | center | max)
+    # level: 2                  # explode the parts inside sub-assemblies instead
+    # parts:                    # per-part overrides: direction + distance (fraction of model size)
+    #   - { match: "Lid-1", direction: +y, distance: 0.4 }
+
+  # Fold: named parts rotate about a hinge and/or slide (landing gear, folding arms, doors).
+  - id: fold
+    type: fold
+    label: Fold arms
+    seconds: 1.4
+    stagger: 0.2
+    joints:
+      - { match: "CF_Arm-1", pivot: "0.08 -0.015 -0.06", axis: +y, angle: 70 }   # pivot: Shift+click in ?author mode
+      - { match: "Leg-*", pivot: center, axis: +x, angle: -90 }
+      - { match: "Antenna-1", translate: "0 0.03 0" }                            # slide, meters
+
+  # Path: the whole vehicle flies or drives a loop; spinning parts are optional.
+  - id: fly
+    type: path
+    label: Fly a figure 8
+    shape: figure8        # figure8 | circle
+    size: 3               # path width, × the model's size
+    seconds: 10
+    height: 0.5           # climb (× model size); takeoff: true lifts off and lands at the ends
+    takeoff: true
+    bank: 18              # lean into turns, degrees (0 for ground vehicles)
+    spin: [{ match: "MAD_4006_EEE-*", axis: +y, rpm: 900 }]   # motors / props / wheels
+    # autoplay: true      # start on its own when scrolled into view (never with reduced motion)
+```
+
+Then bake it:
+
+```bash
+npm run model:motions -- shuttle-model
+```
+
+This is fast: it re-bakes the published GLB in place and doesn't need the raw CAD file. `model:optimize` runs the same step, so motions survive a re-optimize. It also writes `public/models/<id>/motions.json`, which holds the durations and the camera framing used while a motion plays.
+
+Two checks catch mistakes:
+- If a motion in the YAML isn't baked, the build fails.
+- `npm run lint:content` warns when a motion was edited since its last bake.
+
+The vehicle moves along the model's `forward` axis, so check that it's set correctly.
+
+Tested examples:
+- **Live:** the Space Shuttle's exploded view.
+- **Removed from the live pages, but tested:**
+  - Kermit V3 figure 8. Paste the `fly` block above into kermit-v3.yaml.
+  - Mr Toad circle: `{ id: drive, type: path, label: Drive around, shape: circle, size: 3, seconds: 9, spin: [{ match: ["free_wheel-*", "tread_gear-*"], axis: +z, rpm: -120 }] }`.
+
+#### What each motion needs: GLB or URDF?
+
+| Motion | GLB (`<ModelViewer>`) | URDF (`<RobotViewer>`) |
+| --- | --- | --- |
+| **Exploded view** | Works with a plain GLB. It needs the parts as separate nodes, which SolidWorks' GLB export gives you (one node per component). Sub-assemblies move as one unit unless you set `level: 2`. | Works. Each link's meshes move; the joints stay put. |
+| **Fold / hinge** | Fine for independent hinges (a landing leg, a folding arm, a door). Give a pivot point and an axis. Parts inside a moving sub-assembly follow it. | Use poses plus a `sequence` motion. Best for chains (arm segments that carry each other), because the URDF already knows the joints and their limits. |
+| **Driving / flying a path** | Works. Spinning props or wheels must be separate named parts. | Works. Wheel joints spin via `spin: [{ joint: … }]`. Use this when the vehicle also has articulated parts. |
+| **Arbitrary keyframed motion** (steering plus suspension, a deploy sequence with timing) | Author it in CAD or Blender and export it with the GLB (below). | A `sequence` of poses. |
+
+Rule of thumb: **a GLB is enough** for exploded views, single hinges and vehicle paths. **Use a URDF** when parts are linked in a chain (robot arms, legs, gimbals), or when visitors should drive the joints themselves with sliders.
+
+#### Animations authored in CAD
+
+`<ModelViewer>` also plays animations already stored in the GLB; `npm run model:parts` lists any it finds. To make them:
 
 - **SolidWorks:** build a **Motion Study**, for example an exploded view (*Animation Wizard → Explode*) or arm-fold keyframes. Then *Save As → Extended Reality (`.glb`)* with *Export animations* ticked. Each motion study becomes a named animation.
 - **Blender:** import the GLB, keyframe the named part objects, give each action a name, and export glTF with *Animation* enabled.
@@ -143,7 +224,12 @@ poses:                               # radians (meters for prismatic joints)
   - { id: home, label: Home,  joints: { base_yaw: 0, shoulder: 0, elbow: 0 } }
   - { id: scan, label: Scan,  joints: { base_yaw: 0.8, shoulder: 0.6, elbow: 1.1 } }
   - { id: stow, label: Stow,  joints: { base_yaw: 0, shoulder: -0.4, elbow: 2.2 } }
-sequence: { poses: [home, scan, stow], seconds: 1.4, hold: 0.5, autoplay: false }
+forward: +x                          # the robot's front (ROS convention), for path motions
+motions:                             # buttons above the poses; played live (nothing to bake)
+  - { id: demo, type: sequence, label: Demo, poses: [home, scan, stow, home], seconds: 1.6, hold: 0.4, loop: true, autoplay: true }
+  - { id: fold, type: sequence, label: Fold to stow, poses: [home, stow], loop: false }
+  - { id: explode, type: explode, label: Exploded view, mode: axis, axis: +z, anchor: min, distance: 0.9 }  # URDF frame: +z is up
+  # - { id: drive, type: path, label: Drive, shape: circle, spin: [{ joint: left_wheel_joint, rpm: 60 }] }
 appearance:                          # baked in by robot:import
   default: '#9aa0a8'
   links: { base_plate_link: '#2c4fb8', gimbal_link: '#d63a76' }
@@ -153,7 +239,13 @@ Joint names must match the URDF. The sliders display them, so you can read them 
 
 ### 4. Show it
 
-`<RobotViewer id="dum-i" caption="…" />` in the write-up. Pose buttons ease the joints between configurations, and "Play sequence" loops through `sequence.poses`.
+`<RobotViewer id="dum-i" caption="…" />` in the write-up.
+
+- Pose buttons ease the joints between configurations.
+- Motion buttons play the `motions`: sequences, the exploded view (a toggle; the camera pulls back to fit it) and paths.
+- The first motion with `autoplay: true` starts when the viewer scrolls into view. A slider, a pose or Reset stops it, and it never runs for visitors with reduced motion.
+
+Explode and path math is shared with the GLB baker (`src/lib/motion.ts`), so the same settings behave the same way in both viewers.
 
 `npm run lint:content` checks that every registered model and robot has its files, and that every `part:` name exists.
 
@@ -161,7 +253,13 @@ Joint names must match the URDF. The sliders display them, so you can read them 
 
 ## Part 3 — Circuit boards (`<PcbViewer>`)
 
-Shows a PCB from its fabrication files: rendered top and bottom, an x-ray view where each copper, mask, silkscreen and drill layer can be turned on and off, and an optional 3D view from the board's STEP model. Visitors can drag to pan and Ctrl + scroll (or pinch) to zoom.
+Shows a PCB from its fabrication files. One list, ordered like the physical stack-up, switches the view:
+- the assembled top side;
+- each layer on its own, from top silkscreen through the inner copper to bottom silkscreen, always drawn over the outline and holes;
+- the assembled bottom side;
+- an optional 3D board from the STEP model.
+
+Visitors can step through the list with the arrow keys, drag to pan, and Ctrl + scroll (or pinch) to zoom.
 
 ### 1. Export
 
@@ -195,7 +293,7 @@ The import prints the layers it found. If one is missing, check that its file ha
 
 `<PcbViewer id="typhoon" caption="…" />` in the write-up.
 
-The layers view starts with top copper, the outline and the holes. Inner layers are usually solid planes and would wash out the traces, so visitors turn them on themselves.
+Layer colors come from `manifest.json`. To change one, edit `LAYER_COLORS` in `scripts/import-pcb.mjs` and re-import.
 
 ### Posters
 

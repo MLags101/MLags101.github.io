@@ -87,6 +87,21 @@ for (const f of fs.existsSync(modelsDir) ? fs.readdirSync(modelsDir).filter((f) 
   for (const h of m.hotspots ?? [])
     if (h.part && !parts) errors.push(`model ${f}: hotspot "${h.id}" uses part names but ${rel(partsFile)} is missing (re-run npm run model:optimize)`);
     else if (h.part && !parts[h.part]) errors.push(`model ${f}: hotspot "${h.id}" — no part named "${h.part}" (npm run model:parts -- ${f.replace('.yaml', '')})`);
+  // Motions: baked into the GLB, and not edited since (same fingerprint as scripts/lib/motions.mjs).
+  const motionsFile = path.join(ROOT, 'public', path.dirname(m.src), 'motions.json');
+  const baked = fs.existsSync(motionsFile) ? JSON.parse(fs.readFileSync(motionsFile, 'utf8')).motions : [];
+  const id = f.replace('.yaml', '');
+  for (const mo of m.motions ?? []) {
+    const b = baked.find((x) => x.id === mo.id);
+    if (!b) errors.push(`model ${f}: motion "${mo.id}" isn't baked yet (npm run model:motions -- ${id})`);
+    else if (b.config !== motionHash(mo)) warnings.push(`model ${f}: motion "${mo.id}" changed since it was baked (npm run model:motions -- ${id})`);
+  }
+}
+
+function motionHash(mo) {
+  let h = 2166136261;
+  for (const c of JSON.stringify(mo)) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+  return (h >>> 0).toString(16);
 }
 
 // Robots: URDF present.
@@ -124,8 +139,9 @@ for (const f of fs.existsSync(pcbsDir) ? fs.readdirSync(pcbsDir).filter((f) => f
 const experience = load(path.join(DATA, 'experience.yaml'));
 for (const [id, e] of Object.entries(experience)) {
   for (const g of e.gallery ?? []) {
-    const [slug, file] = g.src.split('/');
-    if (!fs.existsSync(path.join(PROJECTS, slug, 'images', file))) errors.push(`experience.yaml → ${id}.gallery: ${g.src} not found in src/content/projects/${slug}/images/`);
+    const [slug, file] = g.src.includes('/') ? g.src.split('/') : [null, g.src];
+    const where = slug ? `src/content/projects/${slug}/images` : 'src/assets/site';
+    if (!fs.existsSync(path.join(ROOT, where, file))) errors.push(`experience.yaml → ${id}.gallery: ${g.src} not found in ${where}/`);
   }
   if (e.video && !fs.existsSync(path.join(ROOT, 'public', e.video))) errors.push(`experience.yaml → ${id}.video: missing public file ${e.video}`);
 }

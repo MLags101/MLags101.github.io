@@ -1,13 +1,14 @@
 ---
 /**
- * Interactive PCB viewer built from the board's Gerbers (and STEP, if provided).
+ * PCB viewer built from the board's Gerbers (and STEP, if provided).
  * Data: src/data/pcbs/<id>.yaml · files: public/pcbs/<id>/ (made by `npm run pcb:import`).
  *
  *   <PcbViewer id="typhoon" caption="…" />
  *
- * Views: Top / Bottom (realistic renders), Layers (x-ray: toggle each copper, mask,
- * silkscreen and drill layer), and 3D (the STEP board in the model viewer).
- * Drag to pan; zoom with the +/− buttons, Ctrl/⌘ + scroll, or pinch.
+ * One list switches the view: the assembled top side, each layer on its own (top silkscreen
+ * down through the inner copper to the bottom silkscreen, always over the board outline and
+ * holes), the assembled bottom side, and 3D (the STEP board in the model viewer).
+ * Arrow keys step through the list. Drag to pan; zoom with +/−, Ctrl/⌘ + scroll, or pinch.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,62 +21,40 @@ interface Props {
   caption?: string;
 }
 
+type Layer = { id: string; label: string; type: string; side: string; color: string; file: string };
+
 const { id, caption } = Astro.props;
 const entry = await getEntry('pcbs', id);
 if (!entry) throw new Error(`<PcbViewer id="${id}">: no src/data/pcbs/${id}.yaml`);
 const manifestFile = path.join(process.cwd(), 'public/pcbs', id, 'manifest.json');
 if (!fs.existsSync(manifestFile)) throw new Error(`<PcbViewer id="${id}">: run npm run pcb:import first (no ${manifestFile})`);
-const m = JSON.parse(fs.readFileSync(manifestFile, 'utf8')) as {
-  width: number;
-  height: number;
-  units: string;
-  copperLayers: number;
-  layers: { id: string; label: string; type: string; side: string; color: string; file: string }[];
-};
+const m = JSON.parse(fs.readFileSync(manifestFile, 'utf8')) as { width: number; height: number; units: string; copperLayers: number; layers: Layer[] };
 const base = `/pcbs/${id}`;
 const aspect = `${m.width} / ${m.height}`;
 const size = `${+m.width.toFixed(1)} × ${+m.height.toFixed(1)} ${m.units}`;
-const groups = [
-  { label: 'Top', items: m.layers.filter((l) => l.side === 'top') },
-  { label: 'Inner', items: m.layers.filter((l) => l.side === 'inner') },
-  { label: 'Bottom', items: m.layers.filter((l) => l.side === 'bottom') },
-  { label: 'Board', items: m.layers.filter((l) => l.side === 'all') },
-].filter((g) => g.items.length);
-// Layers shown when the Layers view first opens: all copper + drills + outline.
-// Start with one copper layer: stacked ground pours wash out the traces. The presets add the rest.
-const onByDefault = (l: { type: string; side: string }) => ['drill', 'outline'].includes(l.type) || (l.type === 'copper' && l.side === 'top');
+
+// Physical stack order, top to bottom. Outline and holes aren't entries; they sit under every layer view.
+const RANK: Record<string, number> = { silkscreen: 0, solderpaste: 1, soldermask: 2, copper: 3 };
+const sideRank = (l: Layer) => (l.side === 'top' ? RANK[l.type]! : l.side === 'inner' ? 10 : 20 + (3 - RANK[l.type]!));
+const stack = m.layers.filter((l) => l.side !== 'all').sort((a, b) => sideRank(a) - sideRank(b) || a.label.localeCompare(b.label));
+const context = m.layers.filter((l) => l.side === 'all');
+
+const views = [
+  { id: 'top', label: 'Top side', note: 'assembled', color: undefined as string | undefined },
+  ...stack.map((l) => ({ id: l.id, label: l.label, note: undefined as string | undefined, color: l.color })),
+  { id: 'bottom', label: 'Bottom side', note: 'from below', color: undefined },
+  ...(entry.data.model ? [{ id: '3d', label: '3D board', note: 'from STEP', color: undefined }] : []),
+];
 ---
 
 <figure class="pcb wide" data-pcb style={`--aspect:${aspect}`}>
-  <div class="pcb__bar">
-    <div class="pcb__tabs" role="tablist" aria-label="PCB view">
-      <button type="button" role="tab" class="pcb__tab" data-view="top" aria-selected="true">Top</button>
-      <button type="button" role="tab" class="pcb__tab" data-view="bottom" aria-selected="false">Bottom</button>
-      <button type="button" role="tab" class="pcb__tab" data-view="layers" aria-selected="false">Layers</button>
-      {entry.data.model && <button type="button" role="tab" class="pcb__tab" data-view="3d" aria-selected="false">3D</button>}
-    </div>
-    <p class="pcb__meta label">{size} · {m.copperLayers} copper layers</p>
-  </div>
-
   <div class="pcb__body">
     <div class="pcb__stage crop-marks" data-stage role="img" aria-label={entry.data.alt}>
       <div class="pcb__canvas" data-canvas>
-        <img class="pcb__view" data-for="top" src={`${base}/top.svg`} alt="" loading="lazy" draggable="false" />
-        <img class="pcb__view" data-for="bottom" src={`${base}/bottom.svg`} alt="" loading="lazy" draggable="false" hidden />
-        <div class="pcb__view pcb__layers" data-for="layers" hidden>
-          {
-            m.layers.map((l) => (
-              <img
-                data-layer={l.id}
-                data-src={`${base}/${l.file}`}
-                class:list={[`is-${l.type}`, l.side === 'inner' && 'is-inner']}
-                alt=""
-                draggable="false"
-                hidden={!onByDefault(l)}
-              />
-            ))
-          }
-        </div>
+        <img class="pcb__img" data-show="top" src={`${base}/top.svg`} alt="" loading="lazy" draggable="false" />
+        <img class="pcb__img" data-show="bottom" data-src={`${base}/bottom.svg`} alt="" draggable="false" hidden />
+        {context.map((l) => <img class:list={['pcb__img', 'pcb__context', `is-${l.type}`]} data-show="layer" data-src={`${base}/${l.file}`} alt="" draggable="false" hidden />)}
+        {stack.map((l) => <img class="pcb__img pcb__layer-img" data-show={l.id} data-src={`${base}/${l.file}`} alt="" draggable="false" hidden />)}
       </div>
       <div class="pcb__zoom" data-zoom>
         <button type="button" class="parts__btn" data-z="in" aria-label="Zoom in">+</button>
@@ -85,37 +64,36 @@ const onByDefault = (l: { type: string; side: string }) => ['drill', 'outline'].
       <p class="pcb__hint label" aria-hidden="true">Drag to pan · Ctrl + scroll to zoom</p>
     </div>
 
-    <fieldset class="pcb__panel" data-panel hidden>
-      <legend class="label">Layers</legend>
-      <div class="pcb__presets">
-        <button type="button" class="parts__btn" data-preset="all">All</button>
-        <button type="button" class="parts__btn" data-preset="top">Top</button>
-        <button type="button" class="parts__btn" data-preset="bottom">Bottom</button>
-        <button type="button" class="parts__btn" data-preset="copper">Copper</button>
-      </div>
-      {
-        groups.map((g) => (
-          <div class="pcb__group">
-            <p class="label">{g.label}</p>
-            {g.items.map((l) => (
-              <label class="pcb__layer">
-                <input type="checkbox" data-toggle={l.id} data-type={l.type} data-side={l.side} checked={onByDefault(l)} />
-                <span class="pcb__swatch" style={`--c:${l.color}`} />
-                {l.label}
-              </label>
-            ))}
-          </div>
-        ))
-      }
-    </fieldset>
-
     {
       entry.data.model && (
-        <div class="pcb__3d" data-for="3d" hidden>
+        <div class="pcb__3d" data-show="3d" hidden>
           <ModelViewer id={entry.data.model.id} />
         </div>
       )
     }
+
+    <div class="pcb__side">
+      <p class="label">{size} · {m.copperLayers} copper layers</p>
+      <div class="pcb__list" role="tablist" aria-orientation="vertical" aria-label="Board view">
+        {
+          views.map((v, i) => (
+            <button
+              type="button"
+              role="tab"
+              class:list={['pcb__item', v.color ? 'is-layer' : 'is-view']}
+              data-view={v.id}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              style={v.color ? `--c:${v.color}` : undefined}
+            >
+              <span class="pcb__swatch" aria-hidden="true" />
+              <span class="pcb__name">{v.label}</span>
+              {v.note && <span class="pcb__note">{v.note}</span>}
+            </button>
+          ))
+        }
+      </div>
+    </div>
   </div>
 
   {
@@ -134,55 +112,20 @@ const onByDefault = (l: { type: string; side: string }) => ['drill', 'outline'].
     container-type: inline-size;
   }
 
-  .pcb__bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--s-3);
-    margin-bottom: var(--s-3);
-  }
-
-  .pcb__tabs {
-    display: inline-flex;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .pcb__tab {
-    height: 2.1rem;
-    padding-inline: var(--s-4);
-    font-size: var(--step--1);
-    color: var(--text-2);
-    border-right: 1px solid var(--line);
-    transition:
-      color var(--dur-2) var(--ease),
-      background-color var(--dur-2) var(--ease);
-  }
-
-  .pcb__tab:last-child {
-    border-right: 0;
-  }
-
-  .pcb__tab:hover {
-    color: var(--text);
-  }
-
-  .pcb__tab[aria-selected='true'] {
-    background: var(--accent);
-    color: var(--accent-ink);
-  }
-
   .pcb__body {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--s-4);
   }
 
-  @container (min-width: 900px) {
-    .pcb:has(.pcb__panel:not([hidden])) .pcb__body {
-      grid-template-columns: minmax(0, 1fr) 240px;
+  @container (min-width: 760px) {
+    .pcb__body {
+      grid-template-columns: minmax(0, 1fr) 220px;
+    }
+    .pcb__stage,
+    .pcb__3d {
+      grid-column: 1;
+      grid-row: 1;
     }
   }
 
@@ -203,9 +146,7 @@ const onByDefault = (l: { type: string; side: string }) => ['drill', 'outline'].
   }
 
   .pcb__stage[hidden],
-  .pcb__view[hidden],
-  .pcb__layers img[hidden],
-  .pcb__panel[hidden],
+  .pcb__img[hidden],
   .pcb__3d[hidden] {
     display: none;
   }
@@ -217,8 +158,7 @@ const onByDefault = (l: { type: string; side: string }) => ['drill', 'outline'].
     will-change: transform;
   }
 
-  .pcb__view,
-  .pcb__layers img {
+  .pcb__img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -227,29 +167,24 @@ const onByDefault = (l: { type: string; side: string }) => ['drill', 'outline'].
     user-select: none;
   }
 
-  /* X-ray: layers glow through each other; holes punch through everything. */
-  .pcb__layers img {
-    mix-blend-mode: screen;
-    opacity: 0.92;
+  /* Single-layer views: the layer over a faint outline, with holes punched through. */
+  .pcb__context.is-outline {
+    opacity: 0.5;
   }
 
-  .pcb__layers img.is-soldermask {
-    opacity: 0.45;
+  .pcb__context.is-drill {
+    z-index: 1;
   }
 
-  .pcb__layers img.is-inner {
-    opacity: 0.4;
-  }
-
-  .pcb__layers img.is-drill {
-    mix-blend-mode: normal;
-    opacity: 1;
+  .pcb__3d :global(.parts) {
+    margin: 0;
   }
 
   .pcb__zoom {
     position: absolute;
     right: var(--s-3);
     bottom: var(--s-3);
+    z-index: 2;
     display: flex;
     gap: var(--s-1);
   }
@@ -267,57 +202,87 @@ const onByDefault = (l: { type: string; side: string }) => ['drill', 'outline'].
     pointer-events: none;
   }
 
-  .pcb__panel {
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: var(--s-4);
-    margin: 0;
+  /* ── view list (a stack-up: top of the board first) ── */
+  .pcb__side {
     min-width: 0;
   }
 
-  .pcb__panel legend {
-    padding-inline: var(--s-1);
-  }
-
-  .pcb__presets {
+  .pcb__list {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-1);
-    margin-bottom: var(--s-3);
-  }
-
-  .pcb__group + .pcb__group {
+    flex-direction: column;
     margin-top: var(--s-3);
+    border-top: 1px solid var(--line);
   }
 
-  .pcb__group .label {
-    margin-bottom: var(--s-1);
-  }
-
-  .pcb__layer {
-    display: flex;
+  .pcb__item {
+    display: grid;
+    grid-template-columns: 14px minmax(0, 1fr) auto;
     align-items: center;
-    gap: var(--s-2);
-    padding-block: 0.2rem;
+    gap: var(--s-3);
+    padding: 0.55rem var(--s-2);
+    border-bottom: 1px solid var(--line);
     font-size: var(--step--1);
+    text-align: left;
     color: var(--text-2);
-    cursor: pointer;
+    transition:
+      color var(--dur-2) var(--ease),
+      background-color var(--dur-2) var(--ease);
   }
 
-  .pcb__layer input {
-    accent-color: var(--accent);
+  .pcb__item:hover {
+    color: var(--text);
+    background: var(--bg-elev);
+  }
+
+  .pcb__item[aria-selected='true'] {
+    color: var(--text);
+    background: var(--bg-elev);
+    box-shadow: inset 2px 0 0 var(--accent);
   }
 
   .pcb__swatch {
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
-    background: var(--c);
-    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.15);
+    width: 14px;
+    height: 6px;
+    border-radius: 1px;
+    background: var(--c, transparent);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
   }
 
-  .pcb__3d :global(.parts) {
-    margin: 0;
+  .pcb__item.is-view .pcb__swatch {
+    height: 14px;
+    background: linear-gradient(180deg, #2f8f4e 0 30%, #d9a441 30% 45%, #1f2a22 45% 100%);
+  }
+
+  .pcb__note {
+    font: var(--step--2) var(--font-mono);
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* Narrow: the list becomes a scrolling row under the board. */
+  @container (max-width: 759px) {
+    .pcb__list {
+      flex-direction: row;
+      overflow-x: auto;
+      border-top: 0;
+      gap: var(--s-1);
+      padding-bottom: var(--s-1);
+      scrollbar-width: thin;
+    }
+    .pcb__item {
+      flex: none;
+      grid-template-columns: 14px auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .pcb__item[aria-selected='true'] {
+      box-shadow: inset 0 -2px 0 var(--accent);
+    }
+    .pcb__note,
+    .pcb__hint {
+      display: none;
+    }
   }
 
   figcaption {
@@ -338,41 +303,40 @@ const onByDefault = (l: { type: string; side: string }) => ['drill', 'outline'].
   for (const root of document.querySelectorAll<HTMLElement>('[data-pcb]')) {
     const stage = root.querySelector<HTMLElement>('[data-stage]')!;
     const canvas = root.querySelector<HTMLElement>('[data-canvas]')!;
-    const panel = root.querySelector<HTMLElement>('[data-panel]')!;
     const three = root.querySelector<HTMLElement>('.pcb__3d');
-    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-view]')];
-    const views = [...root.querySelectorAll<HTMLElement>('.pcb__view')];
-    const layerImgs = [...root.querySelectorAll<HTMLImageElement>('[data-layer]')];
-    const toggles = [...root.querySelectorAll<HTMLInputElement>('[data-toggle]')];
+    const items = [...root.querySelectorAll<HTMLButtonElement>('[data-view]')];
+    const imgs = [...canvas.querySelectorAll<HTMLImageElement>('[data-show]')];
 
     // ── view switching ──
-    const show = (view: string) => {
-      tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.view === view)));
+    const show = (view: string, focus = false) => {
+      items.forEach((b) => {
+        const on = b.dataset.view === view;
+        b.setAttribute('aria-selected', String(on));
+        b.tabIndex = on ? 0 : -1;
+        if (on && focus) b.focus();
+      });
       const is3d = view === '3d';
       stage.hidden = is3d;
       if (three) three.hidden = !is3d;
-      panel.hidden = view !== 'layers';
-      views.forEach((v) => (v.hidden = v.dataset.for !== view));
-      if (view === 'layers') layerImgs.forEach((img) => !img.src && (img.src = img.dataset.src!)); // load on first open
+      const isLayer = view !== 'top' && view !== 'bottom' && !is3d;
+      for (const img of imgs) {
+        const on = img.dataset.show === view || (isLayer && img.dataset.show === 'layer');
+        if (on && img.dataset.src) {
+          img.src = img.dataset.src; // load on first view
+          delete img.dataset.src;
+        }
+        img.hidden = !on;
+      }
     };
-    tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.view!)));
-
-    // ── layer toggles ──
-    const sync = () => toggles.forEach((t) => (root.querySelector<HTMLImageElement>(`[data-layer="${t.dataset.toggle}"]`)!.hidden = !t.checked));
-    toggles.forEach((t) => t.addEventListener('change', sync));
-    root.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((b) =>
-      b.addEventListener('click', () => {
-        const p = b.dataset.preset;
-        toggles.forEach((t) => {
-          const { type, side } = t.dataset;
-          t.checked =
-            p === 'all' ||
-            (p === 'copper' && (type === 'copper' || type === 'drill' || type === 'outline')) ||
-            ((p === 'top' || p === 'bottom') && (side === p || side === 'all'));
-        });
-        sync();
-      }),
-    );
+    items.forEach((b) => b.addEventListener('click', () => show(b.dataset.view!)));
+    root.querySelector('[role="tablist"]')!.addEventListener('keydown', (e) => {
+      const k = (e as KeyboardEvent).key;
+      const i = items.findIndex((b) => b.getAttribute('aria-selected') === 'true');
+      const next = ['ArrowDown', 'ArrowRight'].includes(k) ? i + 1 : ['ArrowUp', 'ArrowLeft'].includes(k) ? i - 1 : k === 'Home' ? 0 : k === 'End' ? items.length - 1 : null;
+      if (next === null) return;
+      e.preventDefault();
+      show(items[(next + items.length) % items.length]!.dataset.view!, true);
+    });
 
     // ── pan / zoom ──
     let scale = 1, tx = 0, ty = 0;

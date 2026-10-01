@@ -30,6 +30,7 @@ Everything else is plumbing you rarely touch.
 | Add a company / org logo                     | square PNG/SVG in `src/assets/logos/`, then `logo: file.png` in `experience.yaml`           |
 | Add a video                                  | add a job to `scripts/videos.json` → `npm run media:videos` → `<Video src="/media/…" />`     |
 | Add a 3D CAD model with labeled parts        | `npm run model:optimize -- file.glb <id>` → edit `src/data/models/<id>.yaml` ([guide](docs/3D-MODELS.md)) |
+| Add an exploded view, fold or driving/flying loop | `motions:` in `src/data/models/<id>.yaml` → `npm run model:motions -- <id>` ([guide](docs/3D-MODELS.md#6-motions-exploded-views-folds-vehicle-paths)); robots: `motions:` in `src/data/robots/<id>.yaml` |
 | Recolor a 3D model                           | `appearance:` in `src/data/models/<id>.yaml` → re-run `model:optimize`                      |
 | Add an articulated robot (URDF)              | `npm run robot:import -- <ros-package-folder> <id>` → edit `src/data/robots/<id>.yaml` ([guide](docs/3D-MODELS.md#part-2--robots-from-urdf-robotviewer)) |
 | Add an interactive PCB (Gerbers + STEP)      | `npm run pcb:import -- <design-folder> <id>` → `<PcbViewer id="<id>" />` ([guide](docs/3D-MODELS.md#part-3--circuit-boards-pcbviewer)) |
@@ -121,6 +122,7 @@ Change a date once and every place updates.
 | `npm run media:videos`                          | Encode the jobs in `scripts/videos.json` (needs ffmpeg)         |
 | `npm run model:optimize -- in.glb <id>`         | Compress a CAD export, record its parts, apply `appearance:`    |
 | `npm run model:parts -- <id> [filter]`          | List a model's CAD part names (for hotspot `part:`)             |
+| `npm run model:motions -- <id>`                 | Bake the YAML `motions:` (explode / fold / path) into the GLB   |
 | `npm run robot:import -- <folder> <id>`         | URDF package (STL/DAE meshes) → compressed GLB meshes + YAML    |
 | `npm run pcb:import -- <folder> <id>`           | Gerbers (+ STEP) → board renders, layer views, 3D board model   |
 

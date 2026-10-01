@@ -125,11 +125,11 @@ Jobs, internships, labs, teams. The key (e.g. `robonav:`) is the id a project's 
 | `positions`            | Newest first: `- { title: Electronics Master, start: 2024-08 }`. Dates optional. |
 | `summary`              | A few plain sentences (≤ 480 chars) shown on the Experience page.           |
 | `highlights`           | Resume bullets, used on `/resume` only.                                      |
-| `photo`                | Optional photo in `src/assets/site/` shown with the entry.                   |
+| `photo`, `photoAlt`    | Optional photo in `src/assets/site/` shown with the entry, and its alt text. |
 | `orgUrl`               | The org or lab website (a "Lab website" button on /research).              |
 | `featured`             | Research labs only: `true` gives the lab the large section at the top of /research. |
 | `advisor`              | Shown under a featured lab's name.                                          |
-| `gallery`              | Photos for a featured lab: `- { src: <project>/<file>.jpg, alt: … }` (images from a project's `images/` folder). |
+| `gallery`              | More photos on /research: `- { src: file.jpg, alt: … }` (a file in `src/assets/site/`) or `<project>/<file>.jpg` (a project image). Large for the featured lab, thumbnails on other labs' cards. |
 | `video`                | A featured lab's video, e.g. `/media/<slug>/flight.mp4` (portrait is fine). |
 | `skills`               | Tool ids from `skills.yaml` shown on the entry.                             |
 | `onResume`             | `false` = timeline only, not on `/resume`.                                  |

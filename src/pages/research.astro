@@ -10,7 +10,6 @@ import Video from '../components/media/Video.astro';
 import Lightbox from '../components/media/Lightbox.astro';
 import Icon from '../components/ui/Icon.astro';
 import { getExperience, getProjects, getResearch, resolveSkills } from '../lib/content';
-import { resolveImage } from '../lib/media';
 import { range, mono } from '../lib/dates';
 
 const labs = (await getExperience()).filter((e) => e.data.type === 'research');
@@ -19,6 +18,9 @@ const projects = (await getProjects()).filter((p) => p.data.category === 'resear
 const KIND = { paper: 'Paper', poster: 'Poster', talk: 'Talk', thesis: 'Thesis', report: 'Report', ongoing: 'Ongoing' } as const;
 
 const shortOrg = (org: string) => org.replace(/\s*·\s*Georgia Tech$/, '');
+type Img = (typeof labs)[number]['data']['gallery'][number]['src'];
+// Lightbox gets a 2000px version; the original isn't published.
+const zoomable = async (img: Img, alt: string) => ({ img, alt, full: await getImage({ src: img, width: Math.min(img.width, 2000), quality: 80 }) });
 
 const features = await Promise.all(
   labs
@@ -28,17 +30,21 @@ const features = await Promise.all(
       skills: await resolveSkills(lab.data.skills),
       threads: research.filter((r) => r.data.experience?.id === lab.id),
       projects: projects.filter((p) => p.data.context?.id === lab.id),
-      gallery: await Promise.all(
-        lab.data.gallery.map(async (g) => {
-          const img = resolveImage(g.src);
-          // Lightbox gets a 2000px version; the original isn't published.
-          const full = await getImage({ src: img, width: Math.min(img.width, 2000), quality: 80 });
-          return { ...g, img, full };
-        }),
-      ),
+      gallery: await Promise.all(lab.data.gallery.map((g) => zoomable(g.src, g.alt))),
     })),
 );
-const others = labs.filter((l) => !l.data.featured);
+// Other labs: the photo first, then any gallery photos as thumbnails.
+const others = await Promise.all(
+  labs
+    .filter((l) => !l.data.featured)
+    .map(async (lab) => ({
+      lab,
+      photos: await Promise.all([
+        ...(lab.data.photo ? [zoomable(lab.data.photo, lab.data.photoAlt ?? lab.data.org)] : []),
+        ...lab.data.gallery.map((g) => zoomable(g.src, g.alt)),
+      ]),
+    })),
+);
 const featuredIds = new Set(features.map((f) => f.lab.id));
 const otherThreads = research.filter((r) => !featuredIds.has(r.data.experience?.id ?? ''));
 const otherProjects = projects.filter((p) => !featuredIds.has(p.data.context?.id ?? ''));
@@ -143,10 +149,27 @@ const otherProjects = projects.filter((p) => !featuredIds.has(p.data.context?.id
             Other research
           </h2>
           <div class="others__grid">
-            {others.map((lab) => (
+            {others.map(({ lab, photos }) => (
               <article class="lab">
-                {lab.data.photo && (
-                  <Image src={lab.data.photo} alt="" class="lab__photo" widths={[400, 700]} sizes="(min-width: 900px) 30vw, 100vw" />
+                {photos.length > 0 && (
+                  <div class:list={['lab__photos', photos.length > 1 && 'has-thumbs']} style={`--thumbs:${Math.max(1, photos.length - 1)}`} data-gallery>
+                    {photos.map((p, i) => (
+                      <a
+                        class:list={['lab__photo-link', i === 0 ? 'is-main' : 'is-thumb']}
+                        href={p.full.src}
+                        data-pswp-width={p.full.attributes.width ?? p.img.width}
+                        data-pswp-height={p.full.attributes.height ?? p.img.height}
+                      >
+                        <Image
+                          src={p.img}
+                          alt={p.alt}
+                          class="lab__photo"
+                          widths={i === 0 ? [400, 700] : [240, 480]}
+                          sizes={i === 0 ? '(min-width: 900px) 30vw, 100vw' : '(min-width: 900px) 15vw, 50vw'}
+                        />
+                      </a>
+                    ))}
+                  </div>
                 )}
                 <div class="lab__text">
                   <p class="label label--accent">{range(lab.data.start, lab.data.end)}</p>
@@ -381,11 +404,38 @@ const otherProjects = projects.filter((p) => !featuredIds.has(p.data.context?.id
     overflow: hidden;
   }
 
+  .lab__photos {
+    display: grid;
+    grid-template-columns: repeat(var(--thumbs, 1), minmax(0, 1fr));
+    gap: 2px;
+    border-bottom: 1px solid var(--line);
+    background: var(--line);
+  }
+
+  .lab__photo-link {
+    display: block;
+    overflow: hidden;
+    cursor: zoom-in;
+  }
+
+  .lab__photo-link.is-main {
+    grid-column: 1 / -1;
+  }
+
   .lab :global(.lab__photo) {
+    display: block;
     width: 100%;
     aspect-ratio: 16 / 10;
     object-fit: cover;
-    border-bottom: 1px solid var(--line);
+    transition: transform var(--dur-3) var(--ease);
+  }
+
+  .lab .is-thumb :global(.lab__photo) {
+    aspect-ratio: 4 / 3;
+  }
+
+  .lab__photo-link:hover :global(.lab__photo) {
+    transform: scale(1.03);
   }
 
   .lab__text {

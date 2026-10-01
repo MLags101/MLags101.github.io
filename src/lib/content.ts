@@ -19,7 +19,11 @@ export type Project = Omit<CollectionEntry<'projects'>, 'data'> & {
   data: Omit<ProjectData, 'cover'> & { cover: ImageMetadata; skills: SkillRef[] };
 };
 export type Experience = Omit<CollectionEntry<'experience'>, 'data'> & {
-  data: Omit<ExperienceData, 'logo' | 'photo'> & { logo?: ImageMetadata; photo?: ImageMetadata };
+  data: Omit<ExperienceData, 'logo' | 'photo' | 'gallery'> & {
+    logo?: ImageMetadata;
+    photo?: ImageMetadata;
+    gallery: { src: ImageMetadata; alt: string }[];
+  };
 };
 export type Skill = CollectionEntry<'skills'>;
 export type Research = CollectionEntry<'research'>;
@@ -114,13 +118,18 @@ const pick = (glob: Record<string, { default: ImageMetadata }>, dir: string, fil
 };
 
 const toExperience = (e: CollectionEntry<'experience'>): Experience => {
-  const { logo, photo, ...rest } = e.data;
+  const { logo, photo, gallery, ...rest } = e.data;
   return {
     ...e,
     data: {
       ...rest,
       logo: pick(logos, 'src/assets/logos', logo, `${e.id}.logo`),
       photo: pick(sitePhotos, 'src/assets/site', photo, `${e.id}.photo`),
+      // "slug/file.jpg" = a project image; a bare file name = src/assets/site/.
+      gallery: gallery.map((g, i) => ({
+        alt: g.alt,
+        src: g.src.includes('/') ? resolveImage(g.src) : pick(sitePhotos, 'src/assets/site', g.src, `${e.id}.gallery[${i}]`)!,
+      })),
     },
   };
 };
