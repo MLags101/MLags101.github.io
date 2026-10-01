@@ -8,11 +8,12 @@
  *                  [--featured] [--family Kermit --version V4] [--context invention-studio]
  *   npm run new -- experience "SpaceX" --type internship --start 2027-06 --role "Avionics Intern"
  *   npm run new -- research "Paper title" --start 2026-10
- *   npm run new -- skill "LabVIEW" --group cad-sim
+ *   npm run new -- skill "LabVIEW" --group cad-sim [--resume] [--projects slug-a,slug-b]
  *
  * Projects get a block in src/data/projects.yaml (the facts) plus
  * src/content/projects/<slug>/index.mdx (the write-up) and an images/ folder. Experience and
- * research entries are appended to src/data/experience.yaml / research.yaml.
+ * research entries are appended to src/data/experience.yaml / research.yaml. A project's
+ * --skills are recorded by adding its slug to each tool's `projects:` list in skills.yaml.
  *
  * New entries start as `draft: true`: visible in `npm run dev`, hidden from the live site
  * until you delete that line. Field reference: docs/CONTENT.md · map: SITE_GUIDE.md
@@ -64,7 +65,25 @@ async function ask(fn) {
 }
 
 const readYaml = (f) => yaml.load(fs.readFileSync(path.join(DATA, f), 'utf8')) ?? {};
-const skills = readYaml('skills.yaml');
+const skills = Object.entries(readYaml('skills.yaml')).map(([id, s]) => ({ id, ...s }));
+
+/** Add a project slug to a tool's `projects: [...]` line in skills.yaml (comments untouched). */
+function addProjectToSkill(skillId, slug) {
+  const file = path.join(DATA, 'skills.yaml');
+  const lines = fs.readFileSync(file, 'utf8').split('\n');
+  const start = lines.findIndex((l) => l === `${skillId}:`);
+  if (start < 0) return;
+  for (let i = start + 1; i < lines.length && !/^\S/.test(lines[i]); i++) {
+    const m = lines[i].match(/^  projects: \[(.*)\]\s*$/);
+    if (m) {
+      const list = m[1].split(',').map((x) => x.trim()).filter(Boolean);
+      if (!list.includes(slug)) list.push(slug);
+      lines[i] = `  projects: [${list.join(', ')}]`;
+      fs.writeFileSync(file, lines.join('\n'));
+      return;
+    }
+  }
+}
 const experienceIds = Object.keys(readYaml('experience.yaml'));
 
 /** Map free-text skill names / aliases to ids. */
@@ -100,8 +119,10 @@ if (type === 'skill') {
   if (skills.some((s) => s.id === id)) bail(`Skill "${id}" already exists.`);
   const group = flags.group ?? (interactive ? await ask(p.select({ message: 'Group', options: SKILL_GROUPS.map((g) => ({ value: g, label: g })) })) : bail('Missing --group'));
   if (!SKILL_GROUPS.includes(group)) bail(`Unknown group "${group}"`);
-  fs.appendFileSync(path.join(DATA, 'skills.yaml'), `- { id: ${id}, name: ${JSON.stringify(title)}, group: ${group} }\n`);
-  console.log(`✓ Added skill "${title}" (${id}) to src/data/skills.yaml`);
+  const used = flags.projects ? String(flags.projects).split(',').map((x) => x.trim()).filter(Boolean) : [];
+  const block = `\n${id}:\n  name: ${JSON.stringify(title)}\n  group: ${group}\n${flags.resume ? '  resume: true\n' : ''}  projects: [${used.join(', ')}]\n`;
+  fs.writeFileSync(path.join(DATA, 'skills.yaml'), fs.readFileSync(path.join(DATA, 'skills.yaml'), 'utf8').replace(/\s*$/, '\n') + block);
+  console.log(`✓ Added tool "${title}" (${id}) to src/data/skills.yaml — list the projects that use it under \`projects:\``);
   process.exit(0);
 }
 
@@ -132,7 +153,7 @@ if (type === 'project' || type === 'experience') {
       }),
     );
   }
-  if (type === 'project' && skillIds.length === 0) bail('Projects need at least one skill (--skills a,b)');
+  if (type === 'project' && skillIds.length === 0 && !interactive) console.warn('No --skills given; add the project to tools in src/data/skills.yaml later.');
 
   vars = { ...vars, role: role || 'TODO', skills: skillIds.join(', '), end: end ? `end: ${end}` : vars.end };
 
@@ -169,6 +190,8 @@ const block = fill(fs.readFileSync(path.join(TEMPLATES, `${type}.yaml`), 'utf8')
 fs.writeFileSync(dataPath, fs.readFileSync(dataPath, 'utf8').replace(/\s*$/, '\n') + block);
 
 if (type === 'project') {
+  // Tools: record this project on each chosen tool in skills.yaml.
+  for (const id of vars.skills.split(',').map((x) => x.trim()).filter(Boolean)) addProjectToSkill(id, slug);
   // Write-up + placeholder cover so the build passes immediately; replace the cover.
   fs.mkdirSync(path.dirname(bodyFile), { recursive: true });
   fs.writeFileSync(bodyFile, fill(fs.readFileSync(path.join(TEMPLATES, 'project.mdx'), 'utf8'), vars));
@@ -185,7 +208,8 @@ const rel = (f) => path.relative(ROOT, f).split(path.sep).join('/');
 const steps =
   type === 'project'
     ? [
-        `Facts (dates, skills, specs, cover): src/data/projects.yaml → ${slug}:`,
+        `Facts (dates, specs, cover): src/data/projects.yaml → ${slug}:`,
+        `Tools: added to ${vars.skills || '(none yet)'} in src/data/skills.yaml`,
         `Write-up: ${rel(bodyFile)}`,
         `Photos: ${rel(path.dirname(bodyFile))}/images/ (replace cover.jpg)`,
         'Videos: add a job to scripts/videos.json → npm run media:videos',

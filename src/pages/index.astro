@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/cards/ProjectCard.astro';
 import Icon from '../components/ui/Icon.astro';
@@ -27,17 +28,17 @@ const groups = Object.entries(SKILL_GROUP_LABELS).map(([key, label]) => ({
   key,
   label,
   skills: skills
-    .filter((s) => s.data.group === key && (s.data.featured || (usage.get(s.id)?.length ?? 0) > 0))
+    .filter((s) => s.data.group === key && (s.data.resume || (usage.get(s.id)?.length ?? 0) > 0))
     .map((s) => ({ ...s, count: usage.get(s.id)?.length ?? 0 }))
     .sort((a, b) => b.count - a.count || a.data.name.localeCompare(b.data.name)),
 }));
 
 const firstYear = Math.min(...projects.map((p) => p.data.start.getUTCFullYear()));
 const stats = [
-  { value: String(projects.length), label: 'Projects documented' },
-  { value: String(experience.length), label: 'Roles & teams' },
+  { value: String(projects.length), label: 'Projects' },
+  { value: String(experience.length), label: 'Roles' },
   { value: '3', label: 'Maker Grants' },
-  { value: String(new Date().getUTCFullYear() - firstYear + 1), label: 'Years building' },
+  { value: String(new Date().getUTCFullYear() - firstYear + 1), label: 'Years of projects' },
 ];
 ---
 
@@ -62,7 +63,7 @@ const stats = [
     <div class="container hero__content">
       <p class="label hero__kicker">
         <span class="dot dot--accent"></span>
-        {site.education.degree} · Georgia Tech · {site.education.graduation.replace('Expected ', 'Class of ').replace(/May /, '')}
+        {site.education.degree} · {site.education.minor && <>Minor in {site.education.minor} · </>}Georgia Tech · {site.education.graduation.replace('Expected ', 'Class of ').replace(/May /, '')}
       </p>
       <h1 id="hero-title" class="hero__title">{site.name}</h1>
       {
@@ -76,7 +77,7 @@ const stats = [
       }
       <p class="hero__tagline">{site.tagline}</p>
       <div class="hero__ctas">
-        <a class="btn btn--primary" href="/projects">View work <Icon name="arrow-right" /></a>
+        <a class="btn btn--primary" href="/projects">Projects <Icon name="arrow-right" /></a>
         <a class="btn hero__btn" href="/experience">Experience</a>
         <a class="btn hero__btn" href={site.resumePdf} download><Icon name="download" /> Resume</a>
       </div>
@@ -133,9 +134,7 @@ const stats = [
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="label label--accent eyebrow">01 / Selected work</p>
-          <h2 id="work-title">Hardware that left the bench.</h2>
-          <p>Airframes, rovers, boards and the systems that tie them together — each with the design story, the failures and the fixes.</p>
+          <h2 id="work-title">Selected projects</h2>
         </div>
         <a class="link-arrow" href="/projects">All {projects.length} projects</a>
       </div>
@@ -152,20 +151,23 @@ const stats = [
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="label label--accent eyebrow">02 / Experience</p>
-          <h2 id="exp-title">Flight test, avionics, research.</h2>
+          <h2 id="exp-title">Experience</h2>
         </div>
         <a class="link-arrow" href="/experience">Full timeline</a>
       </div>
 
       <ol class="exp-list">
         {
-          experience.map((e, i) => (
+          experience.slice(0, 6).map((e, i) => (
             <li data-reveal style={`--reveal-i:${i % 4}`}>
               <a href={`/experience#${e.id}`} class="exp-row">
-                <span class="exp-row__mark mono" aria-hidden="true">
-                  {e.data.mark}
-                </span>
+                {e.data.logo ? (
+                  <Image src={e.data.logo} alt="" class="exp-row__logo" widths={[96]} sizes="52px" />
+                ) : (
+                  <span class="exp-row__mark mono" aria-hidden="true">
+                    {e.data.mark}
+                  </span>
+                )}
                 <span class="exp-row__main">
                   <span class="exp-row__title">{e.data.positions[0]!.title}</span>
                   <span class="exp-row__org">{e.data.org}</span>
@@ -186,9 +188,8 @@ const stats = [
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="label label--accent eyebrow">03 / Capabilities</p>
-          <h2 id="cap-title">Tools, measured by use.</h2>
-          <p>Counts are the projects on this site that used each tool — select one to see them.</p>
+          <h2 id="cap-title">Tools</h2>
+          <p>Number of projects on this site that use each tool. Select one to see them.</p>
         </div>
       </div>
 
@@ -464,6 +465,14 @@ const stats = [
   .exp-row:hover .exp-row__mark {
     border-color: var(--accent);
     color: var(--accent);
+  }
+
+  .exp-row :global(.exp-row__logo) {
+    width: 2.5rem;
+    height: 2.5rem;
+    justify-self: center;
+    border-radius: var(--radius);
+    object-fit: cover;
   }
 
   .exp-row__main {

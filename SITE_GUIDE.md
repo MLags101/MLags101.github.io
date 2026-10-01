@@ -17,13 +17,14 @@ Everything else is plumbing you rarely touch.
 
 | I want to…                                   | Open / run                                                                                  |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Change a project's dates, skills, specs, cover, featured status | `src/data/projects.yaml` → find the project's block                      |
+| Change a project's dates, specs, cover, featured status | `src/data/projects.yaml` → find the project's block                              |
+| Change which tools a project used            | `src/data/skills.yaml` → add/remove the project's slug in each tool's `projects:` |
 | Edit a project's text or photos              | `src/content/projects/<slug>/index.mdx` and its `images/` folder                            |
 | Add a new project                            | `npm run new` (creates both of the above with `draft: true`)                                |
 | Change which projects show on the home page  | `featured: true` / `order:` in `src/data/projects.yaml`                                     |
 | Add or edit a job, internship, lab or team   | `src/data/experience.yaml` (or `npm run new -- experience "Org"`)                           |
 | Add a paper / poster / talk                  | `src/data/research.yaml`                                                                    |
-| Add or rename a skill                        | `src/data/skills.yaml` (projects reference skills by `id`)                                  |
+| Add, rename or remove a tool                 | `src/data/skills.yaml`                                                                      |
 | Change name, tagline, "Aspiring Roboticist" line, email, links, GPA, nav | `src/data/site.yaml`                                            |
 | Replace the resume PDF                       | overwrite `public/resume/Michael-Lagana-Resume.pdf`                                         |
 | Add a company / org logo                     | square PNG/SVG in `src/assets/logos/`, then `logo: file.png` in `experience.yaml`           |
@@ -48,10 +49,10 @@ Everything else is plumbing you rarely touch.
 ├─ src/
 │   ├─ data/                ★ FACTS — hand-editable YAML
 │   │   ├─ site.yaml          name, identity line, contact, education, nav
-│   │   ├─ projects.yaml      one block per project (dates, skills, specs, cover…)
+│   │   ├─ projects.yaml      one block per project (dates, specs, cover…)
 │   │   ├─ experience.yaml    jobs, labs, teams (promotion ladders, resume bullets)
 │   │   ├─ research.yaml      papers, posters, talks, ongoing work
-│   │   ├─ skills.yaml        the skill registry
+│   │   ├─ skills.yaml        tools, and which projects used each one
 │   │   ├─ models/<id>.yaml   3D model: hotspots, camera, colors, animations
 │   │   ├─ robots/<id>.yaml   URDF robot: poses, sequence
 │   │   └─ diagrams/<id>.yaml block diagram: nodes, links, traceable flows
@@ -87,7 +88,8 @@ Everything else is plumbing you rarely touch.
 ## How a project page is assembled
 
 ```
-src/data/projects.yaml  ─┐  title, dates, role, skills, specs, cover, lineage…
+src/data/projects.yaml  ─┐  title, dates, role, specs, cover, lineage…
+src/data/skills.yaml    ─┤  which tools it used
                          ├─▶  src/layouts/ProjectLayout.astro  ─▶  /projects/<slug>
 src/content/projects/    │      header · hero (photo, video or 3D) · sidebar · related ·
   <slug>/index.mdx  ─────┘      prev/next — and your write-up in the middle

@@ -96,6 +96,11 @@ for (const f of fs.existsSync(robotsDir) ? fs.readdirSync(robotsDir).filter((f) 
   if (!fs.existsSync(path.join(ROOT, 'public', r.urdf))) errors.push(`robot ${f}: missing ${r.urdf}`);
 }
 
+// Tools: every project should appear on at least one tool's `projects:` list.
+const tools = load(path.join(DATA, 'skills.yaml'));
+const withTools = new Set(Object.values(tools).flatMap((t) => t.projects ?? []));
+for (const slug of folders) if (!withTools.has(slug)) warnings.push(`${slug}: no tools list it in src/data/skills.yaml`);
+
 if (featured < 3 || featured > 6) warnings.push(`${featured} featured projects — aim for 3–6 on the home page`);
 
 for (const e of errors) console.log(`✗ ${e}`);

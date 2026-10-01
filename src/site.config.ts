@@ -16,17 +16,18 @@ const schema = z.object({
   availability: z.string().default(''),
   location: z.string(),
   email: z.email(),
-  links: z.object({ linkedin: z.url(), github: z.url() }),
+  links: z.object({ linkedin: z.url(), github: z.url().optional() }),
   resumePdf: z.string(),
   education: z.object({
     school: z.string(),
     degree: z.string(),
     detail: z.string(),
     location: z.string(),
+    minor: z.string().optional(),
     graduation: z.string(),
     gpa: z.coerce.string(),
-    coursework: z.array(z.string()),
   }),
+  honors: z.array(z.string()).default([]),
   nav: z.array(z.object({ href: z.string(), label: z.string() })),
 });
 

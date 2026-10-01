@@ -10,13 +10,22 @@ import { resolveImage } from './media';
 type ProjectData = CollectionEntry<'projects'>['data'];
 type ExperienceData = CollectionEntry<'experience'>['data'];
 
-/** A project with its cover resolved to an image (from src/data/projects.yaml). */
-export type Project = Omit<CollectionEntry<'projects'>, 'data'> & { data: Omit<ProjectData, 'cover'> & { cover: ImageMetadata } };
-export type Experience = Omit<CollectionEntry<'experience'>, 'data'> & { data: Omit<ExperienceData, 'logo'> & { logo?: ImageMetadata } };
+type SkillRef = { id: string; collection: 'skills' };
+/**
+ * A project with its cover resolved to an image and its tools filled in from
+ * src/data/skills.yaml (each tool lists the projects that used it).
+ */
+export type Project = Omit<CollectionEntry<'projects'>, 'data'> & {
+  data: Omit<ProjectData, 'cover'> & { cover: ImageMetadata; skills: SkillRef[] };
+};
+export type Experience = Omit<CollectionEntry<'experience'>, 'data'> & {
+  data: Omit<ExperienceData, 'logo' | 'photo'> & { logo?: ImageMetadata; photo?: ImageMetadata };
+};
 export type Skill = CollectionEntry<'skills'>;
 export type Research = CollectionEntry<'research'>;
 
 const logos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/logos/*.{png,jpg,jpeg,webp,svg}', { eager: true });
+const sitePhotos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/site/*.{png,jpg,jpeg,webp}', { eager: true });
 
 /** Drafts render in `astro dev` (with a DRAFT ribbon) but never ship. */
 const visible = ({ data }: { data: { draft?: boolean } }) => !(import.meta.env.PROD && data.draft);
@@ -49,15 +58,25 @@ export const SKILL_GROUP_LABELS: Record<Skill['data']['group'], string> = {
   fabrication: 'Fabrication',
 };
 
-const toProject = (e: CollectionEntry<'projects'>): Project => ({
+/** Tool chips are ordered by group (most telling first), then by their order in skills.yaml. */
+const GROUP_ORDER: Skill['data']['group'][] = ['robotics', 'cad-sim', 'electronics', 'fabrication', 'languages'];
+
+const toProject = (e: CollectionEntry<'projects'>, skills: Skill[]): Project => ({
   ...e,
-  data: { ...e.data, cover: resolveImage(e.data.cover, e.id) },
+  data: {
+    ...e.data,
+    cover: resolveImage(e.data.cover, e.id),
+    skills: skills
+      .filter((s) => s.data.projects.some((p) => p.id === e.id))
+      .sort((a, b) => GROUP_ORDER.indexOf(a.data.group) - GROUP_ORDER.indexOf(b.data.group))
+      .map((s) => ({ id: s.id, collection: 'skills' as const })),
+  },
 });
 
 let cache: Promise<Project[]> | undefined;
 async function allProjects() {
   cache ??= (async () => {
-    const [meta, bodies] = await Promise.all([getCollection('projects'), getCollection('projectBodies')]);
+    const [meta, bodies, skills] = await Promise.all([getCollection('projects'), getCollection('projectBodies'), getCollection('skills')]);
     // Every project needs both halves — catch a typo'd slug in either place.
     const bodyIds = new Set(bodies.map((b) => b.id));
     const metaIds = new Set(meta.map((m) => m.id));
@@ -65,7 +84,7 @@ async function allProjects() {
       if (!bodyIds.has(id)) throw new Error(`projects.yaml has "${id}" but src/content/projects/${id}/index.mdx doesn't exist.`);
     for (const id of bodyIds)
       if (!metaIds.has(id)) throw new Error(`src/content/projects/${id}/index.mdx has no "${id}:" entry in src/data/projects.yaml.`);
-    return meta.map(toProject);
+    return meta.map((m) => toProject(m, skills));
   })();
   return cache;
 }
@@ -87,15 +106,23 @@ export async function getProjectBody(id: string) {
   return body;
 }
 
+const pick = (glob: Record<string, { default: ImageMetadata }>, dir: string, file: string | undefined, where: string) => {
+  if (!file) return undefined;
+  const mod = glob[`/${dir}/${file}`];
+  if (!mod) throw new Error(`experience.yaml → ${where}: "${file}" not found in ${dir}/`);
+  return mod.default;
+};
+
 const toExperience = (e: CollectionEntry<'experience'>): Experience => {
-  const { logo, ...rest } = e.data;
-  let img: ImageMetadata | undefined;
-  if (logo) {
-    const mod = logos[`/src/assets/logos/${logo}`];
-    if (!mod) throw new Error(`experience.yaml → ${e.id}.logo: "${logo}" not found in src/assets/logos/`);
-    img = mod.default;
-  }
-  return { ...e, data: { ...rest, logo: img } };
+  const { logo, photo, ...rest } = e.data;
+  return {
+    ...e,
+    data: {
+      ...rest,
+      logo: pick(logos, 'src/assets/logos', logo, `${e.id}.logo`),
+      photo: pick(sitePhotos, 'src/assets/site', photo, `${e.id}.photo`),
+    },
+  };
 };
 
 /** Experience, most recent first. */
@@ -129,7 +156,7 @@ export async function resolveSkills(refs: { id: string }[]) {
   const byId = new Map(skills.map((s) => [s.id, s]));
   return refs.map((r) => {
     const s = byId.get(r.id);
-    if (!s) throw new Error(`Unknown skill "${r.id}" — add it to src/data/skills.yaml`);
+    if (!s) throw new Error(`Unknown tool "${r.id}" — add it to src/data/skills.yaml`);
     return s;
   });
 }

@@ -8,8 +8,7 @@ initials: ML                      # the square badge in the header / favicon tex
 role: Aerospace Engineer          # used in page titles and search results
 # Short identity line shown under your name on the home page and on About.
 identity: [Engineer, Aspiring Roboticist, Cyber-Enthusiast]
-tagline: >-
-  I design, build and fly hardware — from flight-ready airframes to the avionics inside them.
+tagline: Focused on autonomous flying vehicles and mechatronics.
 description: >-
   Portfolio of Michael Lagana — Georgia Tech aerospace engineering student building UAVs,
   robots, PCBs and flight test hardware.
@@ -20,22 +19,24 @@ location: Atlanta, GA
 email: mlagana6@gatech.edu
 links:
   linkedin: https://www.linkedin.com/in/mlagana6
-  github: https://github.com/MLags101
 # Put the PDF at public/resume/ and point to it here.
 resumePdf: /resume/Michael-Lagana-Resume.pdf
 
 education:
   school: Georgia Institute of Technology
   degree: B.S. Aerospace Engineering
-  detail: Minor in Robotics · BS/MS Honors Program
+  minor: Robotics
+  detail: BS/MS Honors Program
   location: Atlanta, GA
   graduation: Expected May 2027
   gpa: '3.95'
-  coursework: [Thermodynamics & Fluids, Structural Analysis, Jet & Rocket Propulsion]
+
+# Shown on the About page.
+honors: [National Hispanic Recognition Program, Faculty Honors]
 
 # Top navigation, in order.
 nav:
-  - { href: /projects, label: Work }
+  - { href: /projects, label: Projects }
   - { href: /experience, label: Experience }
   - { href: /research, label: Research }
   - { href: /about, label: About }

@@ -2,18 +2,15 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Lost signal" noindex>
+<BaseLayout title="Page not found" noindex>
   <section class="nf">
     <div class="container">
-      <p class="label label--accent eyebrow">Error 404 · Link lost</p>
-      <h1>Telemetry lost.</h1>
-      <p class="lede">The page you're looking for isn't on this flight plan. It may have moved during the site's redesign.</p>
-      <pre class="mono nf__log" aria-hidden="true">[WARN] GCS: no heartbeat for 3.0 s
-[INFO] Failsafe → RTL
-[INFO] Returning to launch…</pre>
+      <p class="label label--accent eyebrow">404</p>
+      <h1>Page not found.</h1>
+      <p class="lede">This page doesn't exist or has moved.</p>
       <div class="nf__actions">
-        <a class="btn btn--primary" href="/">Return to launch</a>
-        <a class="btn" href="/projects">Browse work</a>
+        <a class="btn btn--primary" href="/">Home</a>
+        <a class="btn" href="/projects">Projects</a>
       </div>
     </div>
   </section>
@@ -34,18 +31,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin-top: var(--s-5);
   }
 
-  .nf__log {
-    margin-top: var(--s-6);
-    padding: var(--s-4) var(--s-5);
-    border: 1px solid var(--line);
-    border-left: 2px solid var(--accent);
-    border-radius: var(--radius);
-    background: var(--bg-elev);
-    font-size: var(--step--1);
-    color: var(--text-2);
-    max-width: 44ch;
-    overflow-x: auto;
-  }
 
   .nf__actions {
     display: flex;

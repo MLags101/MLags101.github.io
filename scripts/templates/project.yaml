@@ -12,7 +12,6 @@
   draft: true   # visible in `npm run dev` only — delete this line to publish
   role: {{role}}
   {{context}}
-  skills: [{{skills}}]   # ids from src/data/skills.yaml
   cover: cover.jpg   # file in src/content/projects/{{slug}}/images/ — replace the placeholder
   coverAlt: TODO describe the cover image for screen readers
   specs:

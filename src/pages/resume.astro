@@ -10,7 +10,7 @@ import { getExperience, getSkills, SKILL_GROUP_LABELS } from '../lib/content';
 import { monthYear } from '../lib/dates';
 
 const experience = (await getExperience()).filter((e) => e.data.onResume);
-const skills = (await getSkills()).filter((s) => s.data.featured);
+const skills = (await getSkills()).filter((s) => s.data.resume);
 const groups = Object.entries(SKILL_GROUP_LABELS)
   .map(([key, label]) => ({ label, items: skills.filter((s) => s.data.group === key).map((s) => s.data.name) }))
   .filter((g) => g.items.length);
@@ -47,8 +47,7 @@ const dates = (s: Date, e?: Date) => `${monthYear(s)} – ${e ? monthYear(e) : '
             <p class="entry__date">{site.education.location} · {site.education.graduation}</p>
           </div>
           <ul>
-            <li class="entry__row"><span>{site.education.detail}</span><span>GPA {site.education.gpa}</span></li>
-            <li>Related coursework: {site.education.coursework.join(', ')}</li>
+            <li class="entry__row"><span>{site.education.minor && <>Minor in {site.education.minor}, </>}{site.education.detail}</span><span>GPA {site.education.gpa}</span></li>
           </ul>
         </div>
       </section>

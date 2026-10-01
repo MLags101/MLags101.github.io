@@ -2,10 +2,10 @@
 
 Two folders hold everything. You never edit HTML.
 
-- **`src/data/`** — the **facts**, as plain YAML you edit by hand: dates, skills, specs, which projects are featured, your contact info. One file per kind of thing.
+- **`src/data/`** — the **facts**, as plain YAML you edit by hand: dates, specs, tools, which projects are featured, your contact info. One file per kind of thing.
 - **`src/content/projects/<slug>/`** — the **write-up** for each project (`index.mdx`) and its photos (`images/`).
 
-A project's title, dates, role, skills and specs are rendered by the page layout from `projects.yaml`, so never repeat them in the write-up. The build checks the YAML: a typo'd skill id, a missing cover photo or an end date before the start fails with a message naming the file and field.
+A project's title, dates, role, tools and specs are rendered by the page layout from `projects.yaml`, so never repeat them in the write-up. The build checks the YAML: a typo'd skill id, a missing cover photo or an end date before the start fails with a message naming the file and field.
 
 ## Workflow
 
@@ -30,7 +30,6 @@ kermit-v3:
   start: 2026-04
   end: 2026-04
   featured: true
-  skills: [solidworks, ardupilot, 3d-printing]
   cover: img-8094.jpg
   coverAlt: Kermit V3 on a table outdoors
   specs:
@@ -51,7 +50,6 @@ kermit-v3:
 | `role`      | ✓        | "Sole designer", "Drone Lead", …                                                          |
 | `context`   |          | An experience id (`robonav`, `invention-studio`…); links the project on that role.        |
 | `team`      |          | Free text shown in the sidebar.                                                           |
-| `skills`    | ✓        | Ids from `src/data/skills.yaml`. Unknown ids fail the build.                              |
 | `cover`     | ✓        | A file name in this project's `images/` folder: card thumbnail, hero, share image.        |
 | `coverAlt`  | ✓        | What the cover shows, for screen readers.                                                 |
 | `model`     |          | A 3D model id (`src/data/models/<id>.yaml`); replaces the hero image with the 3D viewer.  |
@@ -123,9 +121,10 @@ Jobs, internships, labs, teams. The key (e.g. `robonav:`) is the id a project's 
 | `type`                 | `internship` · `co-op` · `research` · `team` · `leadership`                 |
 | `start`, `end`         | `YYYY-MM`; leave `end` out while ongoing.                                   |
 | `positions`            | Newest first: `- { title: Electronics Master, start: 2024-08 }`. Dates optional. |
-| `summary`              | ≤ 260 chars.                                                                |
-| `highlights`           | Resume-style bullets.                                                       |
-| `skills`               | Skill ids.                                                                  |
+| `summary`              | A few plain sentences (≤ 480 chars) shown on the Experience page.           |
+| `highlights`           | Resume bullets, used on `/resume` only.                                      |
+| `photo`                | Optional photo in `src/assets/site/` shown with the entry.                   |
+| `skills`               | Tool ids from `skills.yaml` shown on the entry.                             |
 | `onResume`             | `false` = timeline only, not on `/resume`.                                  |
 
 ## Research outputs — `src/data/research.yaml`
@@ -133,14 +132,23 @@ Jobs, internships, labs, teams. The key (e.g. `robonav:`) is the id a project's 
 Papers, posters, talks, ongoing work. Research *positions* go in `experience.yaml` with `type: research`.
 Fields: `title`, `kind` (`paper` · `poster` · `talk` · `thesis` · `report` · `ongoing`), `date`, `venue`, `authors`, `summary`, `links`, optional `experience` / `project` ids.
 
-## Skills — `src/data/skills.yaml`
+## Tools — `src/data/skills.yaml`
 
-The only place a skill is defined: `- { id: solidworks, name: SolidWorks, group: cad-sim, featured: true }`.
+The one place a tool is defined, **and** where you say which projects used it:
 
-- **Groups:** `languages` · `cad-sim` · `electronics` · `robotics` · `fabrication`.
-- **`featured`** puts the skill on the resume page.
-- **`aliases`** are alternative spellings that `npm run new` will accept.
-- **The home page's "used in N projects"** counts are computed from projects' `skills` lists, so you never edit them.
+```yaml
+solidworks:
+  name: SolidWorks
+  group: cad-sim            # languages · cad-sim · electronics · robotics · fabrication
+  resume: true              # listed in the Skills section of /resume
+  projects: [eevi, kermit-v3, mr-toad]
+```
+
+- **Make a tool show up on a project:** add the project's slug to that tool's `projects:` list. Remove the slug to take it off.
+- **Remove a tool:** delete its block. If an `experience.yaml` entry lists the tool, delete its id there too.
+- **Add a tool:** run `npm run new -- skill "Name" --group cad-sim --projects a,b`, or copy a block.
+- **Computed from these lists:** project pages' tool chips, the Projects filter and the home page's "used in N projects" counts.
+- **`npm run lint:content`** warns about any project that no tool lists.
 
 ## Site info — `src/data/site.yaml`
 

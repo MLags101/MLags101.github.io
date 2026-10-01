@@ -8,8 +8,7 @@ const built = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric'
 <footer class="site-footer">
   <div class="container">
     <div class="site-footer__cta">
-      <p class="label label--accent eyebrow">Get in touch</p>
-      <h2>Let's build something that flies.</h2>
+      <h2>Contact</h2>
       <div class="site-footer__actions">
         <a class="btn btn--primary" href={`mailto:${site.email}`}><Icon name="mail" />{site.email}</a>
         <a class="btn" href={site.resumePdf} download><Icon name="download" />Resume (PDF)</a>
@@ -31,23 +30,17 @@ const built = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric'
         </ul>
       </div>
       <div>
-        <p class="label">Elsewhere</p>
+        <p class="label">Links</p>
         <ul>
           <li><a href={site.links.linkedin} rel="me noopener" target="_blank">LinkedIn <Icon name="arrow-up-right" size={12} /></a></li>
-          <li><a href={site.links.github} rel="me noopener" target="_blank">GitHub <Icon name="arrow-up-right" size={12} /></a></li>
           <li><a href={`mailto:${site.email}`}>Email</a></li>
         </ul>
-      </div>
-      <div class="site-footer__meta">
-        <p class="label">Station</p>
-        <p class="mono">33.7756° N, 84.3963° W</p>
-        <p class="mono muted">{site.location}</p>
       </div>
     </div>
 
     <div class="site-footer__base label">
       <span>© {new Date().getFullYear()} {site.name}</span>
-      <span>Rev. {built} · Built with Astro</span>
+      <span>Updated {built}</span>
     </div>
   </div>
 </footer>
@@ -61,9 +54,8 @@ const built = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric'
   }
 
   .site-footer__cta h2 {
-    margin-top: var(--s-4);
-    font-size: var(--step-5);
-    max-width: 16ch;
+    margin-top: 0;
+    font-size: var(--step-3);
   }
 
   .site-footer__actions {
@@ -75,7 +67,7 @@ const built = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric'
 
   .site-footer__grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 220px));
     gap: var(--s-6);
     margin-top: var(--s-9);
     padding-top: var(--s-6);

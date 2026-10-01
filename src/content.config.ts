@@ -42,7 +42,10 @@ const skills = defineCollection({
     name: z.string(),
     group: z.enum(['languages', 'cad-sim', 'electronics', 'robotics', 'fabrication']),
     aliases: list(z.string()),
-    featured: z.boolean().default(false),
+    /** Listed in the Skills section of /resume. */
+    resume: z.boolean().default(false),
+    /** Projects that used this tool — the source of every project's tool chips. */
+    projects: list(reference('projects')),
   }),
 });
 
@@ -70,7 +73,6 @@ const projects = defineCollection({
       role: z.string(),
       context: reference('experience').optional(),
       team: z.string().optional(),
-      skills: z.array(reference('skills')).min(1),
       specs: list(z.object({ label: z.string(), value: z.coerce.string() })),
       lineage: z.object({ family: z.string(), version: z.coerce.string(), order: z.number() }).optional(),
       related: list(reference('projects')),
@@ -88,6 +90,8 @@ const experience = defineCollection({
     mark: z.string().max(6),
     /** File name in src/assets/logos/. */
     logo: z.string().optional(),
+    /** Optional photo, file name in src/assets/site/. */
+    photo: z.string().optional(),
     orgUrl: z.string().optional(),
     location: z.string(),
     type: z.enum(['internship', 'co-op', 'research', 'team', 'leadership']),
@@ -95,7 +99,9 @@ const experience = defineCollection({
     end: monthOpt,
     /** Promotion ladder, newest first. Position dates are optional. */
     positions: z.array(z.object({ title: z.string(), start: monthOpt, end: monthOpt })).min(1),
-    summary: z.string().max(260),
+    /** A few plain sentences for the Experience page. */
+    summary: z.string().max(480),
+    /** Resume bullets — used on /resume only. */
     highlights: list(z.string()),
     skills: list(reference('skills')),
     /** Show on the resume page. */

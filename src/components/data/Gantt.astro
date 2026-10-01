@@ -1,20 +1,23 @@
 ---
 /**
- * Overview chart of experience as horizontal bars on a shared time axis.
- * Pure HTML/CSS (no JS); each bar links to its entry below.
+ * Overview chart of experience as horizontal bars on a shared time axis, with projects
+ * underneath as start → completion bars (diamond = completed). Pure HTML/CSS: each
+ * experience bar links to its entry below; hovering / focusing a project shows a card
+ * with its photo, name and dates that links to the project page.
  */
-import type { Experience } from '../../lib/content';
+import { Image } from 'astro:assets';
+import type { Experience, Project } from '../../lib/content';
 import { range, duration } from '../../lib/dates';
 
 interface Props {
   entries: Experience[];
-  /** Extra marks (e.g. projects) drawn as ticks on a bottom lane. */
-  ticks?: { date: Date; label: string }[];
+  /** Projects drawn on lanes under the experience rows. */
+  projects?: Project[];
 }
 
-const { entries, ticks = [] } = Astro.props;
+const { entries, projects = [] } = Astro.props;
 const now = new Date();
-const startYear = Math.min(...entries.map((e) => e.data.start.getUTCFullYear()), ...ticks.map((t) => t.date.getUTCFullYear()));
+const startYear = Math.min(...entries.map((e) => e.data.start.getUTCFullYear()), ...projects.map((p) => p.data.start.getUTCFullYear()));
 const endYear = now.getUTCFullYear() + 1;
 const t0 = Date.UTC(startYear, 0, 1);
 const t1 = Date.UTC(endYear, 0, 1);
@@ -23,6 +26,21 @@ const pct = (d: Date) => ((d.getTime() - t0) / (t1 - t0)) * 100;
 const endOfMonth = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1));
 const years = Array.from({ length: endYear - startYear }, (_, i) => startYear + i);
 const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.getTime());
+
+// Pack projects into as few lanes as possible without overlapping (a small gap keeps
+// neighbouring diamonds apart).
+const GAP = 1.6; // % of the axis
+const spans = [...projects]
+  .map((p) => ({ p, left: pct(p.data.start), right: pct(p.data.end ? endOfMonth(p.data.end) : now) }))
+  .sort((a, b) => a.left - b.left);
+const laneEnds: number[] = [];
+const placed = spans.map((s) => {
+  let lane = laneEnds.findIndex((end) => end + GAP <= s.left);
+  if (lane < 0) lane = laneEnds.push(0) - 1;
+  laneEnds[lane] = Math.max(s.right, s.left + 0.6);
+  return { ...s, lane };
+});
+const laneCount = laneEnds.length;
 ---
 
 <figure class="gantt" aria-label="Experience timeline overview" data-reveal>
@@ -71,12 +89,25 @@ const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.g
           })
         }
         {
-          ticks.length > 0 && (
-            <div class="gantt__row gantt__row--ticks">
-              {ticks.map((t) => (
-                <span class="gantt__tick" style={`left:${pct(t.date)}%`} title={t.label} aria-hidden="true" />
-              ))}
+          laneCount > 0 && (
+            <div class="gantt__projects" style={`--lanes:${laneCount}`}>
               <span class="gantt__ticks-label label">Projects</span>
+              {placed.map(({ p, left, right, lane }, i) => (
+                <a
+                  href={`/projects/${p.id}`}
+                  class:list={['gproj', left > 62 && 'gproj--flip', !p.data.end && 'is-ongoing']}
+                  style={`left:${left}%; width:${Math.max(right - left, 0)}%; --lane:${lane}; --k:${i}`}
+                  aria-label={`${p.data.title}, ${range(p.data.start, p.data.end, 'text')}`}
+                >
+                  <span class="gproj__bar" aria-hidden="true" />
+                  {p.data.end && <span class="gantt__tick" aria-hidden="true" />}
+                  <span class="gproj__card" aria-hidden="true">
+                    <Image src={p.data.cover} alt="" widths={[240, 480]} sizes="220px" loading="lazy" />
+                    <span class="gproj__title">{p.data.title}</span>
+                    <span class="label">{range(p.data.start, p.data.end)}</span>
+                  </span>
+                </a>
+              ))}
             </div>
           )
         }
@@ -87,7 +118,7 @@ const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.g
     <span><i class="sw sw--internship"></i>Internship / Co-op</span>
     <span><i class="sw sw--research"></i>Research</span>
     <span><i class="sw sw--team"></i>Team / Leadership</span>
-    <span><i class="sw sw--tick"></i>Project shipped</span>
+    <span><i class="sw sw--proj"></i><i class="sw sw--tick"></i>Project, start → completed</span>
   </figcaption>
 </figure>
 
@@ -241,30 +272,116 @@ const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.g
     white-space: nowrap;
   }
 
-  .gantt__row--ticks {
+  /* ── project lanes ── */
+  .gantt__projects {
+    position: relative;
+    height: calc(var(--lanes) * 1.15rem + 1.2rem);
     margin-top: var(--s-2);
     border-top: 1px dashed var(--line);
-  }
-
-  .gantt__tick {
-    position: absolute;
-    top: 0.6rem;
-    width: 9px;
-    height: 9px;
-    transform: translateX(-50%) rotate(45deg);
-    border: 1.5px solid var(--accent);
-    background: var(--bg-elev);
-    transition: background-color var(--dur-2) var(--ease);
-  }
-
-  .gantt__tick:hover {
-    background: var(--accent);
   }
 
   .gantt__ticks-label {
     position: absolute;
     right: 0;
-    top: 0.45rem;
+    bottom: 0.1rem;
+  }
+
+  .gproj {
+    position: absolute;
+    top: calc(0.6rem + var(--lane) * 1.15rem);
+    height: 0.9rem;
+    min-width: 0.5rem;
+    z-index: 3;
+    outline-offset: 3px;
+  }
+
+  .gproj:hover,
+  .gproj:focus-visible {
+    z-index: 6;
+  }
+
+  .gproj__bar {
+    position: absolute;
+    inset: 50% 0 auto 0;
+    height: 3px;
+    transform: translateY(-50%);
+    border-radius: 2px;
+    background: var(--accent);
+    opacity: 0.5;
+    transition: opacity var(--dur-2) var(--ease);
+  }
+
+  .gproj.is-ongoing .gproj__bar {
+    background: linear-gradient(90deg, var(--accent) 70%, transparent);
+  }
+
+  .gantt__tick {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    transform: translate(50%, -50%) rotate(45deg);
+    border: 1.5px solid var(--accent);
+    background: var(--bg-elev);
+    transition: background-color var(--dur-2) var(--ease);
+  }
+
+  .gproj:hover .gproj__bar,
+  .gproj:focus-visible .gproj__bar {
+    opacity: 1;
+  }
+
+  .gproj:hover .gantt__tick,
+  .gproj:focus-visible .gantt__tick {
+    background: var(--accent);
+  }
+
+  /* Hover / focus card: photo, name, dates. Opens upward over the experience rows. */
+  .gproj__card {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: -6px;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 6px 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateY(4px);
+    pointer-events: none;
+    transition:
+      opacity var(--dur-2) var(--ease),
+      transform var(--dur-2) var(--ease);
+  }
+
+  .gproj--flip .gproj__card {
+    left: auto;
+    right: -6px;
+  }
+
+  .gproj:hover .gproj__card,
+  .gproj:focus-visible .gproj__card {
+    opacity: 1;
+    transform: none;
+  }
+
+  .gproj__card :global(img) {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 2px;
+  }
+
+  .gproj__title {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.25;
   }
 
   .gantt__legend {
@@ -308,6 +425,14 @@ const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.g
     height: 8px;
     transform: rotate(45deg);
     border: 1.5px solid var(--accent);
+    margin-left: -6px;
+  }
+
+  .sw--proj {
+    width: 18px;
+    height: 3px;
+    background: var(--accent);
+    opacity: 0.6;
   }
 
   /* Bars grow from their start date the first time the chart scrolls into view. */
@@ -319,15 +444,11 @@ const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.g
       transform-origin: left center;
       transition: transform 0.9s var(--ease) calc(var(--k, 0) * 110ms + 150ms);
     }
-    .gantt__tick {
-      transition:
-        background-color var(--dur-2) var(--ease),
-        opacity 0.4s var(--ease) 0.9s,
-        transform 0.4s var(--ease) 0.9s;
+    .gproj {
+      transition: opacity 0.4s var(--ease) calc(var(--k, 0) * 40ms + 0.8s);
     }
-    :global(.js) .gantt:not(.is-in) .gantt__tick {
+    :global(.js) .gantt:not(.is-in) .gproj {
       opacity: 0;
-      transform: translateX(-50%) rotate(45deg) scale(0.4);
     }
   }
 </style>

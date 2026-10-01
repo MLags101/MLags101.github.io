@@ -10,8 +10,8 @@ import studio from '../assets/site/invention-studio.jpg';
 
 <PageLayout
   title="About"
-  eyebrow={["Profile", ...site.identity].join(" / ")}
-  lede="Aerospace engineering student at Georgia Tech who learns fastest with hardware in hand — prototyping, testing, breaking and rebuilding, especially UAVs and mechatronics."
+  eyebrow={site.identity.join(' / ')}
+  lede="Aerospace Engineering BS/MS student at Georgia Tech, minoring in Robotics."
   image={portrait}
 >
   <div class="container about">
@@ -23,27 +23,25 @@ import studio from '../assets/site/invention-studio.jpg';
 
       <div class="about__text">
         <p>
-          I'm an Aerospace Engineering undergraduate at Georgia Tech, minoring in Robotics in the BS/MS Honors Program. I
-          have a deep curiosity and a relentless drive to master skills across many fields — so whatever I want to
-          build next, I know I can make it real.
+          My focus is autonomous flying vehicles and mechatronics, which I've pursued through research and
+          through independent projects, many of which are documented on this site.
         </p>
         <p>
-          Most of what I know I learned by building: drones from a box of salvaged parts, gimbal controllers that
-          let the magic smoke out, and rovers sketched on lined paper before they ever touched CAD. Along the way
-          I've worked on sUAS flight test at AV's MacCready Works, debugged UAV avionics in the field at GTRI, and
-          now build research vehicles in Georgia Tech's Aerospace Robotics Laboratory.
+          I've worked as a systems test engineering intern at AV's MacCready Works, including on the Skyfall
+          Mars helicopter program, and as an electrical engineering co-op at the Georgia Tech Research
+          Institute. I'm now an undergraduate researcher in the Aerospace Robotics Lab, building a group of
+          swarm drones that will work together to manipulate their environment.
         </p>
         <p>
-          In the Invention Studio and on RoboNav, I share ideas, troubleshoot designs and co-develop prototypes with
-          engineers from every background. As a leader in those spaces I mentor others — teaching prototyping
-          techniques, guiding them through iterative design, and building the kind of collaborative environment
-          that ships hardware.
+          At the Invention Studio makerspace I volunteer as Electronics Master and Prototyping Instructor,
+          helping students and faculty build their projects. I also led the drone team at RoboNav, developing
+          a Mars reconnaissance UAV for the University Rover Challenge.
         </p>
 
         <dl class="facts">
           <div>
             <dt class="label">Studying</dt>
-            <dd>{site.education.degree}<br /><span class="muted">{site.education.detail}</span></dd>
+            <dd>{site.education.degree}<br /><span class="muted">{site.education.minor && <>Minor in {site.education.minor} · </>}{site.education.detail}</span></dd>
           </div>
           <div>
             <dt class="label">Graduation</dt>
@@ -53,6 +51,14 @@ import studio from '../assets/site/invention-studio.jpg';
             <dt class="label">Based in</dt>
             <dd>{site.location}</dd>
           </div>
+          {
+            site.honors.length > 0 && (
+              <div>
+                <dt class="label">Honors</dt>
+                <dd>{site.honors.join(' · ')}</dd>
+              </div>
+            )
+          }
           {
             site.availability && (
               <div>
@@ -71,7 +77,7 @@ import studio from '../assets/site/invention-studio.jpg';
       </div>
     </div>
 
-    <section class="about__gallery" aria-label="Where the work happens">
+    <section class="about__gallery" aria-label="Photos">
       <figure class="crop-marks">
         <Image src={team} alt="The RoboJackets RoboNav team in front of the team trailer" widths={[600, 900, 1300]} sizes="(min-width: 900px) 60vw, 100vw" />
         <figcaption class="label">RoboNav · RoboJackets</figcaption>

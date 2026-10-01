@@ -2,7 +2,7 @@
 
 I started this project to fill a gap in small-UAV prototyping: a compact, low-cost brushless controller made for camera gimbals. Existing options were either expensive and oversized (ODrive, Moteus) or plagued with software issues (STorM32).
 
-<Figure src="storm.jpg" alt="STorM32 gimbal controller board" caption="The STorM32 — the existing solution I set out to improve on." contain />
+<Figure src="storm.jpg" alt="STorM32 gimbal controller board" caption="The STorM32 gimbal controller." contain />
 
 ## V1 — Teensy + L6234
 
@@ -26,7 +26,7 @@ Assembly was hard without a reflow oven — I hand-soldered every SMD part. Init
 <Figure src="img-7389.jpg" alt="Assembled V1 driver board with the Teensy attached" caption="V1, assembled and on the bench." />
 
 <Callout tone="lesson">
-A $25 dev board as the only copy is a single point of failure. V2 put the microcontroller on the board itself.
+With only one Teensy, one short stopped testing. V2 puts the microcontroller on the board itself.
 </Callout>
 
 ## V2 — integrated ATmega328
@@ -48,5 +48,5 @@ I assembled and tested the boards in the Student Competition Center. After some 
 <Figure src="img-7873.jpg" alt="Finished V2 gimbal controller board held in hand" caption="The finished V2 board — small enough to sit inside the gimbal." />
 
 <Callout tone="result">
-Solidified PCB design, AVR programming and brushless motor control — and gave the drone team a gimbal controller we can repair and modify ourselves.
+Working velocity and position control of the gimbal motor, now used on EEVi v3.
 </Callout>

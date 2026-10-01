@@ -27,7 +27,7 @@ That first VIP taught me a lot about proven frame designs and the common electro
     { src: 'quadfrog/img-5798.jpg', alt: 'Kermit V1, a green printed quad, on a table with its wiring exposed' },
     { src: 'quadfrog/img-6252.jpg', alt: 'Kermit V1 with orange propellers on a wooden floor' },
   ]}
-  caption="Earlier builds — Kermit V1's flat printed arms and loose wiring set the requirements for V2."
+  caption="Earlier builds, including Kermit V1."
 />
 
 ## A modular frame
@@ -65,8 +65,8 @@ OpenHD made for an interesting experience. It relies on a specific set of Wi-Fi 
 
 For a long stretch the feed kept cutting out, reviving, then dying again a few seconds later, and I couldn't figure out why. After a series of tests on the power supply, software configuration and wiring, I found the cause. I had made an extended USB cable with a separate power supply so the Wi-Fi radio could transmit at full power, but I hadn't shielded it, so electromagnetic interference was corrupting the packets.
 
-<Callout tone="lesson" title="Debugging win">
-Wrapping the USB differential pair in aluminium foil and heat shrink shielded it from EMI — and the video stream stabilized.
+<Callout tone="result" title="Fix">
+Wrapping the USB differential pair in aluminium foil and heat shrink shielded it from EMI, and the video stream stabilized.
 </Callout>
 
 <Figure src="openhd-video-test.jpg" alt="Laptop showing the OpenHD live video feed during a bench test" caption="OpenHD video on the ground station during bench testing." />

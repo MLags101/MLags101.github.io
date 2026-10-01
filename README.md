@@ -19,12 +19,13 @@ Push to `main` → the **Deploy** workflow publishes the site. Every other branc
 
 **New here? Read [SITE_GUIDE.md](SITE_GUIDE.md)** — the map of the repo and a "I want to… → open this" table.
 
-Short version: **facts** (dates, skills, specs, contact info) are hand-editable YAML in
+Short version: **facts** (dates, tools, specs, contact info) are hand-editable YAML in
 `src/data/`; **write-ups** (text + photos) are in `src/content/projects/<slug>/`.
 
 | I want to…                         | Do this                                                                      |
 | ---------------------------------- | ---------------------------------------------------------------------------- |
-| Change a project's dates / skills / specs | `src/data/projects.yaml`                                             |
+| Change a project's dates / specs  | `src/data/projects.yaml`                                                     |
+| Change which tools a project used | `src/data/skills.yaml` (each tool lists its projects)                        |
 | Add a project                      | `npm run new` (or `npm run new -- project "Name" --category personal …`)    |
 | Add a job / team / lab             | `src/data/experience.yaml` (or `npm run new -- experience "Org name"`)      |
 | Add photos to a project            | Drop them in `src/content/projects/<slug>/images/`, reference by file name   |
@@ -44,4 +45,4 @@ Guides: **[docs/CONTENT.md](docs/CONTENT.md)** (every data field, component chea
 Dark technical theme with a light toggle; one accent (`--accent`); tokens in `src/styles/tokens.css`.
 Motion is purposeful (diagram signal flow, CAD camera moves, draw-ins) and disappears under
 `prefers-reduced-motion`. Each fact lives in exactly one place — never repeat a project's
-title/date/skills in its write-up; the layout renders them from `src/data/projects.yaml`.
+title/date/tools in its write-up; the layout renders them from `src/data/projects.yaml`.

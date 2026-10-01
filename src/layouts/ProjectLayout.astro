@@ -49,7 +49,7 @@ const linkIcon = (kind: string) => (kind === 'github' ? 'github' : 'arrow-up-rig
 
     <header class="project__head container">
       <nav class="project__crumbs label" aria-label="Breadcrumb">
-        <a href="/projects"><Icon name="arrow-left" size={12} /> All work</a>
+        <a href="/projects"><Icon name="arrow-left" size={12} /> All projects</a>
         <span aria-hidden="true">/</span>
         <a href={`/projects?category=${data.category}`}>{CATEGORY_LABELS[data.category]}</a>
       </nav>
@@ -188,7 +188,7 @@ const linkIcon = (kind: string) => (kind === 'github' ? 'github' : 'arrow-up-rig
         <section class="section project__related" aria-labelledby="related">
           <div class="container">
             <p id="related" class="label label--accent eyebrow">
-              Related work
+              Related projects
             </p>
             <div class="related-grid">
               {related.map((p, i) => (

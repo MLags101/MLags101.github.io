@@ -20,16 +20,16 @@ const entries = await Promise.all(
 const filterType = (t: string) => (t === 'co-op' ? 'internship' : t);
 const types = [...new Set(experience.map((e) => filterType(e.data.type)))];
 const FILTER_LABELS: Record<string, string> = { ...EXPERIENCE_LABELS, internship: 'Industry' };
-const ticks = projects.map((p) => ({ date: p.data.end ?? p.data.start, label: p.data.title }));
+const gtLogo = (await import('../../assets/logos/georgia-tech.png')).default;
 ---
 
 <PageLayout
   title="Experience"
-  eyebrow="Timeline / roles & teams"
-  lede="Industry internships, research and the student teams where I learned to lead. Select a bar to jump to that role; diamonds mark when projects shipped."
+  eyebrow="Timeline"
+  lede="Internships, research labs and student teams."
 >
   <div class="container exp">
-    <Gantt entries={experience} ticks={ticks} />
+    <Gantt entries={experience} projects={projects} />
 
     <div class="exp__filters" role="group" aria-label="Filter by type" data-exp-filters>
       <button type="button" class="fchip" data-type="" aria-pressed="true">All</button>
@@ -92,12 +92,14 @@ const ticks = projects.map((p) => ({ date: p.data.end ?? p.data.start, label: p.
 
               <p class="tl__summary">{e.data.summary}</p>
 
-              {e.data.highlights.length > 0 && (
-                <ul class="tl__highlights">
-                  {e.data.highlights.map((h) => (
-                    <li>{h}</li>
-                  ))}
-                </ul>
+              {e.data.photo && (
+                <Image
+                  src={e.data.photo}
+                  alt={`${e.data.org}`}
+                  class="tl__photo"
+                  widths={[480, 800, 1100]}
+                  sizes="(min-width: 1000px) 640px, 100vw"
+                />
               )}
 
               {skills.length > 0 && (
@@ -139,7 +141,7 @@ const ticks = projects.map((p) => ({ date: p.data.end ?? p.data.start, label: p.
         <div class="tl__rail" aria-hidden="true"><span class="tl__node" /></div>
         <article class="tl__card">
           <header class="tl__head">
-            <span class="tl__mark mono" aria-hidden="true">GT</span>
+            <Image src={gtLogo} alt="" class="tl__logo" widths={[96]} sizes="48px" />
             <div>
               <p class="label">Education</p>
               <h2>{site.education.school}</h2>
@@ -148,10 +150,7 @@ const ticks = projects.map((p) => ({ date: p.data.end ?? p.data.start, label: p.
           <ol class="tl__positions">
             <li class="is-current"><span class="tl__pos-title">{site.education.degree}</span></li>
           </ol>
-          <p class="tl__summary">{site.education.detail} · GPA {site.education.gpa}</p>
-          <ul class="chip-list tl__skills" aria-label="Related coursework">
-            {site.education.coursework.map((c) => <li class="chip">{c}</li>)}
-          </ul>
+          <p class="tl__summary">{site.education.minor && <>Minor in {site.education.minor} · </>}{site.education.detail} · GPA {site.education.gpa}</p>
         </article>
       </li>
     </ol>
@@ -380,6 +379,16 @@ const ticks = projects.map((p) => ({ date: p.data.end ?? p.data.start, label: p.
     margin-top: var(--s-4);
     color: var(--text-2);
     max-width: 70ch;
+  }
+
+  .tl__photo {
+    width: 100%;
+    max-width: 640px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    margin-top: var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
   }
 
   .tl__highlights {
