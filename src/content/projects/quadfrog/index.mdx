@@ -1,0 +1,60 @@
+## Overview
+
+This project was my hands-on exploration of drones and what they can do. I wanted to grow across as many disciplines as possible by building as much of the drone myself as I could: I designed and fabricated the frame, chose a V-tail configuration, selected and soldered the electronics, built my own ground-station module, and wrote Python and C++ for both the onboard Raspberry Pi and my laptop.
+
+### Motivation
+
+Drones blend mechanical, electrical and software engineering, which is exactly why I love them. The goal was a functional, customizable platform to serve as a foundation for future experiments — the platform that became the Kermit line.
+
+## Frame design
+
+The project began with the V-tail configuration, chosen to improve forward flight and simplify component placement. I designed the frame in Fusion 360, ensuring structural integrity (after a few iterations and lessons learned) and precise motor placement for balanced flight.
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  items={[
+    { src: 'img-5642.jpg', alt: 'Flight controller, ESCs and wiring laid out on a bench before integration', caption: 'Electronics before integration.' },
+    { src: 'img-5657.jpg', alt: 'Raspberry Pi and power distribution board wired together on a desk', caption: 'Companion computer and PDB.' },
+  ]}
+/>
+
+## Electronics & software
+
+The onboard flight computer, a Raspberry Pi, ran custom Python to manage flight-control inputs and sensor data, talking to the flight controller over serial. For the ground station I built a box around a Raspberry Pi Pico and an HC-12 radio, paired with Python GCS software I wrote for real-time control and telemetry.
+
+Across iterations I kept improving it: the arms moved from flat plates to an **I-beam section** to account for PLA's weakness, and I added a live camera feed from a webcam on the Pi, streamed over a self-hosted Flask server.
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  items={[
+    { src: 'img-5797.jpg', alt: 'Green printed V-tail frame with electronics mounted on a desk', caption: 'Frame and electronics come together.' },
+    { src: 'img-5798.jpg', alt: 'QuadFrog frame on a table with motors installed', caption: 'Motors installed.' },
+  ]}
+/>
+
+## Fabrication
+
+I printed the frame on the Invention Studio's Ultimakers in PLA, iterating to fix cracking and arm bowing. The final frame was light but robust. I soldered the flight controller, ESCs and motors onto an off-the-shelf power-distribution board.
+
+<Callout tone="lesson">
+My first time with high-current LiPo electronics, I blew up an ESC in my dorm and nearly set off the fire alarm. It taught me fast to respect the hardware — and to write procedures before powering up.
+</Callout>
+
+<Gallery
+  columns={3}
+  aspect="1/1"
+  items={[
+    { src: 'img-5830.jpg', alt: 'Bright green frame print viewed from above' },
+    { src: 'img-6252.jpg', alt: 'Completed QuadFrog with orange props on a wooden floor' },
+    { src: 'img-6253.jpg', alt: 'Holding the finished QuadFrog by its frame' },
+  ]}
+  caption="From fresh print to finished airframe."
+/>
+
+## Results
+
+The project merged mechanical design, electronics and programming in one airframe — the V-tail's look was a nod to Watch Dogs 2. I brought Kermit home from college and test-flew it in my backyard. It went well, right up until my inexperience as a pilot put it into a branch. Onward to version 2.
+
+<Video src="/media/quadfrog/backyard-flight.mp4" caption="Backyard test flight — right before the branch." />

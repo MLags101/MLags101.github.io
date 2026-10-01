@@ -1,0 +1,111 @@
+## Overview
+
+DUM-I is a modular robotic arm: the base units are easy to swap, and so is the end linkage. I meant the project to focus on a **ROS 2 implementation of inverse kinematics**, accurately pointing a gimballed laser module to scan the surroundings.
+
+Unforeseen complications sent my learning in a different direction. The biggest problems came from the STorM32 gimbal board and the BeagleBone Blue single-board computer, and both had the same root cause: a lack of resources like tutorials, books and guides. I had to learn how each board worked in much more detail so I could build my own tools for the jobs I needed done.
+
+- **For the STorM32**, I learned a lot about brushless motors and the electronics and control theory needed to drive them.
+- **For the BeagleBone**, whose supported Python libraries are years out of date, I learned to control GPIO through the Linux sysfs interface and to use embedded C to take advantage of it.
+
+Despite the very different path, I learned a great deal of useful material that I'll use in future projects.
+
+<Video src="/media/dum-i/arm-motion.mp4" caption="DUM-I moving through its range." />
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  items={[
+    { src: 'arm-desk-test.jpg', alt: 'The assembled arm on a desk beside a laptop during testing', caption: 'Desk testing.' },
+    { src: 'arm-wiring-overview.jpg', alt: 'Overhead view of the arm, base modules and wiring spread across a counter', caption: 'Everything wired up.' },
+  ]}
+/>
+
+## Modular design
+
+Modularity was always going to be central: a robotic arm is useful in many applications. I designed a **stackable base** for the electronics, so new features can be built seamlessly into it. I also gave the final joint a **modular interface**, so it can carry an end effector, a sensor package or something else.
+
+<Gallery
+  columns={3}
+  fit="contain"
+  aspect="4/5"
+  items={[
+    { src: 'cad-assembly.png', alt: 'CAD render of the full arm with color-coded base modules', caption: 'Full assembly — each colored ring is a stackable base module.' },
+    { src: 'cad-gimbal-head.png', alt: 'CAD render of the gimbal head with lidar and driver board', caption: 'Gimbal head on the modular end joint.' },
+    { src: 'cad-base-stack.png', alt: 'Section render of the stacked electronics bays in the base', caption: 'Electronics bays inside the base.' },
+  ]}
+/>
+
+## Electronics
+
+The electronics were mostly a matter of voltage conversion. The main reason I chose the **BeagleBone Blue** as the compute board is its 8 independent servo channels, which is great compared with other BeagleBone and Raspberry Pi models. A Raspberry Pi has 2 PWM channels; its GPIO can be configured for software PWM, but that's less reliable. Unfortunately, the Blue's servo channels output 6 V, below the 8.4 V needed for maximum torque on the primary servos and the 7.2 V for the secondary servos.
+
+<Gallery
+  columns={2}
+  aspect="3/4"
+  items={[
+    { src: 'electronics-layout.jpg', alt: 'Arm segments and base electronics laid out on the floor during assembly', caption: 'Laying out the electronics.' },
+    { src: 'base-compute-board.jpg', alt: 'BeagleBone Blue mounted inside the blue base module', caption: 'BeagleBone Blue in the base.' },
+  ]}
+/>
+
+## Gimbal control
+
+I decided to hand the gimbal's compute to a separate board, a **Raspberry Pi Zero**. With it, the arm drives the gimbal over a single I²C connection, so the data lines for the gimbal motor drivers and the lidar can be wired locally at the head.
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  items={[
+    { src: 'gimbal-head-built.jpg', alt: 'Magenta printed gimbal head holding the lidar sensor', caption: 'The built gimbal head with the lidar.' },
+    { src: 'gimbal-driver-board.jpg', alt: 'Small green circuit board with wiring held in hand', caption: 'Gimbal-head electronics before mounting.' },
+  ]}
+/>
+
+The STorM32 controller caused many problems because of its unmaintained software and inactive community, which pushed me toward controlling the brushless gimbal motors manually. I interfaced directly with the motor driver ICs on the STorM32, which let me drive the motors over a simple makeshift I²C connection. That frustration is exactly what later became the [Typhoon gimbal controller](/projects/typhoon-bgc).
+
+## Fighting the BeagleBone
+
+The largest and most time-consuming problem quickly became the BeagleBone Blue. The recommended Python GPIO libraries had gone unmaintained for years, and many were incompatible with the modern Debian image the website recommended. The approach that finally worked was installing an older Debian release compatible with the **librobotcontrol** C library.
+
+Before I found that, I'd been testing on a BeagleBone Black with direct kernel interfacing through **sysfs**, the part of the Linux filesystem that directly reflects GPIO state. Information on it was hard to find and often led down rabbit holes. Once librobotcontrol worked, I still had to learn to write C and to blend Python with C, so I could keep the input library I'd already tested for reading the joystick. That was a lot of embedded programming I hadn't planned on.
+
+<Columns>
+  <Figure src="joystick-control-setup.jpg" alt="Desk with a flight-stick joystick, laptop and monitor running code" caption="Joystick control setup." />
+  <Figure src="beaglebone-servo-test.jpg" alt="BeagleBone and a servo on a desk during a test" caption="Servo bring-up on the BeagleBone." />
+</Columns>
+
+<Video src="/media/dum-i/joystick-control.mp4" caption="Driving the arm from the joystick." />
+
+## ROS 2
+
+During a break from the BeagleBone, I learned a lot about ROS 2 while developing and testing on the Raspberry Pi. I wrote and tested nodes for three jobs:
+
+- reading the joystick
+- inverse kinematics to direct servo motion
+- sending I²C commands to the Pi Zero
+
+Unfortunately the code didn't transfer, because ROS 2 isn't well supported on the BeagleBone's Debian. Theoretically the only route is building ROS 2 from source. I tried several times without success, and dropped ROS 2 from the final product to make the deadline.
+
+<Callout tone="lesson">
+If I did it again, I'd keep a Raspberry Pi as the main compute and use SimpleFOC drivers from the start instead of the STorM32 board — that would have left the time for ROS 2 development, which was the point.
+</Callout>
+
+### Bill of materials
+
+| # | Part | Qty | Unit | Total |
+| -: | :-- | -: | -: | -: |
+| 1 | MG996R servo (6-pack) | 1 | $26.99 | $26.99 |
+| 2 | T-Motor GB4106 gimbal motor | 2 | $45.90 | $91.80 |
+| 3 | Joystick | 1 | $69.99 | $69.99 |
+| 4 | BeagleBone Blue | 1 | $53.77 | $53.77 |
+| 5 | Power supply | 1 | $12.00 | $12.00 |
+| 6 | Brushless motor driver | 2 | $8.00 | $16.00 |
+| 7 | 2-axis gimbal controller | 1 | $19.49 | $19.49 |
+| 8 | Long-range lidar (LIDAR-Lite v3) | 1 | $130.00 | $130.00 |
+| 9 | High-torque servo (pair) | 1 | $36.99 | $36.99 |
+| 10 | Matek PDB | 1 | $13.50 | $13.50 |
+| 11 | Lazy Susan bearing | 1 | $13.20 | $13.20 |
+
+<Callout tone="note" title="Support">
+Funded and supported by the Invention Studio at Georgia Tech, a student organization. Thanks to the Invention Studio for supporting this project and my learning!
+</Callout>

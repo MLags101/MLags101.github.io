@@ -1,0 +1,50 @@
+{
+  "name": "mlags101-portfolio",
+  "type": "module",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Michael Lagana — engineering portfolio",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "new": "node scripts/new.mjs",
+    "lint:content": "node scripts/check-content.mjs",
+    "linkcheck": "linkinator http://localhost:4321 --recurse --skip \"^(?!http://localhost)\"",
+    "migrate:media": "node scripts/migrate/migrate-media.mjs",
+    "media:videos": "node scripts/encode-videos.mjs",
+    "model:optimize": "node scripts/optimize-model.mjs",
+    "model:parts": "node scripts/model-parts.mjs"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/mdx": "^8.0.2",
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "@google/model-viewer": "^4.3.1",
+    "astro": "^7.3.5",
+    "js-yaml": "^5.4.2",
+    "photoswipe": "^5.4.4",
+    "sharp": "^0.35.5",
+    "three": "^0.183.2",
+    "typescript": "^6.0.3",
+    "urdf-loader": "^0.13.1"
+  },
+  "devDependencies": {
+    "@clack/prompts": "^1.8.1",
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
+    "@types/three": "^0.183.1",
+    "linkinator": "^8.1.0",
+    "meshoptimizer": "^1.3.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

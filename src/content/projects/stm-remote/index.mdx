@@ -1,0 +1,25 @@
+## Overview
+
+STM Remote continues my push into embedded systems: designing and programming custom PCBs around the **STM32** family. It evolves my earlier Custom Remote — where that board was a simple trigger, this one adds an accelerometer/gyro module and a larger button array for intuitive robot control.
+
+## Design philosophy
+
+With the IMU, the user directs motion by moving the hand holding the remote. That makes control far more intuitive, especially for people new to driving robots.
+
+<Figure src="stm-rem-sch.png" alt="Full schematic of the STM Remote" caption="STM Remote schematic." contain />
+
+## Technical challenges
+
+I learned STM32 hardware design from Phil's Lab on YouTube and ST's datasheets. It was harder than expected — from the precise external **crystal oscillator** circuit to the large **decoupling capacitor network** needed for clean power. Using a board house raised the stakes: every mistake meant weeks of waiting for revised boards, so reviews had to be meticulous.
+
+<Gallery
+  columns={2}
+  fit="contain"
+  aspect="4/3"
+  items={[
+    { src: 'stm-rem-2d.png', alt: 'Two-layer layout of the STM Remote PCB', caption: 'Board layout.' },
+    { src: 'stm-rem-pcb.png', alt: '3D render of the populated STM Remote board', caption: '3D render.' },
+  ]}
+/>
+
+<Figure src="stm-sch.png" alt="Earlier STM32 reference schematic" caption="Early STM32 core schematic used to learn the clock and power design." contain />

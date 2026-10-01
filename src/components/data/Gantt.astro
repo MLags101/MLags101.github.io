@@ -1,0 +1,333 @@
+---
+/**
+ * Overview chart of experience as horizontal bars on a shared time axis.
+ * Pure HTML/CSS (no JS); each bar links to its entry below.
+ */
+import type { Experience } from '../../lib/content';
+import { range, duration } from '../../lib/dates';
+
+interface Props {
+  entries: Experience[];
+  /** Extra marks (e.g. projects) drawn as ticks on a bottom lane. */
+  ticks?: { date: Date; label: string }[];
+}
+
+const { entries, ticks = [] } = Astro.props;
+const now = new Date();
+const startYear = Math.min(...entries.map((e) => e.data.start.getUTCFullYear()), ...ticks.map((t) => t.date.getUTCFullYear()));
+const endYear = now.getUTCFullYear() + 1;
+const t0 = Date.UTC(startYear, 0, 1);
+const t1 = Date.UTC(endYear, 0, 1);
+const pct = (d: Date) => ((d.getTime() - t0) / (t1 - t0)) * 100;
+// Month-precision ends mean "through the end of that month".
+const endOfMonth = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1));
+const years = Array.from({ length: endYear - startYear }, (_, i) => startYear + i);
+const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.getTime());
+---
+
+<figure class="gantt" aria-label="Experience timeline overview" data-reveal>
+  <div class="gantt__scroll">
+    <div class="gantt__chart">
+      <div class="gantt__axis" aria-hidden="true">
+        {
+          years.map((y) => (
+            <span class="label" style={`left:${pct(new Date(Date.UTC(y, 0, 1)))}%`}>
+              {y}
+            </span>
+          ))
+        }
+      </div>
+      <div class="gantt__rows">
+        {
+          years.map((y) => <span class="gantt__gridline" style={`left:${pct(new Date(Date.UTC(y, 0, 1)))}%`} aria-hidden="true" />)
+        }
+        <span class="gantt__now" style={`left:${pct(now)}%`} aria-hidden="true"><span class="label">Now</span></span>
+        {
+          rows.map((e, i) => {
+            const left = pct(e.data.start);
+            const right = pct(e.data.end ? endOfMonth(e.data.end) : now);
+            const title = e.data.positions[0]!.title;
+            // Long bars carry their label inside; short ones put it on whichever side has room.
+            const inside = right - left > 34;
+            const labelStyle = left > 50 ? `right:${100 - left + 0.8}%; text-align:right` : `left:${right + 0.8}%`;
+            return (
+              <div class="gantt__row">
+                <a
+                  href={`#${e.id}`}
+                  class:list={['gantt__bar', `gantt__bar--${e.data.type}`, !e.data.end && 'is-ongoing']}
+                  style={`left:${left}%; width:${Math.max(right - left, 1.2)}%; --k:${i}`}
+                  title={`${e.data.org} · ${range(e.data.start, e.data.end, 'text')} (${duration(e.data.start, e.data.end)})`}
+                >
+                  <span class="gantt__name">{e.data.mark}</span>
+                  {inside && <span class="gantt__inner">{title}</span>}
+                </a>
+                {!inside && (
+                  <span class="gantt__label" style={labelStyle}>
+                    {title}
+                  </span>
+                )}
+              </div>
+            );
+          })
+        }
+        {
+          ticks.length > 0 && (
+            <div class="gantt__row gantt__row--ticks">
+              {ticks.map((t) => (
+                <span class="gantt__tick" style={`left:${pct(t.date)}%`} title={t.label} aria-hidden="true" />
+              ))}
+              <span class="gantt__ticks-label label">Projects</span>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+  <figcaption class="gantt__legend">
+    <span><i class="sw sw--internship"></i>Internship / Co-op</span>
+    <span><i class="sw sw--research"></i>Research</span>
+    <span><i class="sw sw--team"></i>Team / Leadership</span>
+    <span><i class="sw sw--tick"></i>Project shipped</span>
+  </figcaption>
+</figure>
+
+<style>
+  .gantt {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    padding: var(--s-5) var(--s-5) var(--s-4);
+  }
+
+  .gantt__scroll {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  .gantt__chart {
+    min-width: 640px;
+  }
+
+  .gantt__axis {
+    position: relative;
+    height: 1.5rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .gantt__axis span {
+    position: absolute;
+    top: 0;
+    transform: translateX(4px);
+  }
+
+  .gantt__rows {
+    position: relative;
+    padding-block: var(--s-3);
+  }
+
+  .gantt__gridline {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--line);
+  }
+
+  .gantt__now {
+    position: absolute;
+    top: -1.5rem;
+    bottom: 0;
+    width: 1px;
+    background: var(--accent);
+    z-index: 2;
+  }
+
+  .gantt__now .label {
+    position: absolute;
+    top: 0;
+    left: 6px;
+    color: var(--accent);
+  }
+
+  .gantt__row {
+    position: relative;
+    height: 2.1rem;
+  }
+
+  .gantt__bar {
+    position: absolute;
+    top: 0.3rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    padding-inline: 0.5rem;
+    border-radius: 2px;
+    text-decoration: none;
+    overflow: hidden;
+    transition:
+      filter var(--dur-2) var(--ease),
+      transform var(--dur-2) var(--ease);
+    z-index: 1;
+  }
+
+  .gantt__bar:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+  }
+
+  .gantt__name {
+    font: 600 0.66rem/1 var(--font-mono);
+    letter-spacing: 0.05em;
+    color: var(--accent-ink);
+    white-space: nowrap;
+  }
+
+  .gantt__inner {
+    margin-left: var(--s-3);
+    font-size: var(--step--2);
+    white-space: nowrap;
+    color: inherit;
+    opacity: 0.8;
+  }
+
+  .gantt__bar--team .gantt__inner,
+  .gantt__bar--leadership .gantt__inner {
+    color: var(--text-2);
+  }
+
+  .gantt__bar--research .gantt__inner {
+    color: var(--bg);
+  }
+
+  .gantt__bar--internship .gantt__inner,
+  .gantt__bar--co-op .gantt__inner {
+    color: var(--accent-ink);
+  }
+
+  .gantt__bar--internship,
+  .gantt__bar--co-op {
+    background: var(--accent);
+  }
+
+  .gantt__bar--research {
+    background: var(--text);
+  }
+
+  .gantt__bar--research .gantt__name {
+    color: var(--bg);
+  }
+
+  .gantt__bar--team,
+  .gantt__bar--leadership {
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+
+  .gantt__bar--team .gantt__name,
+  .gantt__bar--leadership .gantt__name {
+    color: var(--text);
+  }
+
+  .gantt__bar.is-ongoing {
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+
+  .gantt__label {
+    position: absolute;
+    top: 0.55rem;
+    font-size: var(--step--2);
+    color: var(--text-2);
+    white-space: nowrap;
+  }
+
+  .gantt__row--ticks {
+    margin-top: var(--s-2);
+    border-top: 1px dashed var(--line);
+  }
+
+  .gantt__tick {
+    position: absolute;
+    top: 0.6rem;
+    width: 9px;
+    height: 9px;
+    transform: translateX(-50%) rotate(45deg);
+    border: 1.5px solid var(--accent);
+    background: var(--bg-elev);
+    transition: background-color var(--dur-2) var(--ease);
+  }
+
+  .gantt__tick:hover {
+    background: var(--accent);
+  }
+
+  .gantt__ticks-label {
+    position: absolute;
+    right: 0;
+    top: 0.45rem;
+  }
+
+  .gantt__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+    margin-top: var(--s-3);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--line);
+    font: var(--step--2) var(--font-mono);
+    color: var(--text-3);
+  }
+
+  .gantt__legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .sw {
+    width: 14px;
+    height: 8px;
+    border-radius: 1px;
+  }
+
+  .sw--internship {
+    background: var(--accent);
+  }
+
+  .sw--research {
+    background: var(--text);
+  }
+
+  .sw--team {
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+
+  .sw--tick {
+    width: 8px;
+    height: 8px;
+    transform: rotate(45deg);
+    border: 1.5px solid var(--accent);
+  }
+
+  /* Bars grow from their start date the first time the chart scrolls into view. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .gantt:not(.is-in) .gantt__bar {
+      transform: scaleX(0);
+    }
+    .gantt__bar {
+      transform-origin: left center;
+      transition: transform 0.9s var(--ease) calc(var(--k, 0) * 110ms + 150ms);
+    }
+    .gantt__tick {
+      transition:
+        background-color var(--dur-2) var(--ease),
+        opacity 0.4s var(--ease) 0.9s,
+        transform 0.4s var(--ease) 0.9s;
+    }
+    :global(.js) .gantt:not(.is-in) .gantt__tick {
+      opacity: 0;
+      transform: translateX(-50%) rotate(45deg) scale(0.4);
+    }
+  }
+</style>

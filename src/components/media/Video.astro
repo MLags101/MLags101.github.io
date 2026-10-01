@@ -1,0 +1,122 @@
+---
+/**
+ * <Video src="/media/eevi/urc-2025-flight.mp4" caption="…" />
+ * Videos live in public/media/<slug>/ (encode with `npm run media:videos`); the poster
+ * defaults to the .jpg the encoder writes next to the .mp4.
+ *
+ * mode="player"  (default) native controls, nothing downloads until play.
+ * mode="ambient" muted loop that autoplays only while on screen and never under reduced motion.
+ */
+interface Props {
+  src: string;
+  poster?: string;
+  caption?: string;
+  mode?: 'player' | 'ambient';
+  /** Aspect ratio, e.g. "16/9" (default) or "9/16" for phone video. */
+  aspect?: string;
+  size?: 'prose' | 'wide';
+  label?: string;
+}
+
+const { src, poster = src.replace(/\.mp4$/, '.jpg'), caption, mode = 'player', aspect = '16/9', size = 'wide', label } = Astro.props;
+const ambient = mode === 'ambient';
+---
+
+<figure class:list={['video', size === 'wide' && 'wide']} style={`--aspect:${aspect}`}>
+  <div class="video__frame crop-marks">
+    <video
+      src={src}
+      data-poster={poster}
+      preload="none"
+      playsinline
+      controls={!ambient}
+      muted={ambient}
+      loop={ambient}
+      data-ambient={ambient ? '' : undefined}
+      aria-label={label ?? caption}
+    ></video>
+  </div>
+  {
+    caption && (
+      <figcaption>
+        <span class="label video__num" />
+        <span>{caption}</span>
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .video {
+    counter-increment: fig;
+  }
+
+  .video:not(.wide) {
+    max-width: var(--prose);
+  }
+
+  .video__frame {
+    aspect-ratio: var(--aspect);
+    max-height: 80vh;
+    margin-inline: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #000;
+  }
+
+  .video__frame video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: var(--radius);
+  }
+
+  figcaption {
+    display: flex;
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+    font-size: var(--step--1);
+    color: var(--text-3);
+  }
+
+  .video__num::before {
+    content: 'VID.\00a0' counter(fig, decimal-leading-zero);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  // Posters load only when a video nears the viewport (a poster attribute ignores lazy loading).
+  const lazy = document.querySelectorAll<HTMLVideoElement>('video[data-poster]');
+  if ('IntersectionObserver' in window) {
+    const pio = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries)
+          if (e.isIntersecting) {
+            const v = e.target as HTMLVideoElement;
+            v.poster = v.dataset.poster!;
+            pio.unobserve(v);
+          }
+      },
+      { rootMargin: '600px 0px' },
+    );
+    lazy.forEach((v) => pio.observe(v));
+  } else lazy.forEach((v) => (v.poster = v.dataset.poster!));
+
+  // Ambient videos: play only while visible, never when the user prefers reduced motion.
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const vids = document.querySelectorAll<HTMLVideoElement>('video[data-ambient]');
+  if (vids.length && !reduce.matches && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        const v = e.target as HTMLVideoElement;
+        if (e.isIntersecting) {
+          v.preload = 'auto';
+          void v.play().catch(() => {});
+        } else v.pause();
+      }
+    });
+    vids.forEach((v) => io.observe(v));
+  }
+</script>

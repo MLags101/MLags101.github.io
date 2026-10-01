@@ -1,0 +1,42 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# SITE — who you are and how to reach you. Used by the header, footer, home page,
+# About, Experience and Resume pages. Changes show up on the next `npm run dev` reload.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+name: Michael Lagana
+initials: ML                      # the square badge in the header / favicon text
+role: Aerospace Engineer          # used in page titles and search results
+# Short identity line shown under your name on the home page and on About.
+identity: [Engineer, Aspiring Roboticist, Cyber-Enthusiast]
+tagline: >-
+  I design, build and fly hardware — from flight-ready airframes to the avionics inside them.
+description: >-
+  Portfolio of Michael Lagana — Georgia Tech aerospace engineering student building UAVs,
+  robots, PCBs and flight test hardware.
+# Shown on About and in the footer. Leave empty ('') to hide.
+availability: Open to 2027 full-time & internship roles
+
+location: Atlanta, GA
+email: mlagana6@gatech.edu
+links:
+  linkedin: https://www.linkedin.com/in/mlagana6
+  github: https://github.com/MLags101
+# Put the PDF at public/resume/ and point to it here.
+resumePdf: /resume/Michael-Lagana-Resume.pdf
+
+education:
+  school: Georgia Institute of Technology
+  degree: B.S. Aerospace Engineering
+  detail: Minor in Robotics · BS/MS Honors Program
+  location: Atlanta, GA
+  graduation: Expected May 2027
+  gpa: '3.95'
+  coursework: [Thermodynamics & Fluids, Structural Analysis, Jet & Rocket Propulsion]
+
+# Top navigation, in order.
+nav:
+  - { href: /projects, label: Work }
+  - { href: /experience, label: Experience }
+  - { href: /research, label: Research }
+  - { href: /about, label: About }
+  - { href: /resume, label: Resume }

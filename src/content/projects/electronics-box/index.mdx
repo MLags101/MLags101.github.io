@@ -1,0 +1,26 @@
+## Overview
+
+As a Prototyping Instructor at the Invention Studio, I pursued the role of **Electronics Master**. The final task was to design and build something that makes the space better. I built a lockbox to secure the electronics cabinet keys — integrating RFID, an RF remote, a solenoid lock and a spark-gap deterrent.
+
+### Motivation
+
+The electronics tool group is a small family of engineers. The lockbox gave all of us access with our student IDs, so special equipment could be locked up without key access becoming a burden.
+
+<Figure src="img-6131.jpg" alt="Lockbox electronics: Arduino Nano on a milled board with RFID reader and solenoid" caption="The control electronics before installation." />
+
+## Technical features
+
+- **RFID reader** — an MFRC522 module (13.56 MHz) reads university ID cards over MIFARE. The Arduino checks card UIDs against an authorized list stored in EEPROM.
+- **MOSFET-driven solenoid** — a 12 V solenoid retracts when an authorized ID or RF signal is detected.
+- **RF module** — a 433 MHz receiver allows remote unlocking for convenient key access.
+- **Spark-gap deterrent** — an incorrect ID fires a loud arc from a high-voltage transformer driven by a PWM-controlled MOSFET.
+
+<Video src="/media/electronics-box/lockbox-demo.mp4" caption="Unlocking the box with a student ID." size="prose" aspect="9/16" />
+
+## Fabrication
+
+I designed a 3D-printed door and laser-cut MDF sides in SolidWorks, iterating on prototypes to fix component fit and solenoid alignment until the lock operated smoothly.
+
+## Results
+
+The lockbox secured the cabinet keys reliably: IDs authenticated, the RF remote worked, and the spark gap fired consistently on unauthorized attempts. The tool group adopted it — and it earned me the Electronics Master role.

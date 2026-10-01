@@ -1,0 +1,60 @@
+---
+/** Standard inner page: a header block (eyebrow, title, lede) followed by content. */
+import type { ImageMetadata } from 'astro';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  eyebrow: string;
+  lede?: string;
+  description?: string;
+  image?: ImageMetadata;
+}
+
+const { title, eyebrow, lede, description, image } = Astro.props;
+---
+
+<BaseLayout title={title} description={description ?? lede} image={image}>
+  <header class="page-head">
+    <div class="container">
+      <p class="label label--accent eyebrow">{eyebrow}</p>
+      <h1>{title}</h1>
+      {lede && <p class="lede">{lede}</p>}
+      <slot name="head" />
+    </div>
+  </header>
+  <slot />
+</BaseLayout>
+
+<style>
+  .page-head {
+    position: relative;
+    isolation: isolate;
+    padding-top: clamp(3.5rem, 2rem + 6vw, 7rem);
+    padding-bottom: var(--s-8);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .page-head::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 90% at 20% 0%, #000 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 90% at 20% 0%, #000 30%, transparent 75%);
+  }
+
+  .page-head h1 {
+    margin-top: var(--s-4);
+    font-size: var(--step-6);
+    letter-spacing: -0.04em;
+  }
+
+  .page-head .lede {
+    margin-top: var(--s-5);
+  }
+</style>

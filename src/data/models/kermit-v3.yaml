@@ -1,0 +1,63 @@
+# 3D model — used by <ModelViewer id="kermit-v3" /> in the Kermit V3 write-up.
+# Guide: docs/3D-MODELS.md · list part names: npm run model:parts -- kermit-v3
+src: /models/kermit-v3/model.glb
+poster: /models/kermit-v3/poster.webp
+alt: Kermit V3 quadcopter CAD assembly with carbon arms, gimbal camera, lidar and GPS mast
+sizeMB: 2.2
+forward: +x          # the gimbal end
+cameraOrbit: 40deg 62deg 92%
+hotspots:
+  - id: lidar
+    part: LD19_v2-1
+    from: top
+    label: 360° LiDAR
+    partNo: LDROBOT LD19
+    detail: Scanning lidar on top of the stack for surround obstacle detection, integrated into ArduPilot's proximity sensing.
+  - id: gimbal
+    part: SIYI_A8_mini-2
+    from: front
+    label: 3-axis gimbal camera
+    partNo: SIYI A8 mini
+    detail: 4K camera on a 3-axis stabilized gimbal — it held the shot steady even before the PID gains were tuned.
+  - id: gps
+    part: Here4-1
+    from: top
+    label: GNSS + compass
+    partNo: CubePilot Here4
+    detail: Multi-band GPS module — a big step up from Kermit V2's unit for position hold and navigation.
+  - id: fc
+    part: CUBE Orange-1
+    from: top
+    label: Flight controller
+    partNo: CubePilot Cube Orange
+    detail: ArduPilot autopilot at the center of the dense stage-1 stack, under the printed top cover.
+  - id: flow
+    part: H-FLOW-1
+    from: bottom
+    label: Optical flow + rangefinder
+    partNo: Holybro H-Flow
+    detail: Ground-facing optical flow and lidar for height and drift sensing close to the ground.
+  - id: radio
+    part: MK32 HM30 Air Unit-1
+    from: top
+    label: Long-range link
+    partNo: SIYI HM30 air unit
+    detail: Control, telemetry and video radio that pairs with the handheld MK32 ground station.
+  - id: arms
+    part: CF_Arm-1
+    from: top
+    label: Folding carbon arms
+    detail: A double, vertical-flip fold keeps each arm joint simple and strong, and packs the airframe small enough to carry on a paracord strap.
+  - id: motors
+    part: MAD_4006_EEE-2
+    from: top
+    label: Motors
+    partNo: MAD 4006 EEE
+    detail: One of four brushless motors on printed motor mounts at the arm tips.
+
+# Colors applied by `npm run model:optimize` (re-run it after editing — see docs/3D-MODELS.md).
+# defaultColor replaces SolidWorks' unassigned pale-lavender appearance; flattenTextures turns
+# the carbon-fiber texture (which aliases into noise on the web) into a flat matte color.
+appearance:
+  defaultColor: '#3c4046'
+  flattenTextures: '#1b1d21'

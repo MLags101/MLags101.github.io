@@ -1,0 +1,37 @@
+/* Print: clean black-on-white, no chrome. The /resume page is designed to print to 1 page. */
+@media print {
+  :root,
+  :root[data-theme='light'],
+  :root[data-theme='dark'] {
+    --bg: #fff;
+    --bg-elev: #fff;
+    --surface: #fff;
+    --surface-2: #fff;
+    --text: #000;
+    --text-2: #222;
+    --text-3: #444;
+    --line: #bbb;
+    --line-strong: #888;
+    --accent: #000;
+    color-scheme: light;
+  }
+
+  .site-header,
+  .site-footer,
+  .no-print,
+  .skip-link {
+    display: none !important;
+  }
+
+  body {
+    font-size: 10pt;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  .section {
+    padding-block: 0;
+  }
+}

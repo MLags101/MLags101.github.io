@@ -1,0 +1,21 @@
+## Overview
+
+Robin — named after Kermit the Frog's nephew — is a compact, fully custom quadcopter built as a learning platform for Betaflight and more advanced control schemes. An F7 flight-controller/ESC stack does the flying, with a Raspberry Pi Zero 2 W as companion computer. The question: how cheaply can I prototype a quad while keeping a strong frame and real capability?
+
+<Figure src="img-6461.jpg" alt="SolidWorks model of Robin's X-frame" caption="Robin's frame in SolidWorks." />
+
+## Frame design
+
+I designed the frame in SolidWorks so every component fits a streamlined, printable chassis. The key feature: the **rotor arms double as structural standoffs** between the top and bottom plates, cutting part count, weight and fasteners.
+
+## Software integration
+
+The F7 runs Betaflight, which needed a different approach than the MAVProxy code I'd written for Kermit. I learned the **MultiWii Serial Protocol** to send RC channel values straight from the Pi to the F7, in Python. Updates are as simple as SSH-ing into the Pi and running a new script — no reflashing the flight controller.
+
+## Fabrication & iteration
+
+Printed at the Invention Studio, the frame went through several prototypes to get structure and fit right. I tuned wall thicknesses and motor mounts to survive crashes, and started designing a handheld remote to talk to the Pi — which became the STM Remote.
+
+## Results
+
+Robin serves as a testbed for Betaflight and experimental control schemes, with stable flight in initial tests. The compact printed frame survived multiple crashes, and the Pi-based control path allowed precise RC channel manipulation.

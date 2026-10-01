@@ -1,0 +1,20 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# local-only archive of unused / full-resolution originals (see docs/MEDIA.md)
+_archive/
+
+# env + logs
+.env
+.env.*
+npm-debug.log*
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini

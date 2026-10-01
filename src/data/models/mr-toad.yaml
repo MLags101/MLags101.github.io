@@ -1,0 +1,72 @@
+# 3D model — used by <ModelViewer id="mr-toad" /> in the Mr Toad write-up.
+# Guide: docs/3D-MODELS.md · list part names: npm run model:parts -- mr-toad
+src: /models/mr-toad/model.glb
+poster: /models/mr-toad/poster.webp
+alt: Mr Toad rover CAD assembly with side covers, wheels, antenna, GPS and front sensors
+sizeMB: 1.3
+forward: -x          # the camera end
+cameraOrbit: -55deg 66deg 95%
+hotspots:
+  - id: camera
+    part: Arducam16MPCamera-1
+    from: front
+    label: Front camera
+    partNo: Arducam 16 MP
+    detail: Streams to the ground-station GUI over the network, handled with GStreamer and OpenCV.
+  - id: lidar
+    part: Garmin_Lidar_Lite_3-1
+    from: front
+    label: Forward rangefinder
+    partNo: Garmin LIDAR-Lite v3
+    detail: Read directly over I²C with smbus; the range feeds obstacle avoidance and shows live in the GUI.
+  - id: gps
+    part: Here4-1
+    from: top
+    label: GNSS + compass
+    partNo: CubePilot Here4
+    detail: GPS for navigation, mounted on the lid above the electronics bay.
+  - id: antenna
+    part: ASUS Wireless USB AC56 Antenna-1
+    from: top
+    label: Wi-Fi link
+    partNo: ASUS USB-AC56
+    detail: Carries the video stream out and the UDP command stream in between rover and laptop.
+  - id: pi
+    part: RaspberryPi4ModelB-1
+    from: top
+    label: Companion computer
+    partNo: Raspberry Pi 4
+    detail: Runs Raspberry Pi OS for the camera stack; the ROS 2 processing (obstacle avoidance) runs on the ground station instead.
+  - id: fc
+    part: CUBE Orange-1
+    from: top
+    label: Controller
+    partNo: CubePilot Cube Orange
+    detail: Autopilot handling drive control and the GPS.
+  - id: wheel
+    part: free_wheel-1
+    from: left
+    label: Front wheel + bearing retainer
+    detail: With a servo sitting co-axially with each front wheel, there's no room for an axle — a printed bearing retainer holds the wheel and lets it spin freely.
+  - id: servo
+    part: DS3235SG 35KG-1
+    from: top
+    label: Stilt servos
+    partNo: DS3235SG · 35 kg·cm
+    detail: High-torque servos meant to swing climbing stilts for tall obstacles — parked for a future revision.
+  - id: drive
+    part: JGB37-520-1
+    from: top
+    label: Drive motors
+    partNo: JGB37-520 · 12 V
+    detail: Two metal gearmotors driving the rear, each on a BTS7960 H-bridge.
+
+# Colors applied by `npm run model:optimize` (re-run it after editing — see docs/3D-MODELS.md).
+# Matched to the built rover: black printed body, magenta wheels. `match` takes CAD part names
+# with * wildcards; later rules win.
+appearance:
+  defaultColor: '#3c4046'
+  parts:
+    - { match: ['*_frame-*', '*_cover-*', 'lid-*', '*_mount-*', 'battery_clamp-*', 'antenna_bracket*'], color: '#24272c', roughness: 0.6 }
+    - { match: ['free_wheel-*', 'tread_gear-*'], color: '#d63a76', roughness: 0.55 }
+    - { match: ['bearing retainer-*'], color: '#24272c', roughness: 0.6 }

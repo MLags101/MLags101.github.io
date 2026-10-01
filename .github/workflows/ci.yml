@@ -1,0 +1,26 @@
+# Checks every branch and pull request: types, content lint, full build, internal links.
+# Runs on Linux, so it also catches file-name case mistakes that Windows hides.
+name: CI
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:content
+      - run: npm run build
+      - name: Check internal links
+        run: |
+          npx astro preview --port 4321 &
+          npx wait-on -t 30000 http://localhost:4321
+          npm run linkcheck

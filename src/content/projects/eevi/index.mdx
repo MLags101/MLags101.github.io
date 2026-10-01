@@ -1,0 +1,88 @@
+## URC 2025
+
+As Drone Lead, I overhauled our entire system from scratch, focusing on keeping communications alive — that had been our point of failure in 2024. I rebuilt the frame from scrapped carbon fiber components of a Tarot frame, with parametric SolidWorks parts and a custom 3D-printed shell for desert operation, and checked the landing gear's structural margins with FEA in ANSYS Mechanical.
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  items={[
+    { src: 'urc-2025-drone-lead.jpg', alt: 'Michael holding EEVi beside the URC course boundary', caption: 'EEVi at the course boundary, URC 2025.' },
+    { src: 'img-2828.jpg', alt: 'EEVi parked beside the RoboNav rover on the desert course', caption: 'Drone and rover staged together on course.' },
+  ]}
+/>
+
+### Communications system
+
+To solve the operational-range problem, I designed and built a **2-axis auto-tracking antenna** in SolidWorks running ArduPilot, with an Intel NUC to receive telemetry and video and relay them into the ground station. The tracker extended our usable comms range by about 2 km.
+
+For telemetry I moved to RFD900x radios. For aerial video I switched from analog to digital, using OpenHD on a Raspberry Pi 4 with an Arducam camera and an ASUS AC56 Wi-Fi adapter powered directly from the PDB.
+
+<Diagram id="eevi-signal-chain" caption="EEVi 2025 telemetry and video paths. Hover or tab through a block to trace its links." />
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  items={[
+    { src: 'img-9766.jpg', alt: 'Ground station and antenna mast set up in the desert near the course sign', caption: 'Ground segment deployed at the URC site.' },
+    { src: 'bench-integration.jpg', alt: 'EEVi on the bench with its electronics and controllers during integration', caption: 'Bench integration before travel.' },
+  ]}
+/>
+
+### Competition results
+
+EEVi made a successful **autonomous takeoff** and began a stable flight toward the target. Unfortunately, GPS terrain data wasn't set up correctly and EEVi flew into a hill between the ground station and the target. Even so, the video feed stayed stable with only about half a second of latency, and every electronic component came through intact.
+
+<Video src="/media/eevi/urc-2025-flight.mp4" caption="EEVi lifting off over the URC course, 2025." />
+
+<Callout tone="lesson">
+Terrain-following needs real terrain data. For v3 I want more distance-sensor integration and a reworked frame.
+</Callout>
+
+<Gallery
+  columns={3}
+  aspect="4/3"
+  items={[
+    { src: 'img-2826.jpg', alt: 'The RoboNav rover and EEVi together on the desert course' },
+    { src: 'ground-station-tent.jpg', alt: 'Team members working in the ground station tent' },
+    { src: 'img-2836.jpg', alt: 'The RoboNav team at URC 2025' },
+  ]}
+  caption="URC 2025 — rover and drone on course, the ground station tent, and the team."
+/>
+
+## URC 2024
+
+As part of RoboNav at RoboJackets, we competed at the University Rover Challenge in Utah. The drone subteam was just me and one other member. We were handed parts from a broken drone left by former members and set out to build something that could help the rover.
+
+<Gallery
+  columns={3}
+  aspect="4/3"
+  items={[
+    { src: 'img-6048.jpg', alt: 'The 2024 drone airframe with red arms on a classroom table' },
+    { src: 'img-6074.jpg', alt: 'EEVi 2024 airframe on the workbench during the build' },
+    { src: 'img-6075.jpg', alt: 'Holding the 2024 build with its end effector attached' },
+  ]}
+  caption="Building the first EEVi from a retired airframe."
+/>
+
+### Technical approach
+
+The heart of the build was a Pixhawk running ArduPilot. We integrated an end effector for carrying hand tools, so the rover could stay focused on larger tasks. I handled the electrical and software integration, reusing a custom PCB from another project to supply power and PWM to the servos.
+
+<Figure src="img-6374.jpg" alt="The 2024 drone on a table next to a laptop running the ground control software" caption="Final checks on the 2024 build." />
+
+### Lessons learned
+
+Shortly before competition we realized our telemetry range was too limited. I mounted the receiver on the rover itself and relayed data through its more reliable communications link. A faulty wire at competition still cost us video — but the team was proud of what two people built, and it set the requirements for the 2025 rebuild.
+
+<Gallery
+  columns={3}
+  aspect="4/3"
+  items={[
+    { src: 'img-7624.jpg', alt: 'The 2024 drone on the ground at night before a test flight' },
+    { src: 'img-7634.jpg', alt: 'Night test flight in Utah, the drone hovering under its lights' },
+    { src: 'img-8129.jpg', alt: 'RoboNav members on site in Utah at URC 2024' },
+  ]}
+  caption="URC 2024 in Utah — late-night test flights before competition day."
+/>
+
+<Figure src="img-6415.jpg" alt="View across the Utah desert course from beside the rover's antenna mast" caption="The 2024 course, seen from the rover." />

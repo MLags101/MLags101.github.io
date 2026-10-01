@@ -1,0 +1,110 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# EXPERIENCE — jobs, internships, research positions, teams and leadership roles.
+#
+# The key (e.g. `robonav:`) is the id other files point to (a project's `context`).
+# `positions` is a promotion ladder, newest first; per-position dates are optional.
+# `onResume: false` keeps an entry on the Experience timeline but off /resume.
+# `logo` is a file in src/assets/logos/ (otherwise the short `mark` text is shown).
+# ═══════════════════════════════════════════════════════════════════════════════
+
+aerospace-robotics-lab:
+  org: Aerospace Robotics Laboratory · Georgia Tech
+  mark: ARL
+  location: Atlanta, GA
+  type: research
+  start: 2025-08
+  positions:
+    - { title: Undergraduate Researcher }
+  summary: >-
+    Building the vehicles the lab's autonomy research flies on — motion-capture-tracked
+    quadcopter testbeds for swarm work, and a small underwater vehicle for manipulation.
+  highlights:
+    - Designed and fabricated autonomy-capable quadcopter testbeds for research in swarm coordination, mapping, and localization
+    - Developed flight code and procedures integrating quadcopters with a motion capture system for high-precision localization
+    - Developing a small underwater vehicle to enable research in autonomous underwater manipulation
+  skills: [solidworks, 3d-printing, python, motion-capture, linux]
+
+robonav:
+  org: RoboNav · RoboJackets
+  mark: RN
+  orgUrl: https://robojackets.org
+  location: Atlanta, GA
+  type: team
+  start: 2023-10
+  positions:
+    - { title: Drone Lead Engineer }
+  summary: >-
+    Founded RoboNav's drone subteam and leads it through three generations of EEVi, a scout
+    UAV that supports the team's rover at the University Rover Challenge in Utah.
+  highlights:
+    - Founded the drone team, secured sponsorship, and directed 10+ members through development of EEVi v3
+    - Designed a 2-axis auto-tracking antenna in SolidWorks running ArduPilot, extending comms range by 2 km
+    - Developed a drone frame from scrapped carbon fiber with parametric SolidWorks components for desert operation
+    - Evaluated landing gear structural viability through FEA in ANSYS Mechanical
+  skills: [solidworks, ardupilot, ansys, composites, openhd]
+
+invention-studio:
+  # Not on the PDF resume — shown on the Experience timeline only.
+  # TODO(Michael): confirm start date and per-role dates.
+  org: Invention Studio · Georgia Tech
+  mark: IS
+  logo: invention-studio.png
+  orgUrl: https://inventionstudio.gatech.edu
+  location: Atlanta, GA
+  type: leadership
+  start: 2023-01
+  positions:
+    - { title: Electronics Master }
+    - { title: Electronics Apprentice }
+    - { title: Prototyping Instructor }
+  summary: >-
+    Student-run makerspace. Teach and supervise students on the space's machines, run the
+    electronics tool group, and build projects funded through the studio's Maker Grant
+    program.
+  highlights:
+    - Promoted from Prototyping Instructor to Electronics Master of the electronics tool group
+    - Wrote the operating procedure for the studio's new PCB mill (FlatCAM toolchain)
+    - Awarded three Maker Grants — DUM-I(S), Kermit V2, and Mr Toad
+  skills: [pcb-fab, 3d-printing, laser-cutting, soldering]
+  onResume: false
+
+maccready-works:
+  org: AV · MacCready Works
+  mark: AV
+  orgUrl: https://www.avinc.com
+  location: Moorpark, CA
+  type: internship
+  start: 2026-06
+  end: 2026-08
+  positions:
+    - { title: Systems Test Engineering Intern }
+  summary: >-
+    Prototyped and flight-tested sUAS airframes at AV's MacCready Works, and built test
+    procedures for the Skyfall Mars helicopter program.
+  highlights:
+    - Prototyped sUAS airframes through rapid CAD iteration and in-house fabrication, from concept to flight-ready hardware
+    - Supported flight test operations, including test setup and hardware turnaround between flights
+    - Developed modal testing procedures for the Skyfall Mars helicopter program
+    - Adapted a motion capture drop test rig for a new vehicle and documented data collection and processing procedures
+  skills: [solidworks, 3d-printing, composites, motion-capture]
+
+gtri-acl:
+  org: GTRI · Advanced Combat Lab
+  mark: GTRI
+  orgUrl: https://gtri.gatech.edu
+  location: Atlanta, GA
+  type: co-op
+  start: 2025-01
+  end: 2025-08
+  positions:
+    - { title: Electrical Engineering Co-Op }
+  summary: >-
+    Field-debugged UAV avionics, designed ruggedized interface PCBs, and ran engine test
+    campaigns whose data and models fed directly into design decisions.
+  highlights:
+    - Diagnosed and repaired UAV avionics faults through field RF testing and signal analysis
+    - Designed NMEA and Ethernet converter PCBs in Altium for deployment in marine environments
+    - Built an engine test rig and collected data to predict failure modes, authoring test procedures and reports
+    - Modeled engine cut-off failure in MATLAB, producing estimates that informed safe design decisions
+    - Designed assembly jigs in SolidWorks to ensure safe, repeatable custom alternator assembly
+  skills: [altium, matlab, solidworks, rf-comms]

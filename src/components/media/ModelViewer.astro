@@ -1,0 +1,495 @@
+---
+/**
+ * Interactive 3D model with labeled parts (SpaceX-style). Data lives in
+ * src/data/models/<id>.yaml; the optimized GLB, parts.json and poster live in public/models/<id>/.
+ *
+ *   <ModelViewer id="kermit-v3" caption="…" />
+ *
+ * - Shows the poster immediately; the 3D runtime and GLB load only when the viewer scrolls
+ *   into view. On small screens / Save-Data it waits for a tap instead.
+ * - Hotspots can name a CAD `part` — the marker position is looked up in parts.json.
+ * - Selecting a part (on the model or in the list) flies the camera to it.
+ * - Animations baked into the GLB get play buttons; `scrub: true` drives one by scroll.
+ * - Authoring: `npm run dev`, open the page with `?author` — Shift+click copies a hotspot,
+ *   "Save poster" exports the current view. See docs/3D-MODELS.md.
+ */
+import '../../styles/parts.css';
+import fs from 'node:fs';
+import path from 'node:path';
+import { getEntry } from 'astro:content';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  id: string;
+  caption?: string;
+  /** Above the fold (page hero): load the poster eagerly at high priority. */
+  hero?: boolean;
+}
+
+const { id, caption, hero = false } = Astro.props;
+const entry = await getEntry('models', id);
+if (!entry) throw new Error(`<ModelViewer id="${id}">: no src/data/models/${id}.yaml`);
+const m = entry.data;
+const pad = (i: number) => String(i + 1).padStart(2, '0');
+
+// ── resolve part-based hotspots ──────────────────────────────────────────
+type Side = { position: number[]; normal: number[] };
+const partsFile = path.join(process.cwd(), 'public', path.dirname(m.src), 'parts.json');
+const partsMap: Record<string, { sides: Record<string, Side> }> = fs.existsSync(partsFile)
+  ? JSON.parse(fs.readFileSync(partsFile, 'utf8')).parts
+  : {};
+const vec = { '+x': [1, 0, 0], '-x': [-1, 0, 0], '+z': [0, 0, 1], '-z': [0, 0, -1] } as const;
+const key = (v: readonly number[]) => ['x', 'y', 'z'].map((a, i) => (v[i] ? `${v[i]! > 0 ? '+' : '-'}${a}` : '')).join('');
+const f = vec[m.forward];
+const right = [-f[2], 0, f[0]]; // forward × up(+y)
+const SIDE_AXIS: Record<string, string> = {
+  top: '+y',
+  bottom: '-y',
+  front: key(f),
+  back: key(f.map((x) => -x)),
+  right: key(right),
+  left: key(right.map((x) => -x)),
+};
+const fmt = (v: number[]) => v.map((x) => `${+x.toFixed(4)}m`).join(' ');
+const fmtN = (v: number[]) => v.map((x) => `${+x.toFixed(4)}`).join(' ');
+
+const hotspots = m.hotspots.map((h) => {
+  if (h.position) return { ...h, position: h.position, normal: h.normal ?? '0 1 0' };
+  const part = partsMap[h.part!];
+  if (!part) {
+    const names = Object.keys(partsMap);
+    const near = names.filter((n) => n.toLowerCase().includes(h.part!.toLowerCase().replace(/-\d+$/, ''))).slice(0, 6);
+    throw new Error(
+      `src/data/models/${id}.yaml → hotspot "${h.id}": no CAD part named "${h.part}".` +
+        (near.length ? ` Did you mean: ${near.map((n) => `"${n}"`).join(', ')}?` : ` Run: npm run model:parts -- ${id}`),
+    );
+  }
+  const s = part.sides[SIDE_AXIS[h.from]!] ?? Object.values(part.sides)[0]!;
+  return { ...h, position: fmt(s.position), normal: fmtN(s.normal) };
+});
+const scrub = m.animations.find((a) => a.scrub);
+---
+
+<figure
+  class="parts wide model"
+  data-model
+  data-src={m.src}
+  data-orbit={m.cameraOrbit}
+  data-target={m.cameraTarget}
+  data-scrub={scrub?.name}
+>
+  <div class="parts__layout">
+    <div class="parts__stage model__stage crop-marks">
+      <model-viewer
+        class="model__mv"
+        poster={m.poster}
+        alt={m.alt}
+        camera-controls
+        touch-action="pan-y"
+        interaction-prompt="none"
+        camera-orbit={m.cameraOrbit}
+        camera-target={m.cameraTarget}
+        exposure={m.exposure}
+        shadow-intensity="0.8"
+        shadow-softness="0.9"
+        environment-image="neutral"
+        tone-mapping="neutral"
+        interpolation-decay="120"
+        reveal="auto"
+        loading="lazy"
+      >
+        {
+          hotspots.map((h, i) => (
+            <button
+              type="button"
+              slot={`hotspot-${h.id}`}
+              class="parts__marker"
+              data-position={h.position}
+              data-normal={h.normal}
+              data-visibility-attribute="visible"
+              data-orbit={h.orbit}
+              data-target={h.position}
+              data-fov={h.fov}
+              data-i={i}
+              aria-pressed="false"
+              aria-label={`${pad(i)}: ${h.label}`}
+            >
+              {i + 1}
+            </button>
+          ))
+        }
+      </model-viewer>
+      <img
+        class="model__poster"
+        src={m.poster}
+        alt=""
+        aria-hidden="true"
+        loading={hero ? 'eager' : 'lazy'}
+        fetchpriority={hero ? 'high' : undefined}
+        onerror="this.remove()"
+      />
+
+      <div class="parts__hud">
+        <span class="parts__btn" aria-hidden="true"><Icon name="cube" size={14} /> 3D · drag to orbit</span>
+        <button type="button" class="parts__btn" data-reset hidden><Icon name="reset" size={14} /> Reset</button>
+      </div>
+      {
+        m.animations.filter((a) => !a.scrub).length > 0 && (
+          <div class="model__anims" role="group" aria-label="Animations" data-anims hidden>
+            {m.animations
+              .filter((a) => !a.scrub)
+              .map((a) => (
+                <button type="button" class="parts__btn" data-anim={a.name} data-loop={a.loop ? '' : undefined} aria-pressed="false">
+                  <span class="model__play" aria-hidden="true">▶</span> {a.label}
+                </button>
+              ))}
+          </div>
+        )
+      }
+      {scrub && <div class="model__scrub label" aria-hidden="true" data-scrub-label>{scrub.label} · scroll</div>}
+      <button type="button" class="parts__btn model__load" data-load hidden>
+        <Icon name="cube" size={14} /> Load 3D model · {m.sizeMB.toFixed(1)} MB
+      </button>
+      <div class="model__progress" aria-hidden="true"><span></span></div>
+    </div>
+
+    <ol class="parts__list" aria-label="Labeled parts">
+      {
+        hotspots.map((h, i) => (
+          <li>
+            <button type="button" class="parts__item" aria-expanded="false" data-i={i}>
+              <span class="parts__num">{pad(i)}</span>
+              <span class="parts__name">{h.label}</span>
+              {h.partNo && <span class="parts__pn label">{h.partNo}</span>}
+              <span class="parts__detail">{h.detail}</span>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  {
+    caption && (
+      <figcaption class="parts__caption">
+        <span class="label" />
+        <span>{caption}</span>
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .model__stage {
+    aspect-ratio: 4 / 3;
+  }
+
+  .model__mv {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    --poster-color: transparent;
+    --progress-bar-height: 0;
+  }
+
+  /* Hide slotted markers until the element upgrades; the list below works regardless. */
+  .model__mv:not(:defined) > * {
+    display: none;
+  }
+
+  .model__mv :global(.parts__marker) {
+    position: relative;
+    translate: none;
+    transition:
+      opacity var(--dur-2) var(--ease),
+      transform var(--dur-2) var(--ease);
+  }
+
+  /* Marker behind other geometry → dimmed, still clickable. */
+  .model__mv :global(.parts__marker:not([data-visible])) {
+    opacity: 0.38;
+  }
+
+  .model__mv :global(.parts__marker[aria-pressed='true']) {
+    opacity: 1;
+  }
+
+  .model__poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    transition: opacity var(--dur-3) var(--ease);
+  }
+
+  .model[data-loaded] .model__poster {
+    opacity: 0;
+  }
+
+  .model__load {
+    position: absolute;
+    left: 50%;
+    bottom: var(--s-5);
+    transform: translateX(-50%);
+    height: 2.5rem;
+    border-color: var(--accent);
+    z-index: 3;
+  }
+
+  .model__anims {
+    position: absolute;
+    left: var(--s-3);
+    bottom: var(--s-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    z-index: 2;
+  }
+
+  .model__anims[hidden] {
+    display: none;
+  }
+
+  .model__anims [aria-pressed='true'] {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .model__anims [aria-pressed='true'] .model__play::before {
+    content: '❚❚';
+    font-size: 0.7em;
+  }
+
+  .model__anims [aria-pressed='true'] .model__play {
+    font-size: 0;
+  }
+
+  .model__scrub {
+    position: absolute;
+    right: var(--s-3);
+    bottom: var(--s-3);
+    padding: 0.3rem 0.55rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+  }
+
+  .model__progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    overflow: hidden;
+  }
+
+  .model__progress span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+    transition: width var(--dur-2) linear;
+  }
+</style>
+
+<script>
+  type MV = HTMLElement & {
+    src: string | null;
+    cameraOrbit: string;
+    cameraTarget: string;
+    fieldOfView: string;
+    animationName: string | undefined;
+    currentTime: number;
+    duration: number;
+    paused: boolean;
+    availableAnimations: string[];
+    play(o?: { repetitions?: number; pingpong?: boolean }): void;
+    pause(): void;
+    jumpCameraToGoal(): void;
+    getCameraOrbit(): { toString(): string };
+    positionAndNormalFromPoint(x: number, y: number): { position: { toString(): string }; normal: { toString(): string } } | null;
+    toBlob(o: object): Promise<Blob>;
+  };
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+  const small = window.matchMedia('(max-width: 640px)').matches;
+
+  // Hotspot orbit from its surface normal when no explicit orbit is given.
+  const orbitFromNormal = (n: string) => {
+    const [x = 0, y = 1, z = 0] = n.split(/\s+/).map(parseFloat);
+    const theta = (Math.atan2(x, z) * 180) / Math.PI;
+    const phi = (Math.acos(Math.max(-1, Math.min(1, y))) * 180) / Math.PI;
+    return `${theta.toFixed(1)}deg ${Math.min(Math.max(phi, 25), 115).toFixed(1)}deg auto`;
+  };
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-model]')) {
+    const mv = root.querySelector('model-viewer') as MV;
+    const loadBtn = root.querySelector<HTMLButtonElement>('[data-load]')!;
+    const resetBtn = root.querySelector<HTMLButtonElement>('[data-reset]')!;
+    const anims = root.querySelector<HTMLElement>('[data-anims]');
+    const bar = root.querySelector<HTMLElement>('.model__progress span')!;
+    const markers = [...root.querySelectorAll<HTMLButtonElement>('.parts__marker')];
+    const items = [...root.querySelectorAll<HTMLButtonElement>('.parts__item')];
+    const scrubName = root.dataset.scrub;
+    let started = false;
+    let active = -1;
+
+    const start = async () => {
+      if (started) return;
+      started = true;
+      loadBtn.hidden = true;
+      const { ModelViewerElement } = await import('@google/model-viewer');
+      (ModelViewerElement as unknown as { meshoptDecoderLocation: string }).meshoptDecoderLocation =
+        '/vendor/meshopt-decoder-shim.js'; // enables meshopt GLBs (npm run model:optimize output)
+      mv.addEventListener('progress', (e) => {
+        bar.style.width = `${Math.round((e as unknown as CustomEvent<{ totalProgress: number }>).detail.totalProgress * 100)}%`;
+      });
+      mv.addEventListener('load', () => {
+        root.toggleAttribute('data-loaded', true);
+        resetBtn.hidden = false;
+        bar.style.opacity = '0';
+        if (anims && mv.availableAnimations.length) anims.hidden = false;
+        if (scrubName && mv.availableAnimations.includes(scrubName)) setupScrub();
+        else if (!reduceMotion) mv.setAttribute('auto-rotate', '');
+      });
+      mv.addEventListener('camera-change', (e) => {
+        if ((e as unknown as CustomEvent<{ source: string }>).detail.source === 'user-interaction') mv.removeAttribute('auto-rotate');
+      });
+      mv.src = root.dataset.src!;
+    };
+
+    if (saveData || small) {
+      loadBtn.hidden = false;
+      loadBtn.addEventListener('click', start);
+    } else if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            io.disconnect();
+            void start();
+          }
+        },
+        { rootMargin: '200px' },
+      );
+      io.observe(root);
+    } else void start();
+
+    // ── animations ──
+    const animBtns = [...(anims?.querySelectorAll<HTMLButtonElement>('[data-anim]') ?? [])];
+    for (const btn of animBtns) {
+      btn.addEventListener('click', () => {
+        const name = btn.dataset.anim!;
+        const playing = btn.getAttribute('aria-pressed') === 'true';
+        animBtns.forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        if (playing) return mv.pause();
+        mv.removeAttribute('auto-rotate');
+        if (mv.animationName !== name) {
+          mv.animationName = name;
+          mv.currentTime = 0;
+        } else if (mv.currentTime >= mv.duration - 0.01) mv.currentTime = 0;
+        btn.setAttribute('aria-pressed', 'true');
+        mv.play(btn.hasAttribute('data-loop') ? undefined : { repetitions: 1 });
+      });
+    }
+    mv.addEventListener('finished', () => animBtns.forEach((b) => b.setAttribute('aria-pressed', 'false')));
+
+    /** Tie an animation's time to how far the figure has scrolled through the viewport. */
+    function setupScrub() {
+      mv.animationName = scrubName;
+      mv.pause();
+      let raf = 0;
+      const update = () => {
+        raf = 0;
+        const r = root.getBoundingClientRect();
+        const p = Math.min(1, Math.max(0, (innerHeight - r.top) / (innerHeight + r.height * 0.4)));
+        mv.currentTime = p * (mv.duration || 0);
+      };
+      addEventListener('scroll', () => (raf ||= requestAnimationFrame(update)), { passive: true });
+      update();
+    }
+
+    // ── hotspots ──
+    const fly = (i: number) => {
+      const m = markers[i];
+      if (!m) return;
+      mv.removeAttribute('auto-rotate');
+      mv.cameraTarget = m.dataset.target!;
+      mv.cameraOrbit = m.dataset.orbit || orbitFromNormal(m.dataset.normal || '0 1 0');
+      mv.fieldOfView = m.dataset.fov || '22deg';
+      if (reduceMotion) mv.jumpCameraToGoal();
+    };
+
+    const reset = () => {
+      active = -1;
+      mv.cameraTarget = root.dataset.target!;
+      mv.cameraOrbit = root.dataset.orbit!;
+      mv.fieldOfView = 'auto';
+      if (reduceMotion) mv.jumpCameraToGoal();
+      sync();
+    };
+
+    const sync = () => {
+      markers.forEach((mk, k) => mk.setAttribute('aria-pressed', String(k === active)));
+      items.forEach((it, k) => it.setAttribute('aria-expanded', String(k === active)));
+    };
+
+    const select = (i: number) => {
+      if (active === i) return reset();
+      active = i;
+      sync();
+      if (!started) void start();
+      fly(i);
+    };
+
+    [...markers, ...items].forEach((el) => {
+      const i = Number(el.dataset.i);
+      el.addEventListener('click', () => select(i));
+      el.addEventListener('mouseenter', () => {
+        markers[i]?.classList.add('is-hover');
+        items[i]?.classList.add('is-hover');
+      });
+      el.addEventListener('mouseleave', () => {
+        markers[i]?.classList.remove('is-hover');
+        items[i]?.classList.remove('is-hover');
+      });
+    });
+    resetBtn.addEventListener('click', reset);
+
+    // Dev-only authoring helper. Tree-shaken from production builds.
+    if (import.meta.env.DEV && new URLSearchParams(location.search).has('author')) {
+      void start();
+      mv.addEventListener('click', (e) => {
+        if (!e.shiftKey) return;
+        const hit = mv.positionAndNormalFromPoint(e.clientX, e.clientY);
+        if (!hit) return console.info('[model author] no surface under cursor');
+        const yaml = [
+          `  - id: TODO`,
+          `    label: TODO`,
+          `    partNo: TODO`,
+          `    detail: TODO`,
+          `    position: "${hit.position.toString()}"`,
+          `    normal: "${hit.normal.toString()}"`,
+          `    orbit: "${mv.getCameraOrbit().toString()}"`,
+        ].join('\n');
+        void navigator.clipboard?.writeText(yaml);
+        console.info('[model author] copied hotspot YAML:\n' + yaml);
+      });
+      // "Save poster": exports the current view as the still shown before the model loads.
+      const save = document.createElement('button');
+      save.type = 'button';
+      save.className = 'parts__btn';
+      save.textContent = 'Save poster';
+      save.addEventListener('click', async () => {
+        const blob = await mv.toBlob({ mimeType: 'image/webp', qualityArgument: 0.9 });
+        const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'poster.webp' });
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+      root.querySelector('.parts__hud')?.append(save);
+      console.info('[model author] Shift+click the model to capture a hotspot; "Save poster" exports the current view.');
+    }
+  }
+</script>

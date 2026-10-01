@@ -1,0 +1,83 @@
+---
+/**
+ * Page-level zoomable lightbox for every [data-gallery] link on the page.
+ * PhotoSwipe's JS is only downloaded on the first click (its small stylesheet ships with the page).
+ */
+---
+
+<script>
+  import type PhotoSwipeLightbox from 'photoswipe/lightbox';
+
+  let lightbox: PhotoSwipeLightbox | undefined;
+
+  async function open(link: HTMLAnchorElement) {
+    const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-gallery] a[data-pswp-width]')];
+    const index = links.indexOf(link);
+    if (!lightbox) {
+      const { default: Lightbox } = await import('photoswipe/lightbox');
+      lightbox = new Lightbox({
+        dataSource: links.map((a) => ({
+          src: a.href,
+          width: Number(a.dataset.pswpWidth),
+          height: Number(a.dataset.pswpHeight),
+          alt: a.querySelector('img')?.alt ?? '',
+          caption: a.dataset.caption ?? a.closest('figure')?.querySelector('figcaption span:last-child')?.textContent ?? '',
+        })),
+        pswpModule: () => import('photoswipe'),
+        bgOpacity: 0.94,
+        wheelToZoom: true,
+        secondaryZoomLevel: 2,
+        maxZoomLevel: 4,
+      });
+      lightbox.on('uiRegister', () => {
+        lightbox!.pswp?.ui?.registerElement({
+          name: 'caption',
+          order: 9,
+          isButton: false,
+          appendTo: 'root',
+          onInit: (el, pswp) => {
+            pswp.on('change', () => {
+              el.textContent = String((pswp.currSlide?.data as { caption?: string })?.caption ?? '');
+            });
+          },
+        });
+      });
+      lightbox.init();
+    }
+    lightbox.loadAndOpen(Math.max(0, index));
+  }
+
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    const link = (e.target as HTMLElement).closest<HTMLAnchorElement>('[data-gallery] a[data-pswp-width]');
+    if (!link) return;
+    e.preventDefault();
+    void open(link);
+  });
+</script>
+
+<style is:global>
+  @import 'photoswipe/style.css';
+
+  .pswp {
+    --pswp-bg: #050607;
+    --pswp-icon-color: #e8eaed;
+    --pswp-icon-color-secondary: #050607;
+  }
+  .pswp__caption {
+    position: absolute;
+    left: 50%;
+    bottom: 1.25rem;
+    transform: translateX(-50%);
+    max-width: min(90vw, 60ch);
+    padding: 0.5rem 0.8rem;
+    font: 500 0.85rem/1.45 var(--font-sans);
+    color: #c9ced5;
+    text-align: center;
+    background: rgb(5 6 7 / 0.7);
+    border-radius: 3px;
+  }
+  .pswp__caption:empty {
+    display: none;
+  }
+</style>

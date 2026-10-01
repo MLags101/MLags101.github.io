@@ -1,0 +1,26 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# RESEARCH OUTPUTS — papers, posters, talks, theses, ongoing work.
+# (Research *positions* go in experience.yaml with type: research.)
+# kind: paper | poster | talk | thesis | report | ongoing
+# ═══════════════════════════════════════════════════════════════════════════════
+
+quadcopter-testbeds:
+  title: Motion-capture quadcopter testbeds for swarm research
+  kind: ongoing
+  date: 2025-08
+  venue: Aerospace Robotics Laboratory, Georgia Tech
+  summary: >-
+    Autonomy-capable quadcopters designed and fabricated as shared lab testbeds for swarm
+    coordination, mapping and localization research, with flight code and procedures that
+    close the loop on a motion capture system for high-precision localization.
+  experience: aerospace-robotics-lab
+
+underwater-vehicle:
+  title: Small underwater vehicle for autonomous manipulation
+  kind: ongoing
+  date: 2025-08
+  venue: Aerospace Robotics Laboratory, Georgia Tech
+  summary: >-
+    A compact underwater vehicle in development to give the lab a platform for research in
+    autonomous underwater manipulation.
+  experience: aerospace-robotics-lab

@@ -1,0 +1,135 @@
+---
+import { site } from '../../site.config';
+import Icon from '../ui/Icon.astro';
+
+const built = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date());
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__cta">
+      <p class="label label--accent eyebrow">Get in touch</p>
+      <h2>Let's build something that flies.</h2>
+      <div class="site-footer__actions">
+        <a class="btn btn--primary" href={`mailto:${site.email}`}><Icon name="mail" />{site.email}</a>
+        <a class="btn" href={site.resumePdf} download><Icon name="download" />Resume (PDF)</a>
+      </div>
+    </div>
+
+    <div class="site-footer__grid">
+      <div>
+        <p class="label">Index</p>
+        <ul>
+          <li><a href="/">Home</a></li>
+          {
+            site.nav.map((n) => (
+              <li>
+                <a href={n.href}>{n.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div>
+        <p class="label">Elsewhere</p>
+        <ul>
+          <li><a href={site.links.linkedin} rel="me noopener" target="_blank">LinkedIn <Icon name="arrow-up-right" size={12} /></a></li>
+          <li><a href={site.links.github} rel="me noopener" target="_blank">GitHub <Icon name="arrow-up-right" size={12} /></a></li>
+          <li><a href={`mailto:${site.email}`}>Email</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__meta">
+        <p class="label">Station</p>
+        <p class="mono">33.7756° N, 84.3963° W</p>
+        <p class="mono muted">{site.location}</p>
+      </div>
+    </div>
+
+    <div class="site-footer__base label">
+      <span>© {new Date().getFullYear()} {site.name}</span>
+      <span>Rev. {built} · Built with Astro</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--line);
+    padding-top: var(--section);
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-elev) 100%);
+  }
+
+  .site-footer__cta h2 {
+    margin-top: var(--s-4);
+    font-size: var(--step-5);
+    max-width: 16ch;
+  }
+
+  .site-footer__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-6);
+  }
+
+  .site-footer__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-6);
+    margin-top: var(--s-9);
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--line);
+  }
+
+  .site-footer__grid ul {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--s-3);
+  }
+
+  .site-footer__grid li + li {
+    margin-top: var(--s-2);
+  }
+
+  .site-footer__grid a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    color: var(--text-2);
+    text-decoration: none;
+    font-size: var(--step--1);
+  }
+
+  .site-footer__grid a:hover {
+    color: var(--text);
+  }
+
+  .site-footer__meta p + p {
+    margin-top: var(--s-2);
+    font-size: var(--step--1);
+  }
+
+  .site-footer__meta .label + .mono {
+    margin-top: var(--s-3);
+  }
+
+  .site-footer__base {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-8);
+    padding-block: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 640px) {
+    .site-footer__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .site-footer__meta {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

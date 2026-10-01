@@ -1,0 +1,96 @@
+---
+/**
+ * <Figure src="frame.jpg" alt="…" caption="…" />
+ * `src` is a file in this project's images/ folder (or "other-slug/file.jpg").
+ * Figures are numbered automatically with a CSS counter (FIG. 01, 02 …).
+ * `size`: "prose" (text width, default) · "wide" (full content width) · "half" (pairs side by side via <Gallery>).
+ */
+import { Image, getImage } from 'astro:assets';
+import { resolveImage, type ImageSrc } from '../../lib/media';
+
+interface Props {
+  src: ImageSrc;
+  alt: string;
+  caption?: string;
+  size?: 'prose' | 'wide';
+  /** Show the whole image on a dark plate instead of filling the frame (schematics, renders). */
+  contain?: boolean;
+  zoom?: boolean;
+}
+
+const { src, alt, caption, size = 'prose', contain = false, zoom = true } = Astro.props;
+const img = resolveImage(src, Astro.locals.projectSlug);
+const full = zoom ? await getImage({ src: img, width: Math.min(img.width, 2000), quality: 80 }) : null;
+---
+
+<figure class:list={['figure', size === 'wide' && 'wide', contain && 'figure--contain']} data-gallery={zoom ? '' : undefined}>
+  <a
+    class="figure__media crop-marks"
+    href={full?.src}
+    data-pswp-width={full ? (full.attributes.width ?? img.width) : undefined}
+    data-pswp-height={full ? (full.attributes.height ?? img.height) : undefined}
+    aria-label={zoom ? `Enlarge: ${alt}` : undefined}
+    tabindex={zoom ? undefined : -1}
+  >
+    <Image src={img} alt={alt} widths={[480, 800, 1200, 1600]} sizes="(min-width: 1100px) 900px, 100vw" />
+  </a>
+  {
+    caption && (
+      <figcaption>
+        <span class="label figure__num" />
+        <span>{caption}</span>
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .figure {
+    counter-increment: fig;
+    max-width: var(--prose);
+  }
+
+  .figure.wide {
+    max-width: none;
+  }
+
+  .figure__media {
+    display: block;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    cursor: zoom-in;
+  }
+
+  .figure__media :global(img) {
+    width: 100%;
+    border-radius: var(--radius);
+  }
+
+  .figure--contain .figure__media {
+    padding: var(--s-5);
+    background: var(--surface);
+  }
+
+  .figure--contain .figure__media :global(img) {
+    max-height: 70vh;
+    width: auto;
+    margin-inline: auto;
+    object-fit: contain;
+  }
+
+  figcaption {
+    display: flex;
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+    font-size: var(--step--1);
+    color: var(--text-3);
+    line-height: 1.5;
+  }
+
+  .figure__num::before {
+    content: 'FIG.\00a0' counter(fig, decimal-leading-zero);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+</style>
