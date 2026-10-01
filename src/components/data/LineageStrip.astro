@@ -49,6 +49,8 @@ const family = current.data.lineage?.family ?? '';
 
 <style>
   .lineage {
+    min-width: 0;
+    max-width: 100%;
     padding: var(--s-5);
     border: 1px solid var(--line);
     border-radius: var(--radius);
@@ -129,5 +131,22 @@ const family = current.data.lineage?.family ?? '';
   .lineage__arrow {
     color: var(--text-3);
     font-family: var(--font-mono);
+  }
+
+  /* Phones: versions stack vertically instead of scrolling sideways. */
+  @media (max-width: 640px) {
+    ol {
+      flex-direction: column;
+    }
+    li {
+      min-width: 0;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .lineage__arrow {
+      transform: rotate(90deg);
+      align-self: center;
+      line-height: 1;
+    }
   }
 </style>

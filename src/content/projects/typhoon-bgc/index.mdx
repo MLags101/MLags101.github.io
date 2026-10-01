@@ -1,27 +1,3 @@
----
-title: Typhoon Brushless Gimbal Controller
-summary: >-
-  A compact, low-cost brushless motor controller for UAV camera gimbals — two board
-  revisions from a Teensy test rig to an integrated ATmega328 design now flying on EEVi v3.
-category: personal
-start: 2026-02
-end: 2026-02
-featured: true
-order: 70
-cover: ./images/typhoonbgc.png
-coverAlt: 3D render of the Typhoon V2 gimbal controller PCB
-role: Sole designer
-skills: [altium, arduino, bldc-control, pcb-fab, soldering]
-specs:
-  - { label: Driver IC, value: ST L6234 3-phase }
-  - { label: MCU (V1), value: Teensy (external) }
-  - { label: MCU (V2), value: ATmega328 on-board }
-  - { label: PCB (V2), value: Double-sided, fab-house }
-  - { label: Control, value: Velocity + position }
-  - { label: Deployed, value: EEVi v3 gimbal }
-related: [eevi, stm-remote]
----
-
 ## Why build one
 
 I started this project to fill a gap in small-UAV prototyping: a compact, low-cost brushless controller made for camera gimbals. Existing options were either expensive and oversized (ODrive, Moteus) or plagued with software issues (STorM32).

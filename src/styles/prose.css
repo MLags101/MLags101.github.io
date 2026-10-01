@@ -99,3 +99,45 @@
 .prose > .wide + .wide {
   margin-top: var(--s-5);
 }
+
+/* Markdown tables (BOMs, test results). Scroll sideways on narrow screens. */
+.prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+}
+
+.prose th,
+.prose td {
+  padding: 0.55rem 0.9rem 0.55rem 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.prose td:nth-child(2) {
+  white-space: normal;
+  min-width: 14ch;
+}
+
+.prose th {
+  font: 500 var(--step--2) / 1.2 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  border-bottom-color: var(--line-strong);
+}
+
+.prose td[align='right'],
+.prose th[align='right'] {
+  text-align: right;
+}
+
+.prose tfoot td,
+.prose tr:last-child td {
+  border-bottom: 0;
+}

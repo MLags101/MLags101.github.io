@@ -1,5 +1,4 @@
 ---
-import { render } from 'astro:content';
 import { Image } from 'astro:assets';
 import PageLayout from '../../layouts/PageLayout.astro';
 import Gantt from '../../components/data/Gantt.astro';
@@ -15,7 +14,6 @@ const entries = await Promise.all(
     entry: e,
     skills: await resolveSkills(e.data.skills),
     projects: await getProjectsFor(e.id),
-    Content: (await render(e)).Content,
   })),
 );
 // Internships and co-ops share one 'Industry' filter.
@@ -46,7 +44,7 @@ const ticks = projects.map((p) => ({ date: p.data.end ?? p.data.start, label: p.
 
     <ol class="tl">
       {
-        entries.map(({ entry: e, skills, projects: related, Content }) => (
+        entries.map(({ entry: e, skills, projects: related }) => (
           <li class="tl__item" id={e.id} data-type={filterType(e.data.type)} data-reveal>
             <div class="tl__when">
               <p class="mono tl__dates">{range(e.data.start, e.data.end)}</p>
@@ -101,10 +99,6 @@ const ticks = projects.map((p) => ({ date: p.data.end ?? p.data.start, label: p.
                   ))}
                 </ul>
               )}
-
-              <div class="prose tl__body">
-                <Content />
-              </div>
 
               {skills.length > 0 && (
                 <ul class="chip-list tl__skills" aria-label="Skills used">

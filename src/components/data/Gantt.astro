@@ -25,7 +25,7 @@ const years = Array.from({ length: endYear - startYear }, (_, i) => startYear + 
 const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.getTime());
 ---
 
-<figure class="gantt" aria-label="Experience timeline overview">
+<figure class="gantt" aria-label="Experience timeline overview" data-reveal>
   <div class="gantt__scroll">
     <div class="gantt__chart">
       <div class="gantt__axis" aria-hidden="true">
@@ -43,7 +43,7 @@ const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.g
         }
         <span class="gantt__now" style={`left:${pct(now)}%`} aria-hidden="true"><span class="label">Now</span></span>
         {
-          rows.map((e) => {
+          rows.map((e, i) => {
             const left = pct(e.data.start);
             const right = pct(e.data.end ? endOfMonth(e.data.end) : now);
             const title = e.data.positions[0]!.title;
@@ -55,7 +55,7 @@ const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.g
                 <a
                   href={`#${e.id}`}
                   class:list={['gantt__bar', `gantt__bar--${e.data.type}`, !e.data.end && 'is-ongoing']}
-                  style={`left:${left}%; width:${Math.max(right - left, 1.2)}%`}
+                  style={`left:${left}%; width:${Math.max(right - left, 1.2)}%; --k:${i}`}
                   title={`${e.data.org} · ${range(e.data.start, e.data.end, 'text')} (${duration(e.data.start, e.data.end)})`}
                 >
                   <span class="gantt__name">{e.data.mark}</span>
@@ -308,5 +308,26 @@ const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.g
     height: 8px;
     transform: rotate(45deg);
     border: 1.5px solid var(--accent);
+  }
+
+  /* Bars grow from their start date the first time the chart scrolls into view. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .gantt:not(.is-in) .gantt__bar {
+      transform: scaleX(0);
+    }
+    .gantt__bar {
+      transform-origin: left center;
+      transition: transform 0.9s var(--ease) calc(var(--k, 0) * 110ms + 150ms);
+    }
+    .gantt__tick {
+      transition:
+        background-color var(--dur-2) var(--ease),
+        opacity 0.4s var(--ease) 0.9s,
+        transform 0.4s var(--ease) 0.9s;
+    }
+    :global(.js) .gantt:not(.is-in) .gantt__tick {
+      opacity: 0;
+      transform: translateX(-50%) rotate(45deg) scale(0.4);
+    }
   }
 </style>

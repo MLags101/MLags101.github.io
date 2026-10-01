@@ -1,0 +1,370 @@
+---
+/**
+ * Articulated robot from a URDF — orbit it, drag joint sliders, and play named poses.
+ * Data: src/data/robots/<id>.yaml · files: public/robots/<id>/ (urdf/ + meshes/).
+ *
+ *   <RobotViewer id="dum-i" caption="…" />
+ *
+ * Built on three.js + urdf-loader, lazy-loaded when the viewer scrolls into view (nothing
+ * downloads on pages without one). Meshes can be STL / DAE (what the SolidWorks URDF
+ * exporter writes) or GLB. Respects prefers-reduced-motion: poses jump instead of easing,
+ * and sequences don't autoplay. Guide: docs/3D-MODELS.md → "Robots (URDF)".
+ */
+import '../../styles/parts.css';
+import { getEntry } from 'astro:content';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  id: string;
+  caption?: string;
+}
+
+const { id, caption } = Astro.props;
+const entry = await getEntry('robots', id);
+if (!entry) throw new Error(`<RobotViewer id="${id}">: no src/data/robots/${id}.yaml`);
+const r = entry.data;
+const config = JSON.stringify({
+  urdf: r.urdf,
+  packages: r.packages,
+  up: r.up,
+  cameraDistance: r.cameraDistance,
+  sliders: r.sliders,
+  poses: r.poses,
+  sequence: r.sequence,
+});
+---
+
+<figure class="parts wide robot" data-robot data-config={config}>
+  <div class="parts__layout">
+    <div class="parts__stage robot__stage crop-marks" role="img" aria-label={r.alt}>
+      {r.poster && <img class="robot__poster" src={r.poster} alt="" aria-hidden="true" loading="lazy" />}
+      <canvas class="robot__canvas" aria-hidden="true"></canvas>
+      <div class="parts__hud">
+        <span class="parts__btn" aria-hidden="true"><Icon name="cube" size={14} /> URDF · drag to orbit</span>
+        <button type="button" class="parts__btn" data-play hidden aria-pressed="false">▶ Play sequence</button>
+      </div>
+      <p class="robot__status label" data-status>Loading robot…</p>
+    </div>
+
+    <div class="robot__panel">
+      {
+        r.poses.length > 0 && (
+          <div class="robot__poses" role="group" aria-label="Poses">
+            <p class="label">Poses</p>
+            <div class="robot__pose-list">
+              {r.poses.map((p) => (
+                <button type="button" class="parts__btn" data-pose={p.id} aria-pressed="false" disabled>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )
+      }
+      {r.sliders && <div class="robot__joints" data-joints aria-label="Joints"><p class="label">Joints</p></div>}
+    </div>
+  </div>
+  {
+    caption && (
+      <figcaption class="parts__caption">
+        <span class="label" />
+        <span>{caption}</span>
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .robot__stage {
+    aspect-ratio: 4 / 3;
+  }
+
+  .robot__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+  }
+
+  .robot__poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity var(--dur-3) var(--ease);
+  }
+
+  .robot[data-loaded] .robot__poster,
+  .robot[data-loaded] .robot__status {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .robot__status {
+    position: absolute;
+    left: 50%;
+    bottom: var(--s-4);
+    transform: translateX(-50%);
+    transition: opacity var(--dur-3) var(--ease);
+  }
+
+  .robot__panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+  }
+
+  .robot__pose-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-top: var(--s-3);
+  }
+
+  .robot__pose-list [aria-pressed='true'] {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .robot__joints :global(label) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--s-1) var(--s-3);
+    padding-block: var(--s-2);
+    border-bottom: 1px solid var(--line);
+    font: var(--step--2) var(--font-mono);
+    color: var(--text-2);
+  }
+
+  .robot__joints :global(label output) {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .robot__joints :global(input[type='range']) {
+    grid-column: 1 / -1;
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .robot__joints > .label {
+    margin-bottom: var(--s-1);
+  }
+
+  [data-play][aria-pressed='true'] {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  type Config = {
+    urdf: string;
+    packages: Record<string, string>;
+    up: '+z' | '+y';
+    cameraDistance?: number;
+    sliders: boolean;
+    poses: { id: string; label: string; joints: Record<string, number> }[];
+    sequence?: { poses: string[]; seconds: number; hold: number; autoplay: boolean };
+  };
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+
+  async function mount(root: HTMLElement) {
+    const cfg = JSON.parse(root.dataset.config!) as Config;
+    const canvas = root.querySelector<HTMLCanvasElement>('canvas')!;
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const jointsEl = root.querySelector<HTMLElement>('[data-joints]');
+    const poseBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-pose]')];
+    const playBtn = root.querySelector<HTMLButtonElement>('[data-play]')!;
+
+    const [THREE, { OrbitControls }, { GLTFLoader }, { default: URDFLoader }] = await Promise.all([
+      import('three'),
+      import('three/examples/jsm/controls/OrbitControls.js'),
+      import('three/examples/jsm/loaders/GLTFLoader.js'),
+      import('urdf-loader'),
+    ]);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NeutralToneMapping;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 100);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x3a3f47, 2.2));
+    const key = new THREE.DirectionalLight(0xffffff, 2.4);
+    key.position.set(2, 4, 3);
+    scene.add(key);
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = !reduceMotion;
+    controls.enablePan = false;
+
+    // Own manager: onLoad fires once the URDF *and* every mesh it references have loaded.
+    const manager = new THREE.LoadingManager();
+    const meshesLoaded = new Promise<void>((res) => {
+      manager.onLoad = () => res();
+      setTimeout(res, 15000); // never hang the UI on a missing mesh
+    });
+    manager.onError = (url) => console.warn('[robot] failed to load', url);
+    const loader = new URDFLoader(manager);
+    loader.packages = cfg.packages;
+    const gltf = new GLTFLoader();
+    const defaultLoad = loader.defaultMeshLoader.bind(loader);
+    loader.loadMeshCb = (url, manager, material, done) => {
+      if (/\.(glb|gltf)$/i.test(url)) gltf.load(url, (g) => done(g.scene), undefined, (e) => done(new THREE.Object3D(), e as Error));
+      else defaultLoad(url, manager, material, done);
+    };
+
+    let robot: Awaited<ReturnType<typeof loader.loadAsync>>;
+    try {
+      robot = await loader.loadAsync(cfg.urdf);
+    } catch (e) {
+      status.textContent = 'Robot failed to load';
+      throw e;
+    }
+    if (cfg.up === '+z') robot.rotation.x = -Math.PI / 2;
+    scene.add(robot);
+
+    // Frame the camera once the meshes are in.
+    await meshesLoaded;
+
+    const box = new THREE.Box3().setFromObject(robot);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const dist = cfg.cameraDistance ?? Math.max(size.x, size.y, size.z) * 2.4;
+    controls.target.copy(center);
+    camera.position.copy(center).add(new THREE.Vector3(dist * 0.75, dist * 0.45, dist * 0.75));
+    controls.update();
+
+    // ── render on demand ──
+    let dirty = true;
+    const resize = () => {
+      const { clientWidth: w, clientHeight: h } = canvas;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      dirty = true;
+    };
+    new ResizeObserver(resize).observe(canvas);
+    resize();
+    controls.addEventListener('change', () => (dirty = true));
+    let visible = true;
+    new IntersectionObserver(([e]) => (visible = !!e?.isIntersecting)).observe(root);
+
+    // ── joints ──
+    const movable = Object.values(robot.joints).filter((j) => ['revolute', 'continuous', 'prismatic'].includes(j.jointType));
+    const sliders = new Map<string, { input: HTMLInputElement; out: HTMLOutputElement }>();
+    const fmt = (j: (typeof movable)[number], v: number) =>
+      j.jointType === 'prismatic' ? `${(v * 1000).toFixed(0)} mm` : `${((v * 180) / Math.PI).toFixed(0)}°`;
+    const setJoint = (name: string, v: number) => {
+      robot.setJointValue(name, v);
+      const s = sliders.get(name);
+      if (s) {
+        s.input.value = String(v);
+        s.out.textContent = fmt(robot.joints[name]!, v);
+      }
+      dirty = true;
+    };
+    if (jointsEl)
+      for (const j of movable) {
+        const lo = j.jointType === 'continuous' ? -Math.PI : j.limit.lower;
+        const hi = j.jointType === 'continuous' ? Math.PI : j.limit.upper;
+        const label = document.createElement('label');
+        const name = document.createElement('span');
+        name.textContent = j.name;
+        const out = document.createElement('output');
+        const input = Object.assign(document.createElement('input'), { type: 'range', min: String(lo), max: String(hi), step: String((hi - lo) / 400) });
+        input.value = String(j.angle ?? 0);
+        out.textContent = fmt(j, Number(input.value));
+        input.addEventListener('input', () => {
+          stop();
+          setJoint(j.name, Number(input.value));
+          poseBtns.forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        });
+        label.append(name, out, input);
+        jointsEl.append(label);
+        sliders.set(j.name, { input, out });
+      }
+
+    // ── poses & sequence ──
+    let tween: { from: Record<string, number>; to: Record<string, number>; t0: number; dur: number; done?: () => void } | null = null;
+    const current = () => Object.fromEntries(movable.map((j) => [j.name, Number(j.angle ?? 0)]));
+    const goTo = (pose: Config['poses'][number], seconds = 1.2) =>
+      new Promise<void>((done) => {
+        poseBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pose === pose.id)));
+        if (reduceMotion || seconds <= 0) {
+          for (const [n, v] of Object.entries(pose.joints)) setJoint(n, v);
+          return done();
+        }
+        tween = { from: current(), to: pose.joints, t0: performance.now(), dur: seconds * 1000, done };
+      });
+    let playing = false;
+    const stop = () => {
+      playing = false;
+      playBtn.setAttribute('aria-pressed', 'false');
+      playBtn.textContent = '▶ Play sequence';
+    };
+    const play = async () => {
+      const seq = cfg.sequence!;
+      playing = true;
+      playBtn.setAttribute('aria-pressed', 'true');
+      playBtn.textContent = '❚❚ Pause';
+      for (let i = 0; playing; i = (i + 1) % seq.poses.length) {
+        const pose = cfg.poses.find((p) => p.id === seq.poses[i]);
+        if (!pose) break;
+        await goTo(pose, seq.seconds);
+        await new Promise((r) => setTimeout(r, seq.hold * 1000));
+      }
+    };
+    poseBtns.forEach((b) => {
+      b.disabled = false;
+      b.addEventListener('click', () => {
+        stop();
+        const p = cfg.poses.find((x) => x.id === b.dataset.pose);
+        if (p) void goTo(p);
+      });
+    });
+    if (cfg.sequence) {
+      playBtn.hidden = false;
+      playBtn.addEventListener('click', () => (playing ? stop() : void play()));
+      if (cfg.sequence.autoplay && !reduceMotion) void play();
+    }
+
+    const loop = (now: number) => {
+      requestAnimationFrame(loop);
+      if (tween) {
+        const k = Math.min(1, (now - tween.t0) / tween.dur);
+        const e = ease(k);
+        for (const [n, to] of Object.entries(tween.to)) setJoint(n, (tween.from[n] ?? 0) + (to - (tween.from[n] ?? 0)) * e);
+        if (k >= 1) {
+          const d = tween.done;
+          tween = null;
+          d?.();
+        }
+      }
+      if (controls.enableDamping) dirty = controls.update() || dirty;
+      if (dirty && visible) {
+        renderer.render(scene, camera);
+        dirty = false;
+      }
+    };
+    requestAnimationFrame(loop);
+    root.toggleAttribute('data-loaded', true);
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-robot]')) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          void mount(root);
+        }
+      },
+      { rootMargin: '200px' },
+    );
+    io.observe(root);
+  }
+</script>

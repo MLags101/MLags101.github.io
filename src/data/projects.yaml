@@ -1,0 +1,354 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# PROJECTS — every fact about every project lives here.
+#
+# Edit dates, skills, specs, featured picks, etc. in this file. The write-up (text,
+# photos, videos, 3D) for each project is in src/content/projects/<slug>/index.mdx and
+# its images/ folder. The key above each block (e.g. `eevi:`) is the slug: it is the
+# URL (/projects/eevi) and must match the folder name.
+#
+# Dates are YYYY-MM. Leave `end` out for ongoing work. A typo here fails the build
+# with a message naming the field, so mistakes can't reach the live site.
+# Full field reference: docs/CONTENT.md · Overview: SITE_GUIDE.md
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ── TEAMS & ORGS ──────────────────────────────────────────────────────────────
+
+eevi:
+  title: EEVi — URC Scout Drone
+  summary: >-
+    RoboNav's scout UAV for the University Rover Challenge. Rebuilt for 2025 around a
+    long-range comms system: an auto-tracking antenna, RFD900x telemetry and digital video.
+  category: team   # research | professional | team | personal | coursework
+  start: 2023-10   # YYYY-MM
+  status: in-progress   # complete | in-progress | paused | concept
+  featured: true   # true = shown on the home page
+  order: 90   # higher = earlier among featured / ties
+  role: Founder & Drone Lead
+  context: robonav   # experience id (src/data/experience.yaml)
+  team: RoboNav drone subteam — 2 members in 2024, 10+ on EEVi v3
+  skills: [ardupilot, mission-planner, openhd, raspberry-pi, solidworks, composites, ansys, 3d-printing]   # ids from src/data/skills.yaml
+  cover: 20250530-085411.jpg   # file in src/content/projects/<slug>/images/
+  coverAlt: EEVi and the RoboNav rover on the Utah desert course at URC 2025
+  specs:
+    - { label: Flight ctrl, value: Pixhawk · ArduPilot }
+    - { label: Airframe, value: Scrapped Tarot carbon fiber + printed shell }
+    - { label: Telemetry, value: RFD900x radio pair }
+    - { label: Video, value: OpenHD digital · Pi 4 + Arducam }
+    - { label: Ground, value: 2-axis auto-tracking antenna }
+    - { label: Range gain, value: +2 km from tracking antenna }
+    - { label: Video lag, value: ~0.5 s at URC 2025 }
+    - { label: Events, value: URC 2024 · URC 2025 }
+  related: [typhoon-bgc]
+  log:   # dated build milestones
+    - { date: 2023-10, title: Drone subteam founded, note: "Two members, a box of parts from a retired drone, and a brief to support the rover." }
+    - { date: 2024-05, title: URC 2024 — first competition, note: Pixhawk build with a tool-carrying end effector. Telemetry range came up short and a bad wire killed video at the event. }
+    - { date: 2025-05, title: URC 2025 — full rebuild, note: "New carbon airframe, tracking antenna and digital video. Autonomous takeoff and stable flight; lost to terrain with all electronics intact." }
+    - { date: 2026-02, title: EEVi v3 in development, note: Team grown to 10+. Typhoon brushless gimbal controller boards integrated. }
+
+electronics-box:
+  title: Electronics Lockbox
+  summary: >-
+    An RFID + RF-remote lockbox for the Invention Studio's electronics keys, with a
+    spark-gap deterrent — my Electronics Master project.
+  category: team
+  start: 2023-11
+  end: 2023-11
+  order: 10
+  role: Designer · Electronics Master candidate
+  context: invention-studio
+  skills: [arduino, rf-comms, solidworks, 3d-printing, laser-cutting]
+  cover: image.jpg
+  coverAlt: >-
+    Laser-cut wooden lockbox labeled Electronics Lockbox sitting on lab equipment
+  specs:
+    - { label: Auth, value: MFRC522 RFID · 13.56 MHz }
+    - { label: Remote, value: 433 MHz RF module }
+    - { label: Lock, value: 12 V solenoid · MOSFET-driven }
+    - { label: Deterrent, value: PWM-driven spark gap }
+    - { label: Enclosure, value: Printed door · laser-cut MDF }
+
+# ── PERSONAL ──────────────────────────────────────────────────────────────────
+
+kermit-v3:
+  title: Kermit V3
+  summary: >-
+    A folding, sensor-dense quadcopter inspired by the Skydio X10 — 360° lidar, optical flow,
+    a 3-axis 4K gimbal and long-range radio, packed into a frame that straps over a shoulder.
+  category: personal
+  start: 2026-04
+  end: 2026-04
+  featured: true
+  order: 100
+  role: Sole designer · Invention Studio funded
+  context: invention-studio
+  skills: [solidworks, ardupilot, 3d-printing, composites]
+  cover: img-8094.jpg
+  coverAlt: Kermit V3 quadcopter on a table outdoors with its ground equipment
+  model: kermit-v3
+  specs:
+    - { label: Flight ctrl, value: CubePilot Cube Orange · ArduPilot }
+    - { label: GNSS, value: CubePilot Here4 }
+    - { label: Obstacle sensing, value: LD19 360° lidar }
+    - { label: Ground sensing, value: Holybro H-Flow (flow + lidar) }
+    - { label: Payload, value: SIYI A8 mini 3-axis 4K gimbal }
+    - { label: Link, value: SIYI HM30 air unit + MK32 handheld GCS }
+    - { label: Motors, value: 4× MAD 4006 EEE }
+    - { label: Power, value: 4S LiPo }
+    - { label: Frame, value: "Carbon arms, double vertical-flip fold" }
+  lineage: { family: Kermit, version: V3, order: 3 }
+
+typhoon-bgc:
+  title: Typhoon Brushless Gimbal Controller
+  summary: >-
+    A compact, low-cost brushless motor controller for UAV camera gimbals — two board
+    revisions from a Teensy test rig to an integrated ATmega328 design now flying on EEVi
+    v3.
+  category: personal
+  start: 2026-02
+  end: 2026-02
+  featured: true
+  order: 70
+  role: Sole designer
+  skills: [altium, arduino, bldc-control, pcb-fab, soldering]
+  cover: typhoonbgc.png
+  coverAlt: 3D render of the Typhoon V2 gimbal controller PCB
+  specs:
+    - { label: Driver IC, value: ST L6234 3-phase }
+    - { label: MCU (V1), value: Teensy (external) }
+    - { label: MCU (V2), value: ATmega328 on-board }
+    - { label: PCB (V2), value: "Double-sided, fab-house" }
+    - { label: Control, value: Velocity + position }
+    - { label: Deployed, value: EEVi v3 gimbal }
+  related: [eevi, stm-remote]
+
+mr-toad:
+  title: Mr Toad's Wild Rover
+  summary: >-
+    A compact scout rover inspired by the iRobot FirstLook — GPS, lidar obstacle avoidance and a
+    16 MP camera, driven from a custom PyQt ground station over ROS 2. My third Maker Grant.
+  category: personal
+  start: 2026-01
+  end: 2026-01
+  featured: true
+  order: 80
+  role: Sole designer · Maker Grant recipient
+  context: invention-studio
+  skills: [solidworks, ros2, python, raspberry-pi, ardupilot, 3d-printing]
+  cover: rovercad.png
+  coverAlt: >-
+    SolidWorks render of the Mr Toad rover with antenna, GNSS puck and climbing stilts
+  model: mr-toad
+  specs:
+    - { label: Class, value: Teleoperated / autonomy-capable UGV }
+    - { label: Inspiration, value: iRobot 110 FirstLook }
+    - { label: Controller, value: CubePilot Cube Orange }
+    - { label: Companion, value: Raspberry Pi 4 · Raspberry Pi OS }
+    - { label: Sensing, value: "Here4 GPS, LIDAR-Lite v3, 16 MP camera" }
+    - { label: Drive, value: 2× JGB37-520 12 V · BTS7960 H-bridges }
+    - { label: Ground station, value: PyQt5 GUI · ROS 2 joy → UDP bridge }
+    - { label: Shell, value: Printed halves heat-welded · heat-set inserts }
+  related: [eevi]
+
+kermit-v2:
+  title: Kermit V2
+  summary: >-
+    A carbon-fiber, Pixhawk-based quadcopter built to learn robust frame design and long-range
+    digital video — OpenHD on a Pi 4, 18-inch props and picatinny payload rails.
+  category: personal
+  start: 2025-06
+  end: 2025-06
+  order: 60
+  role: Sole designer · Maker Grant recipient
+  context: invention-studio
+  skills: [solidworks, ardupilot, openhd, raspberry-pi, composites, 3d-printing]
+  cover: img-7406.jpg
+  coverAlt: >-
+    Kermit V2 quadcopter with long carbon arms and tall landing gear on a workbench
+  specs:
+    - { label: Flight ctrl, value: Pixhawk · ArduPilot }
+    - { label: Video + telemetry, value: OpenHD on Raspberry Pi 4 }
+    - { label: Camera, value: Arducam IMX519 }
+    - { label: Radio, value: RTL8812AU Wi-Fi adapter }
+    - { label: Motors, value: 4× MAD 5008 340 KV }
+    - { label: Props, value: MAD Fluxer 18.1 × 7.2 in }
+    - { label: Frame, value: "Carbon tube arms + legs, printed core" }
+    - { label: Payload mount, value: Printed picatinny rails }
+  lineage: { family: Kermit, version: V2, order: 2 }
+  related: [quadfrog, kermit-v3]
+
+dum-i:
+  title: DUM-I(S)
+  summary: >-
+    A modular desktop robot arm with a gimbaled lidar head — a Maker Grant project that turned
+    into a crash course in brushless gimbal control, Linux GPIO and embedded C.
+  category: personal
+  start: 2025-03
+  end: 2025-03
+  order: 50
+  role: Sole designer · Maker Grant recipient
+  context: invention-studio
+  skills: [solidworks, ros2, python, embedded-c, bldc-control, linux, 3d-printing]
+  cover: dum-i-arm.jpg
+  coverAlt: Grey 3D-printed robot arm on a yellow and magenta base
+  specs:
+    - { label: Compute, value: BeagleBone Blue (8 servo channels) }
+    - { label: Gimbal compute, value: Raspberry Pi Zero over I²C }
+    - { label: Gimbal motors, value: 2× T-Motor GB4106 }
+    - { label: Gimbal drive, value: STorM32 driver ICs, direct }
+    - { label: Sensor, value: Garmin LIDAR-Lite v3 }
+    - { label: Joints, value: MG996R + high-torque servos }
+    - { label: Input, value: Flight-stick joystick }
+    - { label: Base, value: "Stackable electronics bays, lazy-Susan yaw" }
+  related: [typhoon-bgc]
+
+robin:
+  title: Robin
+  summary: >-
+    A compact custom quad for learning Betaflight and companion-computer control — a
+    Raspberry Pi drives the F7 stack directly over the MultiWii Serial Protocol.
+  category: personal
+  start: 2024-08
+  end: 2024-08
+  order: 20
+  role: Sole designer
+  skills: [solidworks, python, betaflight, msp, raspberry-pi, 3d-printing]
+  cover: img-6511.jpg
+  coverAlt: >-
+    Blue 3D-printed quadcopter Robin with black propellers on a light floor
+  specs:
+    - { label: Flight stack, value: F7 FC + ESC stack · Betaflight }
+    - { label: Companion, value: Raspberry Pi Zero 2 W }
+    - { label: Control link, value: MSP (MultiWii Serial) }
+    - { label: Frame, value: "SolidWorks · printed, arms as standoffs" }
+  related: [quadfrog, stm-remote]
+
+stm-remote:
+  title: STM Remote
+  summary: >-
+    A custom STM32 controller with an IMU for motion-based robot control — my step from
+    board-level PCB design into serious embedded hardware.
+  category: personal
+  start: 2024-04
+  end: 2024-04
+  order: 25
+  role: Sole designer
+  skills: [kicad, stm32, embedded-c, pcb-fab]
+  cover: stmremote.png
+  coverAlt: >-
+    3D render of the STM Remote PCB with buttons, radio module and USB connector
+  specs:
+    - { label: MCU, value: STM32 family }
+    - { label: Sensor, value: Accelerometer + gyro (IMU) }
+    - { label: Input, value: Expanded button array }
+    - { label: EDA, value: KiCad }
+    - { label: Firmware, value: Embedded C }
+    - { label: Fab, value: External board house }
+  lineage: { family: Remote, version: V2, order: 2 }
+  related: [robin]
+
+custom-remote:
+  title: Custom Remote
+  summary: >-
+    An RF trigger remote on a board I milled myself — and the job of writing the Invention
+    Studio's procedure for its new PCB mill.
+  category: personal
+  start: 2024-03
+  end: 2024-03
+  order: 15
+  role: Sole designer · Electronics Apprentice
+  context: invention-studio
+  skills: [kicad, arduino, rf-comms, pcb-fab, solidworks, 3d-printing]
+  cover: img-6510.jpg
+  coverAlt: >-
+    Blue 3D-printed handheld remote with an OLED screen on a blue silicone mat
+  specs:
+    - { label: Function, value: RF trigger for MOSFET switches }
+    - { label: Display, value: OLED }
+    - { label: PCB, value: KiCad · milled in-house (FlatCAM) }
+    - { label: Range, value: ~10 m reliable }
+    - { label: Enclosure, value: SolidWorks · printed }
+  lineage: { family: Remote, version: V1, order: 1 }
+
+quadfrog:
+  title: QuadFrog (Kermit V1)
+  summary: >-
+    My first drone, built almost entirely from scratch — a V-tail quad with a printed Fusion
+    360 frame, Raspberry Pi flight computer and a custom radio ground station.
+  category: personal
+  start: 2023-05
+  end: 2023-05
+  order: 40
+  role: Sole designer
+  skills: [fusion-360, python, raspberry-pi, ardupilot, 3d-printing, soldering]
+  cover: img-6257.jpg
+  coverAlt: >-
+    Green 3D-printed V-tail quadcopter with orange propellers on a wooden deck
+  specs:
+    - { label: Layout, value: V-tail quadcopter }
+    - { label: Frame, value: "PLA, printed I-beam arms" }
+    - { label: Companion, value: Raspberry Pi · Python }
+    - { label: Ground station, value: Pi Pico + HC-12 radio }
+    - { label: Video, value: Webcam · Flask stream }
+  lineage: { family: Kermit, version: V1, order: 1 }
+
+# ── COURSEWORK ────────────────────────────────────────────────────────────────
+
+marlin:
+  title: Marlin & Nemo
+  summary: >-
+    AE 3030 final project: an RC plane on a custom-milled flight PCB, and a glider with
+    swappable wings to demonstrate how airfoil choice changes flight.
+  category: coursework
+  start: 2024-12
+  end: 2024-12
+  order: 30
+  role: Designer · AE 3030 Aerodynamics
+  skills: [kicad, arduino, solidworks, 3d-printing, pcb-fab, aero-design]
+  cover: img-6210.jpg
+  coverAlt: >-
+    The project's two printed aircraft resting together on a recycling bin lid
+  specs:
+    - { label: Course, value: AE 3030 Aerodynamics }
+    - { label: Marlin MCU, value: Arduino Nano }
+    - { label: Radio, value: HC-12 · 433 MHz }
+    - { label: PCB, value: KiCad · milled in-house (FlatCAM) }
+    - { label: Nemo airfoils, value: NACA 2412 · flat-bottom · inverted }
+    - { label: Airframes, value: SolidWorks · printed PLA }
+
+shuttle-model:
+  title: Space Shuttle Model
+  summary: >-
+    ME 1670: an interlocking Space Shuttle stack — orbiter, external tank and boosters —
+    modeled in SolidWorks from NASA drawings and printed on an SLS machine.
+  category: coursework
+  start: 2023-04
+  end: 2023-04
+  order: 5
+  role: Designer · ME 1670
+  skills: [solidworks, tolerancing, 3d-printing]
+  cover: img-5869.jpg
+  coverAlt: Small white SLS-printed Space Shuttle stack standing on a desk
+  specs:
+    - { label: Course, value: ME 1670 }
+    - { label: Parts, value: Orbiter · external tank · 2× SRB }
+    - { label: Process, value: Stratasys SLS }
+    - { label: Reference, value: NASA three-view drawings }
+
+glider:
+  title: AE 1601 Glider
+  summary: >-
+    My first aerospace build: a balsa glider refined through laser-cut cardboard prototypes
+    — it won the class distance competition.
+  category: coursework
+  start: 2022-12
+  end: 2022-12
+  order: 1
+  role: Designer · AE 1601 Intro to Aerospace
+  skills: [laser-cutting, 3d-printing, aero-design]
+  cover: img-4780.jpg
+  coverAlt: Balsa glider with a 3D-printed nose hub lying on a workbench
+  specs:
+    - { label: Course, value: AE 1601 }
+    - { label: Prototypes, value: Laser-cut cardboard }
+    - { label: Final, value: Balsa + printed hub }
+    - { label: Result, value: "1st place, distance" }

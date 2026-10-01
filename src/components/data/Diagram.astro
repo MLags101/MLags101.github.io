@@ -1,13 +1,17 @@
 ---
 /**
  * System / block diagram rendered to SVG at build time — zero runtime JS except the
- * ~20-line hover highlighter. Data: src/content/diagrams/<id>.yaml
+ * small client script for hover highlighting and animation. Data: src/data/diagrams/<id>.yaml
  *
  *   <Diagram id="eevi-signal-chain" caption="…" />
  *
  * Nodes are placed on a grid with `col` / `row` (rows may be fractional, e.g. 0.5);
  * edges route orthogonally between them. Edge `kind` sets the line style:
  * data (solid) · rf (dashed, wireless) · video (accent) · power (heavy, muted).
+ *
+ * Animation (all off under prefers-reduced-motion): blocks and links draw in on first view;
+ * with `animate: true` small pulses travel each link while on screen; each entry in
+ * `flows` becomes a "Trace" button that sends a packet hop by hop along that path.
  */
 import { getEntry } from 'astro:content';
 
@@ -18,7 +22,7 @@ interface Props {
 
 const { id, caption } = Astro.props;
 const entry = await getEntry('diagrams', id);
-if (!entry) throw new Error(`<Diagram id="${id}">: no src/content/diagrams/${id}.yaml`);
+if (!entry) throw new Error(`<Diagram id="${id}">: no src/data/diagrams/${id}.yaml`);
 const d = entry.data;
 
 const W = 214; // node width
@@ -81,14 +85,29 @@ const edges = d.edges.map((e, i) => {
   }
   const path = 'M' + pts.map((p) => p.join(' ')).join(' L');
   const labelW = e.label ? e.label.length * 8.6 + 18 : 0;
-  return { ...e, i, path, lx, ly, labelW };
+  let len = 0;
+  for (let k = 0; k < pts.length - 1; k++) len += Math.hypot(pts[k + 1]![0] - pts[k]![0], pts[k + 1]![1] - pts[k]![1]);
+  return { ...e, i, path, lx, ly, labelW, len };
 });
 
 const nodeLabel = (nid: string) => d.nodes.find((n) => n.id === nid)?.label ?? nid;
 const uid = `dg-${id}`;
 ---
 
-<figure class="diagram wide" data-diagram>
+<figure class="diagram wide" data-diagram data-animate={d.animate ? '' : undefined} data-flows={JSON.stringify(d.flows)}>
+  {
+    d.flows.length > 0 && (
+      <div class="diagram__flows no-print" role="group" aria-label="Trace a signal path">
+        <span class="label">Trace</span>
+        {d.flows.map((fl) => (
+          <button type="button" class="diagram__flow" data-flow={fl.id} aria-pressed="false">
+            <span class="dot" aria-hidden="true" />
+            {fl.label}
+          </button>
+        ))}
+      </div>
+    )
+  }
   <div class="diagram__scroll crop-marks">
     <svg
       viewBox={`0 0 ${width} ${height}`}
@@ -123,8 +142,19 @@ const uid = `dg-${id}`;
 
       {
         edges.map((e) => (
-          <g class={`dg-edge dg-edge--${e.kind}`} data-from={e.from} data-to={e.to}>
-            <path d={e.path} marker-end={`url(#${uid}-arrow)`} />
+          <g class={`dg-edge dg-edge--${e.kind}`} data-from={e.from} data-to={e.to} style={`--i:${e.i}; --len:${Math.ceil(e.len) + 12}`}>
+            <path d={e.path} marker-end={`url(#${uid}-arrow)`} class="dg-edge__line" />
+            {d.animate && e.kind !== 'power' && (
+              <circle class="dg-pulse" r={e.kind === 'rf' ? 3.6 : 3}>
+                <animateMotion
+                  dur={`${Math.max(1.4, e.len / 120).toFixed(2)}s`}
+                  begin={`${((e.i * 0.53) % 2.2).toFixed(2)}s`}
+                  repeatCount="indefinite"
+                  path={e.path}
+                  calcMode="linear"
+                />
+              </circle>
+            )}
             {e.label && (
               <g class="dg-edge__label">
                 <rect x={e.lx - e.labelW / 2} y={e.ly - 13} width={e.labelW} height="26" rx="2" />
@@ -142,7 +172,7 @@ const uid = `dg-${id}`;
         d.nodes.map((n) => {
           const b = boxes.get(n.id)!;
           return (
-            <g class="dg-node" tabindex="0" data-node={n.id} aria-label={`${n.label}${n.sub ? `, ${n.sub}` : ''}`}>
+            <g class="dg-node" tabindex="0" data-node={n.id} style={`--c:${n.col}`} aria-label={`${n.label}${n.sub ? `, ${n.sub}` : ''}`}>
               <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="3" />
               <text class="dg-node__label" x={b.x + 16} y={b.y + (n.sub ? 32 : 43)}>
                 {n.label}
@@ -313,6 +343,147 @@ const uid = `dg-${id}`;
     }
   }
 
+  /* ── ambient pulses + traced packets ── */
+  .dg-pulse {
+    fill: var(--text-2);
+    opacity: 0;
+    transition: opacity var(--dur-3) var(--ease);
+  }
+
+  .dg-edge--video .dg-pulse {
+    fill: var(--accent);
+  }
+
+  .dg-edge--rf .dg-pulse {
+    fill: var(--bg-elev);
+    stroke: var(--text);
+    stroke-width: 1.3;
+  }
+
+  [data-diagram].is-live .dg-pulse {
+    opacity: 0.85;
+  }
+
+  [data-diagram].is-focus .dg-pulse,
+  [data-diagram].is-tracing .dg-pulse {
+    opacity: 0;
+  }
+
+  :global(.dg-packet) {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 4px var(--accent));
+  }
+
+  [data-diagram].is-tracing .dg-edge {
+    opacity: 0.16;
+  }
+
+  [data-diagram].is-tracing .dg-edge.is-traced {
+    opacity: 1;
+  }
+
+  [data-diagram].is-tracing .dg-edge.is-traced path {
+    stroke: var(--accent);
+  }
+
+  [data-diagram].is-tracing .dg-node.is-traced rect {
+    stroke: var(--accent);
+    fill: var(--surface-2);
+  }
+
+  /* ── first-view draw-in (JS adds .is-in; without JS everything is simply shown) ── */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) [data-diagram]:not(.is-in) .dg-node,
+    :global(.js) [data-diagram]:not(.is-in) .dg-edge,
+    :global(.js) [data-diagram]:not(.is-in) .dg-group {
+      opacity: 0;
+    }
+
+    [data-diagram].is-in .dg-group {
+      animation: dg-fade 0.6s var(--ease) both;
+    }
+
+    [data-diagram].is-in .dg-node {
+      animation: dg-node 0.5s var(--ease) both;
+      animation-delay: calc(var(--c, 0) * 140ms + 120ms);
+    }
+
+    [data-diagram].is-in .dg-edge {
+      animation: dg-fade 0.3s var(--ease) both;
+      animation-delay: calc(var(--i, 0) * 60ms + 380ms);
+    }
+
+    [data-diagram].is-in .dg-edge__line {
+      animation: dg-draw 0.7s var(--ease-in-out) both;
+      animation-delay: calc(var(--i, 0) * 60ms + 380ms);
+    }
+  }
+
+  @keyframes dg-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes dg-node {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  @keyframes dg-draw {
+    from {
+      stroke-dasharray: var(--len) var(--len);
+      stroke-dashoffset: var(--len);
+    }
+    to {
+      stroke-dasharray: var(--len) var(--len);
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .dg-node {
+    transform-box: fill-box;
+  }
+
+  .diagram__flows {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+    margin-bottom: var(--s-3);
+  }
+
+  .diagram__flow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    height: 2rem;
+    padding-inline: var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-size: var(--step--1);
+    color: var(--text-2);
+    transition:
+      color var(--dur-2) var(--ease),
+      border-color var(--dur-2) var(--ease);
+  }
+
+  .diagram__flow:hover {
+    color: var(--text);
+    border-color: var(--line-strong);
+  }
+
+  .diagram__flow[aria-pressed='true'] {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .diagram__flow[aria-pressed='true'] .dot {
+    background: var(--accent);
+  }
+
   .diagram__foot {
     display: flex;
     justify-content: space-between;
@@ -406,6 +577,83 @@ const uid = `dg-${id}`;
       n.addEventListener('focus', () => on(n.dataset.node!));
       n.addEventListener('mouseleave', off);
       n.addEventListener('blur', off);
+    }
+
+    // ── animation ──
+    const svg = root.querySelector('svg')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ambient = root.hasAttribute('data-animate') && !reduce;
+    if (!ambient) svg.pauseAnimations?.();
+    new IntersectionObserver(
+      ([e]) => {
+        if (!e) return;
+        if (e.isIntersecting) root.classList.add('is-in');
+        root.classList.toggle('is-live', ambient && e.isIntersecting);
+        // Pulses only run while visible (saves battery; SMIL keeps time otherwise).
+        if (ambient) e.isIntersecting ? svg.unpauseAnimations() : svg.pauseAnimations();
+      },
+      { threshold: 0.25 },
+    ).observe(root);
+
+    // ── traced flows ──
+    const flows = JSON.parse(root.dataset.flows || '[]') as { id: string; label: string; path: string[] }[];
+    const NS = 'http://www.w3.org/2000/svg';
+    let run = 0;
+    const edgeBetween = (a: string, b: string) => {
+      const fwd = edges.find((e) => e.dataset.from === a && e.dataset.to === b);
+      return fwd ? { el: fwd, reverse: false } : { el: edges.find((e) => e.dataset.from === b && e.dataset.to === a)!, reverse: true };
+    };
+    const clear = () => {
+      root.classList.remove('is-tracing');
+      [...edges, ...nodes].forEach((el) => el.classList.remove('is-traced'));
+      svg.querySelectorAll('.dg-packet').forEach((p) => p.remove());
+      root.querySelectorAll('[data-flow]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+    };
+    const trace = async (flow: (typeof flows)[number], btn: HTMLElement) => {
+      const id = ++run;
+      clear();
+      btn.setAttribute('aria-pressed', 'true');
+      root.classList.add('is-tracing');
+      const node = (nid: string) => nodes.find((n) => n.dataset.node === nid);
+      node(flow.path[0]!)?.classList.add('is-traced');
+      for (let i = 0; i < flow.path.length - 1; i++) {
+        if (id !== run) return;
+        const { el, reverse } = edgeBetween(flow.path[i]!, flow.path[i + 1]!);
+        el.classList.add('is-traced');
+        if (!reduce) {
+          const d = el.querySelector('path')!.getAttribute('d')!;
+          const len = el.querySelector<SVGPathElement>('path')!.getTotalLength();
+          const dur = Math.max(0.35, len / 420);
+          const dot = document.createElementNS(NS, 'circle');
+          dot.setAttribute('r', '5');
+          dot.setAttribute('class', 'dg-packet');
+          const mo = document.createElementNS(NS, 'animateMotion');
+          mo.setAttribute('path', d);
+          mo.setAttribute('dur', `${dur}s`);
+          mo.setAttribute('begin', 'indefinite');
+          mo.setAttribute('fill', 'freeze');
+          mo.setAttribute('calcMode', 'linear');
+          if (reverse) {
+            mo.setAttribute('keyPoints', '1;0');
+            mo.setAttribute('keyTimes', '0;1');
+          }
+          dot.append(mo);
+          svg.append(dot);
+          svg.unpauseAnimations?.();
+          (mo as unknown as { beginElement(): void }).beginElement();
+          await new Promise((r) => setTimeout(r, dur * 1000));
+          dot.remove();
+        }
+        node(flow.path[i + 1]!)?.classList.add('is-traced');
+      }
+      // Hold the highlighted path, then fade back to the full diagram.
+      await new Promise((r) => setTimeout(r, 2200));
+      if (id === run) clear();
+    };
+    for (const btn of root.querySelectorAll<HTMLButtonElement>('[data-flow]')) {
+      const flow = flows.find((f) => f.id === btn.dataset.flow);
+      if (!flow) continue;
+      btn.addEventListener('click', () => (btn.getAttribute('aria-pressed') === 'true' ? (run++, clear()) : void trace(flow, btn)));
     }
   }
 </script>

@@ -1,13 +1,22 @@
 /**
  * Content queries. Pages never call getCollection() directly — they go through here so
- * drafts, sorting and computed relationships ("used in N projects") behave the same everywhere.
+ * drafts, sorting, image resolution and computed relationships ("used in N projects")
+ * behave the same everywhere.
  */
+import type { ImageMetadata } from 'astro';
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
+import { resolveImage } from './media';
 
-export type Project = CollectionEntry<'projects'>;
-export type Experience = CollectionEntry<'experience'>;
+type ProjectData = CollectionEntry<'projects'>['data'];
+type ExperienceData = CollectionEntry<'experience'>['data'];
+
+/** A project with its cover resolved to an image (from src/data/projects.yaml). */
+export type Project = Omit<CollectionEntry<'projects'>, 'data'> & { data: Omit<ProjectData, 'cover'> & { cover: ImageMetadata } };
+export type Experience = Omit<CollectionEntry<'experience'>, 'data'> & { data: Omit<ExperienceData, 'logo'> & { logo?: ImageMetadata } };
 export type Skill = CollectionEntry<'skills'>;
 export type Research = CollectionEntry<'research'>;
+
+const logos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/logos/*.{png,jpg,jpeg,webp,svg}', { eager: true });
 
 /** Drafts render in `astro dev` (with a DRAFT ribbon) but never ship. */
 const visible = ({ data }: { data: { draft?: boolean } }) => !(import.meta.env.PROD && data.draft);
@@ -15,16 +24,16 @@ const visible = ({ data }: { data: { draft?: boolean } }) => !(import.meta.env.P
 const NOW = new Date();
 const endOf = (d: { end?: Date }) => (d.end ?? NOW).getTime();
 
-export const CATEGORY_LABELS: Record<Project['data']['category'], string> = {
+export const CATEGORY_LABELS: Record<ProjectData['category'], string> = {
   research: 'Research',
   professional: 'Professional',
   team: 'Teams & Orgs',
   personal: 'Personal',
   coursework: 'Coursework',
 };
-export const CATEGORY_ORDER: Project['data']['category'][] = ['research', 'professional', 'team', 'personal', 'coursework'];
+export const CATEGORY_ORDER: ProjectData['category'][] = ['research', 'professional', 'team', 'personal', 'coursework'];
 
-export const EXPERIENCE_LABELS: Record<Experience['data']['type'], string> = {
+export const EXPERIENCE_LABELS: Record<ExperienceData['type'], string> = {
   internship: 'Internship',
   'co-op': 'Co-op',
   research: 'Research',
@@ -40,10 +49,30 @@ export const SKILL_GROUP_LABELS: Record<Skill['data']['group'], string> = {
   fabrication: 'Fabrication',
 };
 
+const toProject = (e: CollectionEntry<'projects'>): Project => ({
+  ...e,
+  data: { ...e.data, cover: resolveImage(e.data.cover, e.id) },
+});
+
+let cache: Promise<Project[]> | undefined;
+async function allProjects() {
+  cache ??= (async () => {
+    const [meta, bodies] = await Promise.all([getCollection('projects'), getCollection('projectBodies')]);
+    // Every project needs both halves — catch a typo'd slug in either place.
+    const bodyIds = new Set(bodies.map((b) => b.id));
+    const metaIds = new Set(meta.map((m) => m.id));
+    for (const id of metaIds)
+      if (!bodyIds.has(id)) throw new Error(`projects.yaml has "${id}" but src/content/projects/${id}/index.mdx doesn't exist.`);
+    for (const id of bodyIds)
+      if (!metaIds.has(id)) throw new Error(`src/content/projects/${id}/index.mdx has no "${id}:" entry in src/data/projects.yaml.`);
+    return meta.map(toProject);
+  })();
+  return cache;
+}
+
 /** All visible projects, newest first (ongoing work counts as "now"); `order` breaks ties. */
 export async function getProjects() {
-  const all = await getCollection('projects', visible);
-  return all.sort((a, b) => endOf(b.data) - endOf(a.data) || b.data.order - a.data.order);
+  return (await allProjects()).filter(visible).sort((a, b) => endOf(b.data) - endOf(a.data) || b.data.order - a.data.order);
 }
 
 export async function getFeaturedProjects() {
@@ -51,9 +80,27 @@ export async function getFeaturedProjects() {
   return all.filter((p) => p.data.featured).sort((a, b) => b.data.order - a.data.order || endOf(b.data) - endOf(a.data));
 }
 
+/** The MDX write-up for a project (render it with `render()` from astro:content). */
+export async function getProjectBody(id: string) {
+  const body = await getEntry('projectBodies', id);
+  if (!body) throw new Error(`No write-up for project "${id}"`);
+  return body;
+}
+
+const toExperience = (e: CollectionEntry<'experience'>): Experience => {
+  const { logo, ...rest } = e.data;
+  let img: ImageMetadata | undefined;
+  if (logo) {
+    const mod = logos[`/src/assets/logos/${logo}`];
+    if (!mod) throw new Error(`experience.yaml → ${e.id}.logo: "${logo}" not found in src/assets/logos/`);
+    img = mod.default;
+  }
+  return { ...e, data: { ...rest, logo: img } };
+};
+
 /** Experience, most recent first. */
 export async function getExperience() {
-  const all = await getCollection('experience', visible);
+  const all = (await getCollection('experience', visible)).map(toExperience);
   return all.sort((a, b) => endOf(b.data) - endOf(a.data) || b.data.start.getTime() - a.data.start.getTime());
 }
 
@@ -82,7 +129,7 @@ export async function resolveSkills(refs: { id: string }[]) {
   const byId = new Map(skills.map((s) => [s.id, s]));
   return refs.map((r) => {
     const s = byId.get(r.id);
-    if (!s) throw new Error(`Unknown skill "${r.id}" — add it to src/content/skills.yaml`);
+    if (!s) throw new Error(`Unknown skill "${r.id}" — add it to src/data/skills.yaml`);
     return s;
   });
 }
@@ -96,8 +143,10 @@ export async function getProjectsFor(experienceId: string) {
 export async function getLineage(project: Project) {
   const fam = project.data.lineage?.family;
   if (!fam) return [];
-  const all = await getCollection('projects', visible);
-  return all.filter((p) => p.data.lineage?.family === fam).sort((a, b) => a.data.lineage!.order - b.data.lineage!.order);
+  return (await allProjects())
+    .filter(visible)
+    .filter((p) => p.data.lineage?.family === fam)
+    .sort((a, b) => a.data.lineage!.order - b.data.lineage!.order);
 }
 
 /** Explicit `related` + lineage-free siblings from the same context, up to `limit`. */
@@ -113,5 +162,6 @@ export async function getRelated(project: Project, limit = 3) {
 }
 
 export async function getExperienceEntry(id: string) {
-  return getEntry('experience', id);
+  const e = await getEntry('experience', id);
+  return e ? toExperience(e) : undefined;
 }

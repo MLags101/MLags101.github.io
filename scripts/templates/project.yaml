@@ -1,0 +1,25 @@
+
+{{slug}}:
+  title: {{title}}
+  summary: >-
+    TODO one or two sentences: what it is, why it's interesting. Shown on cards (≤240 chars).
+  category: {{category}}   # research | professional | team | personal | coursework
+  start: {{start}}   # YYYY-MM
+  {{end}}
+  status: {{status}}   # complete | in-progress | paused | concept
+  featured: {{featured}}   # true = on the home page
+  order: 0   # higher sorts first among featured / ties
+  draft: true   # visible in `npm run dev` only — delete this line to publish
+  role: {{role}}
+  {{context}}
+  skills: [{{skills}}]   # ids from src/data/skills.yaml
+  cover: cover.jpg   # file in src/content/projects/{{slug}}/images/ — replace the placeholder
+  coverAlt: TODO describe the cover image for screen readers
+  specs:
+    - { label: TODO, value: TODO }
+  {{lineage}}
+  # related: [other-project-slug]
+  # model: {{slug}}   # 3D model as the page hero (docs/3D-MODELS.md)
+  # heroVideo: /media/{{slug}}/clip.mp4
+  # log:
+  #   - { date: 2026-01, title: First flight, note: Optional detail. }

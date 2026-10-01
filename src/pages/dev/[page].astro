@@ -11,6 +11,7 @@ import Video from '../../components/media/Video.astro';
 import CompareSlider from '../../components/media/CompareSlider.astro';
 import ImageHotspots from '../../components/media/ImageHotspots.astro';
 import ModelViewer from '../../components/media/ModelViewer.astro';
+import RobotViewer from '../../components/media/RobotViewer.astro';
 import Lightbox from '../../components/media/Lightbox.astro';
 import Diagram from '../../components/data/Diagram.astro';
 import SpecSheet from '../../components/data/SpecSheet.astro';
@@ -23,6 +24,7 @@ export function getStaticPaths() {
 
 Astro.locals.projectSlug = 'typhoon-bgc';
 const hasFixture = !!(await getEntry('models', 'zz-fixture'));
+const hasRobot = !!(await getEntry('robots', 'zz-fixture'));
 ---
 
 <BaseLayout title="Component lab" noindex>
@@ -31,7 +33,9 @@ const hasFixture = !!(await getEntry('models', 'zz-fixture'));
     <h1 style="font-size: var(--step-5); margin-top: 1rem">Component lab</h1>
     <div class="prose" style="margin-top: 3rem">
       <h2>ModelViewer</h2>
-      {hasFixture ? <ModelViewer id="zz-fixture" caption="Test fixture — run scripts in docs/3D-MODELS.md to add real models." /> : <p>No zz-fixture model registered.</p>}
+      <ModelViewer id={hasFixture ? 'zz-fixture' : 'mr-toad'} caption="Model viewer (uses the zz-fixture model if registered)." />
+      <h2>RobotViewer</h2>
+      {hasRobot ? <RobotViewer id="zz-fixture" caption="URDF test fixture — joints, poses and a sequence." /> : <p>No zz-fixture robot registered.</p>}
       <h2>ImageHotspots</h2>
       <ImageHotspots src="mr-toad/rovercad.png" alt="Rover render" caption="2D hotspots" points={[{ x: 40.5, y: 9, label: 'Antenna', detail: 'Example.' }]} />
       <h2>CompareSlider</h2>

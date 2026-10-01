@@ -26,7 +26,7 @@ const ambient = mode === 'ambient';
   <div class="video__frame crop-marks">
     <video
       src={src}
-      poster={poster}
+      data-poster={poster}
       preload="none"
       playsinline
       controls={!ambient}
@@ -87,6 +87,23 @@ const ambient = mode === 'ambient';
 </style>
 
 <script>
+  // Posters load only when a video nears the viewport (a poster attribute ignores lazy loading).
+  const lazy = document.querySelectorAll<HTMLVideoElement>('video[data-poster]');
+  if ('IntersectionObserver' in window) {
+    const pio = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries)
+          if (e.isIntersecting) {
+            const v = e.target as HTMLVideoElement;
+            v.poster = v.dataset.poster!;
+            pio.unobserve(v);
+          }
+      },
+      { rootMargin: '600px 0px' },
+    );
+    lazy.forEach((v) => pio.observe(v));
+  } else lazy.forEach((v) => (v.poster = v.dataset.poster!));
+
   // Ambient videos: play only while visible, never when the user prefers reduced motion.
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   const vids = document.querySelectorAll<HTMLVideoElement>('video[data-ambient]');

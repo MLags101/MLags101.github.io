@@ -1,0 +1,38 @@
+---
+/**
+ * Side-by-side layout inside a write-up — e.g. two portrait videos or a figure + video.
+ *   <Columns><Video … aspect="9/16" /><Video … aspect="9/16" /></Columns>
+ * `widths` sets relative column widths, e.g. "2fr 1fr" for a landscape video next to a portrait one.
+ * Stacks on phones.
+ */
+interface Props {
+  /** Column count on wide screens. */
+  cols?: 2 | 3;
+  /** CSS grid column widths, e.g. "2fr 1fr" (overrides cols). */
+  widths?: string;
+}
+const { cols = 2, widths } = Astro.props;
+---
+
+<div class="columns wide" style={`--tracks:${widths ?? `repeat(${cols}, minmax(0, 1fr))`}`}><slot /></div>
+
+<style>
+  .columns {
+    display: grid;
+    grid-template-columns: var(--tracks);
+    align-items: center;
+    gap: var(--s-5);
+    align-items: start;
+  }
+
+  .columns > :global(*) {
+    margin: 0;
+    max-width: none;
+  }
+
+  @media (max-width: 640px) {
+    .columns {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

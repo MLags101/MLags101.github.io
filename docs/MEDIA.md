@@ -33,6 +33,8 @@ If the poster comes out sideways, add `"rotate": "cw"` / `"ccw"` to the job and 
 
 `_archive/` (git-ignored, local only) holds everything removed in the 2026 redesign: the old Jekyll
 site, unused photos/videos, and full-resolution originals of every migrated image
-(`_archive/originals/`). `_archive/contact-sheet.html` shows each migrated image. Back it up
+(`_archive/originals/`). `_archive/contact-sheet.html` shows each migrated image.
+Also kept there: raw CAD exports (`_archive/cad-src/`) and the full-quality videos downloaded
+from the old Behance pages (`_archive/media-src/behance/`), which `scripts/videos.json` encodes from. Back it up
 somewhere — it is not in the repository. (Everything is also still in git history before the
 `redesign/astro` branch.)

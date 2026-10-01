@@ -10,7 +10,7 @@ import studio from '../assets/site/invention-studio.jpg';
 
 <PageLayout
   title="About"
-  eyebrow="Profile"
+  eyebrow={["Profile", ...site.identity].join(" / ")}
   lede="Aerospace engineering student at Georgia Tech who learns fastest with hardware in hand — prototyping, testing, breaking and rebuilding, especially UAVs and mechatronics."
   image={portrait}
 >

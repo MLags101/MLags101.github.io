@@ -2,38 +2,96 @@
   {
     "in": "_archive/originals/media/robo.mp4",
     "out": "public/media/site/hero-urc.mp4",
-    "start": 1.5, "duration": 9, "maxWidth": 1600, "crf": 28, "audio": false,
+    "start": 1.5,
+    "duration": 9,
+    "maxWidth": 1600,
+    "crf": 28,
+    "audio": false,
     "note": "Homepage ambient loop — EEVI lifting off at URC 2025"
   },
   {
     "in": "_archive/originals/media/robo.mp4",
     "out": "public/media/eevi/urc-2025-flight.mp4",
-    "maxWidth": 1280, "audio": true,
+    "maxWidth": 1280,
+    "audio": true,
     "note": "Autonomous takeoff at URC 2025"
   },
   {
     "in": "_archive/originals/Quadfrog/images/IMG_6259.mp4",
     "out": "public/media/quadfrog/backyard-flight.mp4",
-    "maxWidth": 1280, "audio": true
+    "maxWidth": 1280,
+    "audio": true
   },
   {
     "in": "_archive/media/glider-throw.mp4",
     "out": "public/media/glider/competition-throw.mp4",
-    "maxWidth": 1280, "audio": false
+    "maxWidth": 1280,
+    "audio": false
   },
   {
     "in": "_archive/media/IMG_5222-converted.mp4",
     "out": "public/media/custom-remote/remote-demo.mp4",
-    "maxWidth": 1280, "audio": false
+    "maxWidth": 1280,
+    "audio": false
   },
   {
     "in": "_archive/media/IMG_6073.MOV",
     "out": "public/media/custom-remote/pcb-mill.mp4",
-    "maxWidth": 1280, "audio": false
+    "maxWidth": 1280,
+    "audio": false
   },
   {
     "in": "_archive/media/IMG_6231.MOV",
     "out": "public/media/electronics-box/lockbox-demo.mp4",
-    "maxWidth": 1080, "audio": true
+    "maxWidth": 1080,
+    "audio": true
+  },
+  {
+    "in": "_archive/media-src/behance/kermit-v3/video-1.mp4",
+    "out": "public/media/kermit-v3/gimbal-flight.mp4",
+    "duration": 50,
+    "maxWidth": 1280,
+    "audio": false,
+    "note": "Gimbal camera POV, first test flight"
+  },
+  {
+    "in": "_archive/media-src/behance/kermit-v2/video-1.mp4",
+    "out": "public/media/kermit-v2/field-flight.mp4",
+    "maxWidth": 1280,
+    "audio": false,
+    "note": "Flight test outside the Invention Studio"
+  },
+  {
+    "in": "_archive/media-src/behance/kermit-v2/video-2.mp4",
+    "out": "public/media/kermit-v2/hover-test.mp4",
+    "duration": 60,
+    "maxWidth": 720,
+    "audio": false,
+    "note": "Courtyard hover test (portrait)"
+  },
+  {
+    "in": "_archive/media-src/behance/dum-i/video-1.mp4",
+    "out": "public/media/dum-i/arm-motion.mp4",
+    "maxWidth": 1280,
+    "audio": false
+  },
+  {
+    "in": "_archive/media-src/behance/dum-i/video-2.mp4",
+    "out": "public/media/dum-i/joystick-control.mp4",
+    "maxWidth": 1280,
+    "audio": false
+  },
+  {
+    "in": "_archive/media-src/behance/mr-toad/video-1.mp4",
+    "out": "public/media/mr-toad/ground-station-feed.mp4",
+    "maxWidth": 1280,
+    "audio": false
+  },
+  {
+    "in": "_archive/media-src/behance/mr-toad/video-2.mp4",
+    "out": "public/media/mr-toad/hallway-drive.mp4",
+    "maxWidth": 720,
+    "audio": false,
+    "note": "portrait"
   }
 ]

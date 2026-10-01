@@ -1,36 +1,80 @@
----
-title: Kermit V3
-summary: >-
-  The third generation of my Kermit quadcopter line — a SolidWorks-designed airframe
-  running ArduPilot, built at the Invention Studio.
-category: personal
-start: 2026-04
-end: 2026-04
-featured: true
-order: 100
-cover: ./images/img-8094.jpg
-coverAlt: Kermit V3 quadcopter on a table outdoors with its ground equipment
-role: Sole designer
-context: invention-studio
-skills: [solidworks, ardupilot, 3d-printing]
-lineage: { family: Kermit, version: V3, order: 3 }
-links:
-  - { label: Full build write-up on Behance, url: 'https://www.behance.net/gallery/248209671/Kermit-V3-Invention-Studio', kind: behance }
----
+## Overview
 
-{/* TODO(Michael): expand from the Behance write-up — goals, specs (AUW, motors, battery,
-    flight time), what changed from V2, test results. Add `specs:` to the frontmatter and
-    a <ModelViewer> once the SolidWorks assembly is exported to GLB (docs/3D-MODELS.md). */}
+The third version of my Kermit series of drones, Kermit V3 focused on more sensors and portability. Inspired first by the DJI Mavic Pro and then mostly by the Skydio X10, I wanted to integrate a 3-axis stabilized gimbal, ground sensing and surround obstacle detection — all in a package I could fold up and take with me on the go.
 
-Kermit V3 is the latest iteration of the quadcopter line that started with QuadFrog in 2023 — each version a full redesign built on what the last one taught me. V3's airframe was designed in SolidWorks, fabricated largely with 3D-printed parts, and flies on ArduPilot.
+<Gallery
+  columns={2}
+  fit="contain"
+  aspect="16/9"
+  items={[
+    { src: 'skydio-x10.jpg', alt: 'Skydio X10 drone with arms deployed', caption: 'Skydio X10 — the main inspiration. Image: Skydio.' },
+    { src: 'skydio-x10-folded.jpg', alt: 'Skydio X10 folded for transport', caption: 'Folded for transport. Image: Skydio.' },
+  ]}
+/>
+
+The model above is the final assembly — select a part to fly the camera to it.
+
+## Stage 1 — sensors and a dense frame
+
+I split the project into two stages: sensor integration and general frame design first, then frame improvements and the folding mechanism. For the stage-1 frame I kept things as compact as I could, packing the large components next to each other in a small, dense frame. That traded away the usual modularity of wider plate-based frames like the F405.
+
+<Gallery
+  columns={3}
+  aspect="3/4"
+  items={[
+    { src: 'stage-1-bench.jpg', alt: 'Stage-1 quadcopter on a bench surrounded by test equipment', caption: 'Stage-1 airframe on the bench.' },
+    { src: 'stage-1-build.jpg', alt: 'Stage-1 frame top view during assembly', caption: 'Assembly.' },
+    { src: 'stage-1-electronics.jpg', alt: 'Close view of the stage-1 electronics stack and wiring', caption: 'Electronics stack.' },
+  ]}
+/>
+
+## Stage 2 — folding arms
+
+Building and flying the stage-1 quad showed me plenty to improve, especially deployment and ease of access. Because of where the arm mounts sit, I went with a **double, vertical-flip arm**: it kept the design simple and strong, and very compact when folded.
+
+<Gallery
+  columns={2}
+  fit="contain"
+  aspect="16/10"
+  items={[
+    { src: 'cad-folded.png', alt: 'Top view CAD render of the airframe with arms folded', caption: 'Folded, from above.' },
+    { src: 'cad-folding-arms.jpg', alt: 'CAD render showing the vertical-flip arm hinges mid-fold', caption: 'The vertical-flip fold.' },
+  ]}
+/>
+
+After implementing the fold and fixing the problems found in test flight 1, I built the stage-2 frame. Folded, a length of paracord both secures the arms and doubles as a carrying strap I can wear around my neck or over a shoulder.
+
+<Figure src="img-8093.jpg" alt="Stage-2 Kermit V3 frame folded on a table" caption="The stage-2 frame." />
+
+## The completed build
+
+The finished drone carries a 360° lidar, a Here4 GPS, the SIYI A8 mini gimbal with a 4K camera, the Holybro H-Flow lidar + optical flow sensor, and a long-range radio that talks to the handheld radio/tablet ground station beside it.
 
 <Gallery
   columns={2}
   aspect="4/3"
   items={[
-    { src: 'img-8093.jpg', alt: 'Kermit V3 airframe on an outdoor table', caption: 'V3 airframe, ready for outdoor testing.' },
-    { src: 'img-8095.jpg', alt: 'Kermit V3 with its transmitter and case on a picnic table', caption: 'Field setup with the transmitter.' },
+    { src: 'img-8095.jpg', alt: 'Completed Kermit V3 on an outdoor table next to its handheld ground station', caption: 'With the handheld ground station.' },
+    { src: 'completed-overhead.jpg', alt: 'Overhead view of the completed drone and ground station', caption: 'Ready to fly.' },
   ]}
 />
 
-The full build log, with design details and test footage, is on Behance — linked in the sidebar.
+## Flight testing
+
+Test flying went well, though the PID gains still need more tuning. The 3-axis gimbal worked very well despite the untuned gains, and the added sensors gave great information about the drone's surroundings — integrating them in ArduPilot was its own interesting lesson.
+
+<Figure src="gimbal-camera-still.jpg" alt="Low-angle frame from the gimbal camera over frosted grass on campus" caption="A still from the gimbal camera." />
+
+<Video src="/media/kermit-v3/gimbal-flight.mp4" caption="Footage from the gimbal camera on an early test flight." />
+
+## Three versions in
+
+I'm pleased with how the project has progressed across its three versions:
+
+- **[Kermit V1](/projects/quadfrog)** was my introduction to building custom drones. Small and simple, it taught me basic frame design, Pixhawk and ArduPilot, and companion-computer integration.
+- **[Kermit V2](/projects/kermit-v2)** was a major frame upgrade, with carbon fiber tubes for the arms and legs, basic autonomous navigation through ArduPilot with a new GPS, and much better telemetry with an onboard camera via OpenHD on a Raspberry Pi 4.
+- **Kermit V3** is the most refined: a streamlined, functional frame that shrinks both the main body and the overall footprint with a folding mechanism, and much better sensor fusion from a better GPS, a 360° lidar and a ground-facing optical flow module.
+
+<Callout tone="note" title="Support">
+Funded and supported by the Invention Studio at Georgia Tech, a student organization.
+</Callout>

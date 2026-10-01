@@ -1,27 +1,3 @@
----
-title: STM Remote
-summary: >-
-  A custom STM32 controller with an IMU for motion-based robot control — my step from
-  board-level PCB design into serious embedded hardware.
-category: personal
-start: 2024-04
-end: 2024-04
-order: 25
-cover: ./images/stmremote.png
-coverAlt: 3D render of the STM Remote PCB with buttons, radio module and USB connector
-role: Sole designer
-skills: [kicad, stm32, embedded-c, pcb-fab]
-specs:
-  - { label: MCU, value: STM32 family }
-  - { label: Sensor, value: Accelerometer + gyro (IMU) }
-  - { label: Input, value: Expanded button array }
-  - { label: EDA, value: KiCad }
-  - { label: Firmware, value: Embedded C }
-  - { label: Fab, value: External board house }
-lineage: { family: Remote, version: V2, order: 2 }
-related: [robin]
----
-
 ## Overview
 
 STM Remote continues my push into embedded systems: designing and programming custom PCBs around the **STM32** family. It evolves my earlier Custom Remote — where that board was a simple trigger, this one adds an accelerometer/gyro module and a larger button array for intuitive robot control.

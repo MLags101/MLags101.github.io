@@ -1,47 +1,76 @@
 # Writing content
 
-Everything on the site comes from `src/content/`. Pages are generated from it — you never edit HTML.
+Two folders hold everything. You never edit HTML.
+
+- **`src/data/`** — the **facts**, as plain YAML you edit by hand: dates, skills, specs, which projects are featured, your contact info. One file per kind of thing.
+- **`src/content/projects/<slug>/`** — the **write-up** for each project (`index.mdx`) and its photos (`images/`).
+
+A project's title, dates, role, skills and specs are rendered by the page layout from `projects.yaml`, so never repeat them in the write-up. The build checks the YAML: a typo'd skill id, a missing cover photo or an end date before the start fails with a message naming the file and field.
 
 ## Workflow
 
-1. `npm run new` → answer the prompts. A new entry is created with `draft: true`.
-2. `npm run dev` → open the printed URL. Drafts show with a yellow **DRAFT** badge and never ship.
-3. Write, add photos, refresh. Schema errors appear in the terminal and the browser overlay.
-4. Set `draft: false`, run `npm run lint:content`, commit, push.
+1. `npm run new`, then answer the prompts. This creates:
+   - a block in `src/data/projects.yaml` with `draft: true`
+   - `src/content/projects/<slug>/index.mdx` with a commented template
+   - an `images/` folder with a placeholder cover
+2. `npm run dev`, then open the printed URL. Drafts show with a **DRAFT** ribbon and never ship.
+3. Write, add photos, refresh. Errors appear in the terminal and as a browser overlay.
+4. Delete the `draft: true` line, run `npm run lint:content`, commit, push.
 
-## Projects — `src/content/projects/<slug>/index.mdx`
+## Projects — `src/data/projects.yaml`
 
-The folder name is the URL: `projects/kermit-v3/` → `/projects/kermit-v3`.
-Photos go in `images/` next to it and are referenced **by file name only**.
+Each block's key is the **slug**: the URL (`/projects/kermit-v3`) and the folder name in `src/content/projects/`. Both halves must exist; the build tells you if one is missing.
 
-| Field         | Required | Notes                                                                                  |
-| ------------- | -------- | -------------------------------------------------------------------------------------- |
-| `title`       | ✓        |                                                                                        |
-| `summary`     | ✓        | ≤ 220 chars. Card text, page lede and meta description.                                |
-| `category`    | ✓        | `research` · `professional` · `team` · `personal` · `coursework`                       |
-| `start`       | ✓        | `YYYY-MM`. If you only know the finish month, set `start` = `end`.                     |
-| `end`         |          | `YYYY-MM`. Omit for ongoing work.                                                      |
-| `status`      |          | `complete` (default) · `in-progress` · `paused` · `concept`                            |
-| `featured`    |          | `true` puts it on the home page. Keep 3–6 featured.                                    |
-| `order`       |          | Higher sorts first among featured projects and ties.                                   |
-| `draft`       |          | `true` = dev only.                                                                     |
-| `cover`       | ✓        | `./images/file.jpg` — card thumbnail, hero and social-share image.                     |
-| `coverAlt`    | ✓        | What the cover shows, for screen readers.                                              |
-| `role`        | ✓        | "Sole designer", "Drone Lead", …                                                       |
-| `context`     |          | An experience id (`robonav`, `invention-studio`…) — links the project on that role.    |
-| `team`        |          | Free text shown in the sidebar.                                                        |
-| `skills`      | ✓        | Ids from `src/content/skills.yaml`. Unknown ids fail the build.                        |
-| `specs`       |          | `- { label: Mass, value: 1.08 kg }` → the spec sheet.                                 |
-| `lineage`     |          | `{ family: Kermit, version: V3, order: 3 }` → automatic version strip across projects. |
-| `related`     |          | `[other-slug]` → "Related work".                                                       |
-| `links`       |          | `- { label: …, url: …, kind: behance \| github \| video \| paper \| cad \| website }`  |
-| `log`         |          | `- { date: 2025-05, title: …, note: … }` → build-log timeline.                         |
-| `model`       |          | A 3D model id → replaces the hero image with the interactive viewer.                   |
-| `heroVideo`   |          | `/media/<slug>/clip.mp4` → video hero.                                                 |
+```yaml
+kermit-v3:
+  title: Kermit V3
+  summary: >-
+    One or two sentences for cards and the page lede.
+  category: personal
+  start: 2026-04
+  end: 2026-04
+  featured: true
+  skills: [solidworks, ardupilot, 3d-printing]
+  cover: img-8094.jpg
+  coverAlt: Kermit V3 on a table outdoors
+  specs:
+    - { label: Flight ctrl, value: Cube Orange · ArduPilot }
+```
 
-**Don't repeat metadata in the body.** Title, dates, role, skills and specs are rendered by the layout.
+| Field       | Required | Notes                                                                                     |
+| ----------- | -------- | ----------------------------------------------------------------------------------------- |
+| `title`     | ✓        |                                                                                           |
+| `summary`   | ✓        | ≤ 240 chars. Card text, page lede and search description.                                 |
+| `category`  | ✓        | `research` · `professional` · `team` · `personal` · `coursework`                          |
+| `start`     | ✓        | `YYYY-MM`. If you only know the finish month, set `start` = `end` (shown as one month).   |
+| `end`       |          | `YYYY-MM`. Leave it out (or write `present`) for ongoing work.                            |
+| `status`    |          | `complete` (default) · `in-progress` · `paused` · `concept`                               |
+| `featured`  |          | `true` puts it on the home page. Keep 3–6 featured.                                       |
+| `order`     |          | Higher sorts first among featured projects and ties.                                      |
+| `draft`     |          | `true` = visible in `npm run dev` only.                                                   |
+| `role`      | ✓        | "Sole designer", "Drone Lead", …                                                          |
+| `context`   |          | An experience id (`robonav`, `invention-studio`…); links the project on that role.        |
+| `team`      |          | Free text shown in the sidebar.                                                           |
+| `skills`    | ✓        | Ids from `src/data/skills.yaml`. Unknown ids fail the build.                              |
+| `cover`     | ✓        | A file name in this project's `images/` folder: card thumbnail, hero, share image.        |
+| `coverAlt`  | ✓        | What the cover shows, for screen readers.                                                 |
+| `model`     |          | A 3D model id (`src/data/models/<id>.yaml`); replaces the hero image with the 3D viewer.  |
+| `heroVideo` |          | `/media/<slug>/clip.mp4` gives a video hero.                                              |
+| `specs`     |          | `- { label: Mass, value: 1.08 kg }`, shown as the spec sheet. Quote values with commas: `value: "a, b"`. |
+| `lineage`   |          | `{ family: Kermit, version: V3, order: 3 }` builds an automatic version strip.            |
+| `related`   |          | `[other-slug]`, shown under "Related work".                                               |
+| `links`     |          | `- { label: Code, url: https://…, kind: github \| video \| paper \| cad \| website }`     |
+| `log`       |          | `- { date: 2025-05, title: …, note: … }`, shown as the build-log timeline.                |
 
-### Components you can use in the body (no import needed)
+> **YAML gotcha:** inside `{ … }` or `[ … ]`, put quotes around any text containing a comma or colon, e.g. `{ label: Frame, value: "PLA, printed arms" }`.
+
+## The write-up — `src/content/projects/<slug>/index.mdx`
+
+Plain Markdown (headings, lists, **bold**, links, tables) plus components. No frontmatter is needed.
+Photos go in `images/` next to it and are referenced **by file name only**. To reuse another
+project's photo, write `other-slug/photo.jpg`.
+
+### Components (no import needed)
 
 ```mdx
 <Figure src="frame.jpg" alt="What it shows" caption="Numbered automatically." />
@@ -52,60 +81,84 @@ Photos go in `images/` next to it and are referenced **by file name only**.
   { src: 'b.jpg', alt: '…' },
 ]} />                                                              {/* fit="contain" for PCBs */}
 
+<Columns widths="2fr 1fr">                                        {/* side by side; stacks on phones */}
+  <Video src="/media/<slug>/wide.mp4" caption="…" />
+  <Video src="/media/<slug>/phone.mp4" aspect="9/16" caption="…" />
+</Columns>
+
 <Video src="/media/<slug>/flight.mp4" caption="…" />              {/* poster = same name .jpg */}
 <Video src="…" mode="ambient" />                                  {/* muted loop, plays on screen */}
 
 <ImageHotspots src="render.png" alt="…" caption="…" points={[
   { x: 42.5, y: 18, label: 'Antenna', partNo: 'MT-07', detail: 'Why it matters.' },
-]} />
+]} />                                                              {/* x/y = % of width/height */}
 
 <ModelViewer id="kermit-v3" caption="…" />                         {/* docs/3D-MODELS.md */}
-<Diagram id="eevi-signal-chain" caption="…" />
-<CompareSlider before="v1.jpg" after="v2.jpg" beforeLabel="V1" afterLabel="V2" alt="…" />
-<SpecSheet specs={[{ label: 'Span', value: '450 mm' }]} />
-<Callout tone="lesson">What broke and what you learned.</Callout> {/* note | lesson | result */}
+<RobotViewer id="dum-i" caption="…" />                             {/* URDF — docs/3D-MODELS.md */}
+<Diagram id="eevi-signal-chain" caption="…" />                     {/* src/data/diagrams/ */}
+<CompareSlider before="v1.png" after="v2.png" beforeLabel="V1" afterLabel="V2" alt="…" />
+<SpecSheet specs={[{ label: 'Span', value: '450 mm' }]} title="Wing" />
+<Callout tone="lesson">One thing I'd do differently…</Callout>     {/* note · lesson · result */}
 ```
 
-Use another project's image with `src="eevi/img-2836.jpg"`.
+Tables are written in Markdown and styled automatically (good for BOMs):
 
-**Finding hotspot coordinates:** open the page with `?author` on the URL in `npm run dev`
-(e.g. `http://localhost:4321/projects/mr-toad?author`) and click the image — `{ x, y }` is copied
-to your clipboard.
+```md
+| # | Part | Qty | Unit | Total |
+| -: | :-- | -: | -: | -: |
+| 1 | MAD 5008 motor | 4 | $80 | $320 |
+```
 
-**Preview every component:** `http://localhost:4321/dev/components` (dev only).
+**Finding hotspot coordinates:** run `npm run dev`, open the page with `?author` on the URL, and click the image. The `{ x, y }` is copied to your clipboard.
 
-## Experience — `src/content/experience/<slug>/index.md`
+## Experience — `src/data/experience.yaml`
 
-`org`, `mark` (≤6-char badge, e.g. `GTRI`), `location`, `type` (`internship` · `co-op` · `research` ·
-`team` · `leadership`), `start`, `end?`, `positions` (newest first — several rows draw a promotion
-ladder), `summary`, `highlights` (resume bullets), `skills`, `onResume`. Optional `logo: ./logo.png`
-(square, next to the file) replaces the text badge. Any Markdown body appears under the highlights.
+Jobs, internships, labs, teams. The key (e.g. `robonav:`) is the id a project's `context` points to.
 
-The `/resume` page is generated from entries with `onResume: true` plus `site.config.ts` education
-and `featured` skills — keep it in sync with the PDF in `public/resume/`.
+| Field                  | Notes                                                                       |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `org`, `location`      | Required.                                                                   |
+| `mark`                 | ≤ 6 chars badge text (shown when there's no logo).                          |
+| `logo`                 | A file in `src/assets/logos/` (square PNG/SVG, transparent background).     |
+| `type`                 | `internship` · `co-op` · `research` · `team` · `leadership`                 |
+| `start`, `end`         | `YYYY-MM`; leave `end` out while ongoing.                                   |
+| `positions`            | Newest first: `- { title: Electronics Master, start: 2024-08 }`. Dates optional. |
+| `summary`              | ≤ 260 chars.                                                                |
+| `highlights`           | Resume-style bullets.                                                       |
+| `skills`               | Skill ids.                                                                  |
+| `onResume`             | `false` = timeline only, not on `/resume`.                                  |
 
-## Research — `src/content/research/*.md`
+## Research outputs — `src/data/research.yaml`
 
-Outputs and threads: `title`, `kind` (`paper` · `poster` · `talk` · `thesis` · `report` · `ongoing`),
-`date`, `venue`, `authors`, `summary`, `links`, `experience?`, `project?`. Lab roles themselves live
-in `experience/` with `type: research`; research projects use `category: research`.
+Papers, posters, talks, ongoing work. Research *positions* go in `experience.yaml` with `type: research`.
+Fields: `title`, `kind` (`paper` · `poster` · `talk` · `thesis` · `report` · `ongoing`), `date`, `venue`, `authors`, `summary`, `links`, optional `experience` / `project` ids.
 
-## Skills — `src/content/skills.yaml`
+## Skills — `src/data/skills.yaml`
 
-One line per skill: `{ id, name, group, featured?, aliases? }`. Groups: `languages`, `cad-sim`,
-`electronics`, `robotics`, `fabrication`. `featured: true` = listed on the resume page. The home page
-counts how many projects use each skill — no self-ratings.
+The only place a skill is defined: `- { id: solidworks, name: SolidWorks, group: cad-sim, featured: true }`.
 
-## Diagrams — `src/content/diagrams/<id>.yaml`
+- **Groups:** `languages` · `cad-sim` · `electronics` · `robotics` · `fabrication`.
+- **`featured`** puts the skill on the resume page.
+- **`aliases`** are alternative spellings that `npm run new` will accept.
+- **The home page's "used in N projects"** counts are computed from projects' `skills` lists, so you never edit them.
+
+## Site info — `src/data/site.yaml`
+
+Name, identity line, tagline, email, links, education, availability line, nav order and resume path.
+
+## Diagrams — `src/data/diagrams/<id>.yaml`
 
 ```yaml
-title: …
-description: …            # read by screen readers
-groups: [{ id: air, label: Aircraft }]
-nodes:
-  - { id: fc, label: Pixhawk, sub: flight ctrl, group: air, col: 0, row: 0 }
-edges:
-  - { from: fc, to: radio, label: MAVLink, kind: data }   # data | rf | video | power
+title: …            # → <title> for screen readers
+description: …      # → <desc>
+animate: true       # signal pulses travel the links while on screen (default true)
+groups: [{ id: air, label: 'Aircraft' }]
+nodes:              # col / row place it on a grid (row may be 0.5 etc.)
+  - { id: fc, label: Pixhawk, sub: ArduPilot, group: air, col: 0, row: 0 }
+edges:              # kind: data · rf · video · power
+  - { from: fc, to: radio, label: MAVLink, kind: data }
+flows:              # each becomes a "Trace" button that animates a packet along the path
+  - { id: telemetry, label: Telemetry, path: [fc, radio, gcs] }
 ```
 
-Nodes sit on a grid (`col`, `row`; rows may be fractional). Edges route automatically.
+Use it with `<Diagram id="…" caption="…" />`. The diagram draws itself in on first view. Hovering or focusing a block highlights its links. All motion is off under reduced motion.

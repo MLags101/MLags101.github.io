@@ -65,6 +65,15 @@ const stats = [
         {site.education.degree} · Georgia Tech · {site.education.graduation.replace('Expected ', 'Class of ').replace(/May /, '')}
       </p>
       <h1 id="hero-title" class="hero__title">{site.name}</h1>
+      {
+        site.identity.length > 0 && (
+          <p class="hero__identity mono">
+            {site.identity.map((t, i) => (
+              <span style={`--k:${i}`}>{t}</span>
+            ))}
+          </p>
+        )
+      }
       <p class="hero__tagline">{site.tagline}</p>
       <div class="hero__ctas">
         <a class="btn btn--primary" href="/projects">View work <Icon name="arrow-right" /></a>
@@ -111,7 +120,7 @@ const stats = [
           stats.map((s, i) => (
             <div data-reveal style={`--reveal-i:${i}`}>
               <dt class="label">{s.label}</dt>
-              <dd>{s.value}</dd>
+              <dd data-count={s.value}>{s.value}</dd>
             </div>
           ))
         }
@@ -279,6 +288,23 @@ const stats = [
     font-weight: 600;
     letter-spacing: -0.055em;
     line-height: 0.92;
+  }
+
+  .hero__identity {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-3);
+    margin-top: var(--s-4);
+    font-size: var(--step--1);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #e8eaed;
+  }
+
+  .hero__identity span + span::before {
+    content: '/';
+    margin-right: var(--s-3);
+    color: var(--accent);
   }
 
   .hero__tagline {
@@ -544,6 +570,27 @@ const stats = [
 </style>
 
 <script>
+  // Stats count up once when they scroll into view (final values are in the HTML already).
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const counters = [...document.querySelectorAll<HTMLElement>('[data-count]')];
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        io.unobserve(e.target);
+        const el = e.target as HTMLElement;
+        const to = Number(el.dataset.count);
+        const t0 = performance.now();
+        const tick = (now: number) => {
+          const k = Math.min(1, (now - t0) / 900);
+          el.textContent = String(Math.round(to * (1 - (1 - k) ** 3)));
+          if (k < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+    }, { threshold: 0.6 });
+    counters.forEach((c) => io.observe(c));
+  }
+
   const v = document.querySelector<HTMLVideoElement>('[data-hero-video]');
   if (v && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     v.preload = 'auto';

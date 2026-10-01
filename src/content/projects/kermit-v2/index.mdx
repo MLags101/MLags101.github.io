@@ -1,25 +1,102 @@
----
-title: Kermit V2
-summary: >-
-  Second-generation Kermit, funded by an Invention Studio Maker Grant — a larger
-  quadcopter with a SolidWorks-designed airframe, flying on ArduPilot.
-category: personal
-start: 2025-06
-end: 2025-06
-order: 60
-cover: ./images/img-7406.jpg
-coverAlt: Kermit V2 quadcopter with long carbon arms and tall landing gear on a workbench
-role: Sole designer · Maker Grant recipient
-context: invention-studio
-skills: [solidworks, ardupilot, 3d-printing]
-lineage: { family: Kermit, version: V2, order: 2 }
-links:
-  - { label: Full build write-up on Behance, url: 'https://www.behance.net/gallery/227630087/Kermit-V2-Maker-Grant-Invention-Studio', kind: behance }
----
+## Overview
 
-{/* TODO(Michael): expand from the Behance write-up — specs, design changes from QuadFrog,
-    flight test results. */}
+Kermit V2 is a custom Pixhawk-based quadcopter that uses OpenHD for telemetry and high-quality video. It's the second iteration of my Kermit series, built to practice and improve my technical abilities with UAVs.
 
-Kermit V2 took the lessons from QuadFrog — above all a PLA frame that cracked and bowed — and started over with a larger airframe designed in SolidWorks, flying on ArduPilot. It was funded through the Invention Studio's Maker Grant program.
+[Kermit V1](/projects/quadfrog) was a fully 3D-printed frame with only the basic components of a small UAV, so I could get familiar with how each one works. It also carried a Raspberry Pi underneath, which I used as a Wi-Fi access point for telemetry and some experiments with autonomous control. I learned more drone basics in my first VIP project, on Urban Air Mobility.
 
-The complete build write-up is on Behance, linked in the sidebar.
+Kermit V2 had three objectives:
+
+- **Robust frame design** with materials like carbon fiber.
+- **A much better, longer-range comms system**, including a high-quality camera feed.
+- **Higher-end propulsion**, so the drone could be larger, carry more payload, and stay stable in wind.
+
+<Columns widths="minmax(0, 2.2fr) minmax(0, 1fr)">
+  <Video src="/media/kermit-v2/field-flight.mp4" caption="Flying outside the Invention Studio." />
+  <Video src="/media/kermit-v2/hover-test.mp4" aspect="9/16" caption="Hover test in a courtyard." />
+</Columns>
+
+## Learning from V1
+
+That first VIP taught me a lot about proven frame designs and the common electronics architecture. Combined with Kermit V1, it made several frame decisions easy, like how to position the arms and where to place the electronics. Kermit V1, below, shows some mistakes in arm design and cable management that I've since learned from.
+
+<Gallery
+  columns={3}
+  aspect="4/3"
+  items={[
+    { src: 'early-prop-guard-quad.jpg', alt: 'A small quadcopter frame with white propeller guards on a carpet' },
+    { src: 'quadfrog/img-5798.jpg', alt: 'Kermit V1, a green printed quad, on a table with its wiring exposed' },
+    { src: 'quadfrog/img-6252.jpg', alt: 'Kermit V1 with orange propellers on a wooden floor' },
+  ]}
+  caption="Earlier builds — Kermit V1's flat printed arms and loose wiring set the requirements for V2."
+/>
+
+## A modular frame
+
+I wanted to easily upgrade the frame and mount different payloads as I learn new hardware, so modularity was key. The core frame has a range of mounting holes, and the underside has custom 3D-printed **picatinny rails**. I mounted my telemetry antennas there, but they could just as easily hold a separate camera payload or a sensor suite.
+
+<Gallery
+  columns={2}
+  fit="contain"
+  aspect="16/10"
+  items={[
+    { src: 'cad-core-plate.png', alt: 'CAD render of the core frame plate with mounting hole patterns', caption: 'Core plate with mounting patterns.' },
+    { src: 'cad-picatinny-rail.png', alt: 'CAD render of a 3D-printed picatinny rail segment', caption: 'Printed picatinny rail.' },
+  ]}
+/>
+
+## Working with carbon fiber
+
+The carbon fiber came as long bar stock, which I processed at the Invention Studio with water, masking tape and the other protections this material needs. Cutting carbon fiber can throw off extremely thin shards and a dust that's harmful to breathe, so cutting wet contains the contaminants.
+
+To save weight I used a small number of larger screws that run through the entire frame, clamping the arms and battery together. That was strong, but the downside was a full disassembly whenever I needed to change the Raspberry Pi, the power distribution or the GPS.
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  items={[
+    { src: 'printed-frame-parts.jpg', alt: 'Black and magenta printed frame parts held in hand', caption: 'Printed frame parts.' },
+    { src: 'carbon-frame-assembly.jpg', alt: 'Carbon fiber arms and printed mounts laid out during assembly', caption: 'Carbon arms and mounts during assembly.' },
+  ]}
+/>
+
+## OpenHD: long-range digital video
+
+OpenHD made for an interesting experience. It relies on a specific set of Wi-Fi chips in USB adapters and changes how they transmit to mimic an analog link, which greatly increases range and lowers latency. Setting it up took many trial runs, Linux and Raspberry Pi knowledge to troubleshoot, and the ability to diagnose electronic communication problems.
+
+For a long stretch the feed kept cutting out, reviving, then dying again a few seconds later, and I couldn't figure out why. After a series of tests on the power supply, software configuration and wiring, I found the cause. I had made an extended USB cable with a separate power supply so the Wi-Fi radio could transmit at full power, but I hadn't shielded it, so electromagnetic interference was corrupting the packets.
+
+<Callout tone="lesson" title="Debugging win">
+Wrapping the USB differential pair in aluminium foil and heat shrink shielded it from EMI — and the video stream stabilized.
+</Callout>
+
+<Figure src="openhd-video-test.jpg" alt="Laptop showing the OpenHD live video feed during a bench test" caption="OpenHD video on the ground station during bench testing." />
+
+## Flight test
+
+Development ended with a flight test outside the Invention Studio, where I forgot to bring my GPS, so I couldn't test the autonomous functions. Even so, despite the wind, the drone felt responsive and well balanced on the controls. The landing gear also performed well, giving decent damping at the joints.
+
+<Figure src="flight-test.jpg" alt="Kermit V2 hovering over a courtyard with a laptop and radio in the foreground" caption="First flight, with the ground station in the foreground." />
+
+## Results
+
+I met the objectives I set out to: I learned to machine carbon fiber and to use OpenHD, achieved high-quality, stable video transmission, and built a drone with a high thrust-to-weight ratio. I'm happy with the final product and already have improvements in mind:
+
+- a frame designed with modification in mind
+- easy battery swaps
+- a gimballed camera
+
+Many of those became the goals for [Kermit V3](/projects/kermit-v3).
+
+### Bill of materials (selected)
+
+| # | Part | Qty | Unit | Total |
+| -: | :-- | -: | -: | -: |
+| 1 | MAD 5008 340 KV motor | 4 | $80 | $320 |
+| 2 | MAD Fluxer 18.1 × 7.2 in prop (pair) | 2 | $60 | $120 |
+| 3 | Arducam IMX519 camera | 1 | $38 | $38 |
+| 4 | zSecurity RTL8812AU Wi-Fi adapter | 1 | $35 | $35 |
+| 5 | Carbon fiber tube | 1 | $100 | $100 |
+
+<Callout tone="note" title="Support">
+Funded and supported by the Invention Studio at Georgia Tech, a student organization.
+</Callout>

@@ -92,7 +92,7 @@ const linkIcon = (kind: string) => (kind === 'github' ? 'github' : 'arrow-up-rig
     <div class="project__hero container">
       {
         data.model ? (
-          <ModelViewer id={data.model.id} />
+          <ModelViewer id={data.model.id} hero />
         ) : data.heroVideo ? (
           <div class="project__hero-media crop-marks">
             <video
