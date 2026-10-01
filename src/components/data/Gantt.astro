@@ -1,13 +1,13 @@
 ---
 /**
- * Overview chart of experience as horizontal bars on a shared time axis, with projects
- * underneath as start → completion bars (diamond = completed). Pure HTML/CSS: each
- * experience bar links to its entry below; hovering / focusing a project shows a card
- * with its photo, name and dates that links to the project page.
+ * Overview chart of experience as horizontal bars on a shared time axis, with a diamond
+ * under it for each completed project. Pure HTML/CSS: each experience bar links to its
+ * entry below; hovering / focusing a diamond shows a card with the project's photo, name
+ * and completion date that links to the project page.
  */
 import { Image } from 'astro:assets';
 import type { Experience, Project } from '../../lib/content';
-import { range, duration } from '../../lib/dates';
+import { range, duration, mono, monthYear } from '../../lib/dates';
 
 interface Props {
   entries: Experience[];
@@ -27,18 +27,23 @@ const endOfMonth = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMo
 const years = Array.from({ length: endYear - startYear }, (_, i) => startYear + i);
 const rows = [...entries].sort((a, b) => a.data.start.getTime() - b.data.start.getTime());
 
-// Pack projects into as few lanes as possible without overlapping (a small gap keeps
-// neighbouring diamonds apart).
+// One diamond per completed project, at the middle of its completion month. Diamonds
+// that would overlap stack onto extra lanes.
 const GAP = 1.6; // % of the axis
-const spans = [...projects]
-  .map((p) => ({ p, left: pct(p.data.start), right: pct(p.data.end ? endOfMonth(p.data.end) : now) }))
-  .sort((a, b) => a.left - b.left);
+const points = projects
+  .filter((p) => p.data.end)
+  .map((p) => {
+    const end = p.data.end!;
+    const x = (pct(end) + pct(endOfMonth(end))) / 2;
+    return { p, x };
+  })
+  .sort((a, b) => a.x - b.x);
 const laneEnds: number[] = [];
-const placed = spans.map((s) => {
-  let lane = laneEnds.findIndex((end) => end + GAP <= s.left);
-  if (lane < 0) lane = laneEnds.push(0) - 1;
-  laneEnds[lane] = Math.max(s.right, s.left + 0.6);
-  return { ...s, lane };
+const placed = points.map((pt) => {
+  let lane = laneEnds.findIndex((last) => last + GAP <= pt.x);
+  if (lane < 0) lane = laneEnds.push(-Infinity) - 1;
+  laneEnds[lane] = pt.x;
+  return { ...pt, lane };
 });
 const laneCount = laneEnds.length;
 ---
@@ -92,19 +97,18 @@ const laneCount = laneEnds.length;
           laneCount > 0 && (
             <div class="gantt__projects" style={`--lanes:${laneCount}`}>
               <span class="gantt__ticks-label label">Projects</span>
-              {placed.map(({ p, left, right, lane }, i) => (
+              {placed.map(({ p, x, lane }, i) => (
                 <a
                   href={`/projects/${p.id}`}
-                  class:list={['gproj', left > 62 && 'gproj--flip', !p.data.end && 'is-ongoing']}
-                  style={`left:${left}%; width:${Math.max(right - left, 0)}%; --lane:${lane}; --k:${i}`}
-                  aria-label={`${p.data.title}, ${range(p.data.start, p.data.end, 'text')}`}
+                  class:list={['gproj', x > 62 && 'gproj--flip']}
+                  style={`left:${x}%; --lane:${lane}; --k:${i}`}
+                  aria-label={`${p.data.title}, completed ${monthYear(p.data.end!)}`}
                 >
-                  <span class="gproj__bar" aria-hidden="true" />
-                  {p.data.end && <span class="gantt__tick" aria-hidden="true" />}
+                  <span class="gantt__tick" aria-hidden="true" />
                   <span class="gproj__card" aria-hidden="true">
                     <Image src={p.data.cover} alt="" widths={[240, 480]} sizes="220px" loading="lazy" />
                     <span class="gproj__title">{p.data.title}</span>
-                    <span class="label">{range(p.data.start, p.data.end)}</span>
+                    <span class="label">Completed {mono(p.data.end!)}</span>
                   </span>
                 </a>
               ))}
@@ -118,7 +122,7 @@ const laneCount = laneEnds.length;
     <span><i class="sw sw--internship"></i>Internship / Co-op</span>
     <span><i class="sw sw--research"></i>Research</span>
     <span><i class="sw sw--team"></i>Team / Leadership</span>
-    <span><i class="sw sw--proj"></i><i class="sw sw--tick"></i>Project, start → completed</span>
+    <span><i class="sw sw--tick"></i>Project completed</span>
   </figcaption>
 </figure>
 
@@ -289,10 +293,11 @@ const laneCount = laneEnds.length;
   .gproj {
     position: absolute;
     top: calc(0.6rem + var(--lane) * 1.15rem);
-    height: 0.9rem;
-    min-width: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+    margin-left: -0.5rem;
     z-index: 3;
-    outline-offset: 3px;
+    outline-offset: 2px;
   }
 
   .gproj:hover,
@@ -300,36 +305,18 @@ const laneCount = laneEnds.length;
     z-index: 6;
   }
 
-  .gproj__bar {
-    position: absolute;
-    inset: 50% 0 auto 0;
-    height: 3px;
-    transform: translateY(-50%);
-    border-radius: 2px;
-    background: var(--accent);
-    opacity: 0.5;
-    transition: opacity var(--dur-2) var(--ease);
-  }
 
-  .gproj.is-ongoing .gproj__bar {
-    background: linear-gradient(90deg, var(--accent) 70%, transparent);
-  }
 
   .gantt__tick {
     position: absolute;
-    right: 0;
+    left: 50%;
     top: 50%;
     width: 9px;
     height: 9px;
-    transform: translate(50%, -50%) rotate(45deg);
+    transform: translate(-50%, -50%) rotate(45deg);
     border: 1.5px solid var(--accent);
     background: var(--bg-elev);
     transition: background-color var(--dur-2) var(--ease);
-  }
-
-  .gproj:hover .gproj__bar,
-  .gproj:focus-visible .gproj__bar {
-    opacity: 1;
   }
 
   .gproj:hover .gantt__tick,
@@ -341,7 +328,7 @@ const laneCount = laneEnds.length;
   .gproj__card {
     position: absolute;
     bottom: calc(100% + 8px);
-    left: -6px;
+    left: -4px;
     width: 220px;
     display: flex;
     flex-direction: column;
@@ -361,7 +348,7 @@ const laneCount = laneEnds.length;
 
   .gproj--flip .gproj__card {
     left: auto;
-    right: -6px;
+    right: -4px;
   }
 
   .gproj:hover .gproj__card,
@@ -425,15 +412,8 @@ const laneCount = laneEnds.length;
     height: 8px;
     transform: rotate(45deg);
     border: 1.5px solid var(--accent);
-    margin-left: -6px;
   }
 
-  .sw--proj {
-    width: 18px;
-    height: 3px;
-    background: var(--accent);
-    opacity: 0.6;
-  }
 
   /* Bars grow from their start date the first time the chart scrolls into view. */
   @media (prefers-reduced-motion: no-preference) {

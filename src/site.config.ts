@@ -27,7 +27,6 @@ const schema = z.object({
     graduation: z.string(),
     gpa: z.coerce.string(),
   }),
-  honors: z.array(z.string()).default([]),
   nav: z.array(z.object({ href: z.string(), label: z.string() })),
 });
 

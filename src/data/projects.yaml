@@ -20,7 +20,8 @@ eevi:
     auto-tracking antenna, RFD900x telemetry and digital video.
   category: team   # research | professional | team | personal | coursework
   start: 2023-10   # YYYY-MM
-  status: in-progress   # complete | in-progress | paused | concept
+  end: 2026-05   # YYYY-MM — leave out while ongoing
+  status: complete   # complete | in-progress | paused | concept
   featured: true   # true = shown on the home page
   order: 90   # higher = earlier among featured / ties
   role: Founder & Drone Lead
