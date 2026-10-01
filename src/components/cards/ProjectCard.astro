@@ -1,0 +1,192 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '../../lib/content';
+import { CATEGORY_LABELS, resolveSkills } from '../../lib/content';
+import { range } from '../../lib/dates';
+
+interface Props {
+  project: Project;
+  /** 'feature' = large lead card; 'default' = grid card. */
+  variant?: 'feature' | 'default';
+  /** Index within its list, used for numbering + staggered reveal. */
+  index?: number;
+  headingLevel?: 'h2' | 'h3';
+  /** Eager-load the image (above the fold). */
+  priority?: boolean;
+}
+
+const { project, variant = 'default', index = 0, headingLevel = 'h3', priority = false } = Astro.props;
+const { data } = project;
+const skills = (await resolveSkills(data.skills)).slice(0, variant === 'feature' ? 5 : 3);
+const Heading = headingLevel;
+const sizes =
+  variant === 'feature' ? '(min-width: 1000px) 760px, 100vw' : '(min-width: 1000px) 400px, (min-width: 640px) 50vw, 100vw';
+---
+
+<article
+  class:list={['project-card', `project-card--${variant}`]}
+  data-reveal
+  style={`--reveal-i:${index % 3}`}
+  data-category={data.category}
+  data-skills={data.skills.map((s) => s.id).join(' ')}
+>
+  <a class="project-card__link" href={`/projects/${project.id}`}>
+    <div class="project-card__media">
+      <Image
+        src={data.cover}
+        alt={data.coverAlt}
+        widths={variant === 'feature' ? [600, 900, 1200, 1600] : [400, 600, 800, 1000]}
+        sizes={sizes}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchpriority={priority ? 'high' : undefined}
+        style={`view-transition-name: cover-${project.id}`}
+      />
+      {data.status === 'in-progress' && (
+        <span class="project-card__status label">
+          <span class="dot dot--accent" /> In progress
+        </span>
+      )}
+      {data.draft && <span class="project-card__status label">Draft</span>}
+    </div>
+    <div class="project-card__body">
+      <p class="project-card__meta label">
+        <span>{range(data.start, data.end)}</span>
+        <span aria-hidden="true">/</span>
+        <span>{CATEGORY_LABELS[data.category]}</span>
+      </p>
+      <Heading class="project-card__title">{data.title}</Heading>
+      <p class="project-card__summary">{data.summary}</p>
+      <ul class="chip-list project-card__skills" aria-label="Key skills">
+        {skills.map((s) => <li class="chip">{s.data.name}</li>)}
+      </ul>
+    </div>
+  </a>
+</article>
+
+<style>
+  .project-card {
+    min-width: 0;
+  }
+
+  .project-card__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .project-card__media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  .project-card__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition:
+      transform var(--dur-4) var(--ease),
+      filter var(--dur-3) var(--ease);
+    filter: saturate(0.92);
+  }
+
+  .project-card__link:hover .project-card__media :global(img),
+  .project-card__link:focus-visible .project-card__media :global(img) {
+    transform: scale(1.025);
+    filter: saturate(1.05);
+  }
+
+  .project-card__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px transparent;
+    transition: box-shadow var(--dur-2) var(--ease);
+  }
+
+  .project-card__link:hover .project-card__media::after {
+    box-shadow: inset 0 0 0 1px var(--accent);
+  }
+
+  .project-card__status {
+    position: absolute;
+    top: var(--s-3);
+    left: var(--s-3);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding: 0.3rem 0.55rem;
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    color: var(--text);
+  }
+
+  .project-card__body {
+    padding-top: var(--s-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    flex: 1;
+  }
+
+  .project-card__meta {
+    display: flex;
+    gap: var(--s-2);
+  }
+
+  .project-card__title {
+    font-size: var(--step-2);
+    transition: color var(--dur-2) var(--ease);
+  }
+
+  .project-card__link:hover .project-card__title {
+    color: var(--accent);
+  }
+
+  .project-card__summary {
+    color: var(--text-2);
+    font-size: var(--step--1);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .project-card__skills {
+    margin-top: auto;
+    padding-top: var(--s-2);
+  }
+
+  /* Feature variant: image left, text right on wide screens. */
+  .project-card--feature .project-card__title {
+    font-size: var(--step-4);
+  }
+
+  .project-card--feature .project-card__summary {
+    font-size: var(--step-0);
+    -webkit-line-clamp: 4;
+  }
+
+  @media (min-width: 900px) {
+    .project-card--feature .project-card__link {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+      gap: var(--s-6);
+      align-items: end;
+    }
+    .project-card--feature .project-card__body {
+      padding-top: 0;
+      padding-bottom: var(--s-2);
+      gap: var(--s-3);
+    }
+  }
+</style>

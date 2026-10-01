@@ -1,0 +1,57 @@
+---
+/** Key/value spec readout: mono uppercase keys, tabular values. */
+interface Props {
+  specs: { label: string; value: string }[];
+  title?: string;
+  columns?: 1 | 2;
+}
+const { specs, title, columns = 1 } = Astro.props;
+---
+
+{
+  specs.length > 0 && (
+    <section class="spec" aria-label={title ?? 'Specifications'}>
+      {title && <p class="label spec__title">{title}</p>}
+      <dl style={`--cols:${columns}`}>
+        {specs.map((s) => (
+          <div>
+            <dt class="label">{s.label}</dt>
+            <dd>{s.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  )
+}
+
+<style>
+  .spec__title {
+    margin-bottom: var(--s-3);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    column-gap: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  dl > div {
+    display: grid;
+    grid-template-columns: minmax(7.5rem, 40%) minmax(0, 1fr);
+    gap: var(--s-3);
+    padding-block: 0.6rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  dt {
+    padding-top: 0.15rem;
+  }
+
+  dd {
+    font-size: var(--step--1);
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.45;
+  }
+</style>

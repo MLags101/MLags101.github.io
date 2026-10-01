@@ -1,0 +1,50 @@
+# Skills registry — the only place a skill is defined.
+# Projects and experience entries reference these by `id`; the site computes
+# "used in N projects" from those references. `featured: true` = on the resume.
+# `aliases` are older spellings, used by `npm run new` and the content linter.
+
+# ── Languages ──────────────────────────────────────────────────────────────
+- { id: python, name: Python, group: languages, featured: true }
+- { id: matlab, name: MATLAB, group: languages, featured: true }
+- { id: cpp, name: C++, group: languages, featured: true }
+- { id: embedded-c, name: Embedded C, group: languages, aliases: [C] }
+
+# ── CAD & Simulation ───────────────────────────────────────────────────────
+- { id: solidworks, name: SolidWorks, group: cad-sim, featured: true }
+- { id: fusion-360, name: Fusion 360, group: cad-sim }
+- { id: ansys, name: ANSYS FEA & CFD, group: cad-sim, featured: true, aliases: [ANSYS, ANSYS Mechanical, FEA] }
+- { id: altium, name: Altium Designer, group: cad-sim, featured: true, aliases: [Altium] }
+- { id: kicad, name: KiCad, group: cad-sim, aliases: [KiCAD] }
+- { id: openvsp, name: OpenVSP, group: cad-sim, featured: true }
+- { id: simulink, name: Simulink, group: cad-sim, featured: true }
+- { id: aero-design, name: Aerodynamic Design, group: cad-sim, aliases: [Aerodynamic Design] }
+- { id: tolerancing, name: Tolerancing, group: cad-sim, aliases: [Engineering Tolerancing, CAD] }
+
+# ── Electronics & Embedded ─────────────────────────────────────────────────
+- { id: stm32, name: STM32 / CubeMX, group: electronics, featured: true, aliases: [STM32, STM32CubeMX, IMU Integration] }
+- { id: arduino, name: Arduino / AVR, group: electronics, featured: true, aliases: [Arduino] }
+- { id: raspberry-pi, name: Raspberry Pi, group: electronics }
+- { id: rf-comms, name: RF Comms, group: electronics, aliases: [RF Communication, RFID, RFID (MFRC522)] }
+- { id: bldc-control, name: Brushless Motor Control, group: electronics, aliases: [Brushless Motor Control] }
+- { id: soldering, name: Soldering (SMD/THT), group: electronics, aliases: [Soldering, Electronics] }
+
+# ── Robotics & Flight Systems ──────────────────────────────────────────────
+- { id: ros2, name: ROS 2, group: robotics, featured: true, aliases: [ROS2] }
+- { id: ardupilot, name: ArduPilot, group: robotics, featured: true }
+- { id: mission-planner, name: Mission Planner, group: robotics }
+- { id: betaflight, name: Betaflight, group: robotics, aliases: [BetaFlight] }
+- { id: msp, name: MultiWii Serial Protocol, group: robotics, aliases: [MultiWii Protocol] }
+- { id: openhd, name: OpenHD, group: robotics }
+- { id: motion-capture, name: Motion Capture, group: robotics, featured: true }
+- { id: linux, name: Linux, group: robotics, featured: true }
+- { id: git, name: Git / GitHub, group: robotics, featured: true }
+
+# ── Fabrication ────────────────────────────────────────────────────────────
+- { id: 3d-printing, name: 3D Printing (FDM/SLA/SLS), group: fabrication, featured: true, aliases: [3D Printing] }
+- { id: pcb-fab, name: PCB Fabrication, group: fabrication, featured: true, aliases: [PCB Milling, PCB Fabrication, FlatCAM] }
+- { id: laser-cutting, name: Laser Cutting, group: fabrication, aliases: [Laser Cutting] }
+- { id: machining, name: Lathe & Mill, group: fabrication, featured: true, aliases: [Lathe, Mill] }
+- { id: cnc, name: CNC, group: fabrication, featured: true }
+- { id: waterjet, name: Waterjet, group: fabrication, featured: true }
+- { id: welding, name: MIG Welding, group: fabrication, featured: true }
+- { id: composites, name: Carbon Fiber / Composites, group: fabrication }

@@ -1,0 +1,101 @@
+/*
+ * Design tokens. Dark is the default; [data-theme='light'] overrides.
+ * Every text/background pair below meets WCAG AA in both themes.
+ */
+:root {
+  color-scheme: dark;
+
+  /* ── color ── */
+  --bg: #08090b;
+  --bg-elev: #0d0f12;
+  --surface: #111317;
+  --surface-2: #171a1f;
+  --line: #22262d;
+  --line-strong: #323841;
+  --text: #e8eaed;
+  --text-2: #a7aeb8;
+  --text-3: #7f8690;
+  --accent: #ff6b2c;
+  --accent-2: #ff8a55;
+  --accent-ink: #120a05;
+  --accent-soft: rgb(255 107 44 / 0.12);
+  --ok: #3ddc97;
+  --warn: #f5c451;
+  --grid-line: rgb(255 255 255 / 0.045);
+  --shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 20px 40px -24px rgb(0 0 0 / 0.8);
+  --scrim: linear-gradient(180deg, rgb(8 9 11 / 0.15) 0%, rgb(8 9 11 / 0.55) 55%, var(--bg) 100%);
+
+  /* ── type ── */
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, monospace;
+
+  --step--2: clamp(0.69rem, 0.68rem + 0.05vw, 0.72rem);
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.86rem);
+  --step-0: clamp(0.97rem, 0.94rem + 0.15vw, 1.06rem);
+  --step-1: clamp(1.15rem, 1.08rem + 0.3vw, 1.33rem);
+  --step-2: clamp(1.4rem, 1.27rem + 0.6vw, 1.75rem);
+  --step-3: clamp(1.75rem, 1.5rem + 1.1vw, 2.45rem);
+  --step-4: clamp(2.2rem, 1.75rem + 2vw, 3.4rem);
+  --step-5: clamp(2.7rem, 1.9rem + 3.6vw, 5rem);
+  --step-6: clamp(3.1rem, 1.8rem + 5.8vw, 6.75rem);
+
+  /* ── space (4px base) ── */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4rem;
+  --s-9: 6rem;
+  --s-10: 8rem;
+  --section: clamp(4rem, 3rem + 5vw, 8rem);
+
+  /* ── layout ── */
+  --max: 1240px;
+  --prose: 68ch;
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+  --header-h: 60px;
+  --radius: 3px;
+  --radius-lg: 6px;
+
+  /* ── motion ── */
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 360ms;
+  --dur-4: 700ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f4f4f1;
+  --bg-elev: #fafaf8;
+  --surface: #ffffff;
+  --surface-2: #ecece8;
+  --line: #dcdcd5;
+  --line-strong: #c4c4bc;
+  --text: #0e1013;
+  --text-2: #444a53;
+  --text-3: #5f656e;
+  --accent: #c2410c;
+  --accent-2: #a8380a;
+  --accent-ink: #ffffff;
+  --accent-soft: rgb(194 65 12 / 0.09);
+  --ok: #0f8a5a;
+  --warn: #9a6a00;
+  --grid-line: rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 16px 32px -24px rgb(0 0 0 / 0.25);
+  --scrim: linear-gradient(180deg, rgb(8 9 11 / 0.2) 0%, rgb(8 9 11 / 0.6) 60%, rgb(8 9 11 / 0.92) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 0ms;
+    --dur-2: 0ms;
+    --dur-3: 0ms;
+    --dur-4: 0ms;
+  }
+}

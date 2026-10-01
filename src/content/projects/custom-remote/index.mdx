@@ -1,0 +1,61 @@
+---
+title: Custom Remote
+summary: >-
+  An RF trigger remote on a board I milled myself — and the job of writing the
+  Invention Studio's procedure for its new PCB mill.
+category: personal
+start: 2024-03
+end: 2024-03
+order: 15
+cover: ./images/img-6510.jpg
+coverAlt: Blue 3D-printed handheld remote with an OLED screen on a blue silicone mat
+role: Sole designer · Electronics Apprentice
+context: invention-studio
+skills: [kicad, arduino, rf-comms, pcb-fab, solidworks, 3d-printing]
+specs:
+  - { label: Function, value: RF trigger for MOSFET switches }
+  - { label: Display, value: OLED }
+  - { label: PCB, value: KiCad · milled in-house (FlatCAM) }
+  - { label: Range, value: ~10 m reliable }
+  - { label: Enclosure, value: SolidWorks · printed }
+lineage: { family: Remote, version: V1, order: 1 }
+---
+
+## Overview
+
+A personal exploration of RF modules and PCB fabrication: a remote that can selectively switch any device fitted with a matching receiver or MOSFET switch. Making the board myself mattered — as **Electronics Apprentice**, it was my job to create the operating procedure for the Invention Studio's new PCB mill.
+
+## Circuit design
+
+In KiCad I designed a microcontroller circuit that interfaces with an RF module and supports MOSFET switch control, exploring several RF libraries and protocols for reliable transmission.
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  fit="contain"
+  items={[
+    { src: '2024-01-12-211309.jpg', alt: 'KiCad layout of the remote PCB', caption: 'Board layout in KiCad.' },
+    { src: 'img-5901.jpg', alt: 'Milled remote PCB held in hand with OLED attached', caption: 'First milled board, OLED attached.' },
+  ]}
+/>
+
+## PCB fabrication
+
+I fabricated the board on the studio's new mill and developed the procedure along the way — learning FlatCAM to turn KiCad output into G-code and iterating on milling parameters until traces came out clean and reliable.
+
+<Video src="/media/custom-remote/pcb-mill.mp4" caption="Isolation-milling a board on the Invention Studio's PCB mill." size="prose" />
+
+## Results
+
+The enclosure, designed in SolidWorks and printed, was tailored to the compact PCB while keeping the controls and OLED accessible. The finished remote reliably triggered devices out to about 10 m.
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  items={[
+    { src: 'img-5221.jpg', alt: 'Microcontroller board held next to a red printed enclosure', caption: 'Prototype electronics and enclosure.' },
+    { src: 'img-6510.jpg', alt: 'Finished blue remote with OLED screen on a workbench mat', caption: 'The finished remote.' },
+  ]}
+/>
+
+<Video src="/media/custom-remote/remote-demo.mp4" caption="The remote triggering a receiver on the bench." size="prose" />

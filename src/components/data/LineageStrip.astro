@@ -1,0 +1,133 @@
+---
+/**
+ * Version history across projects that share `lineage.family`:
+ *   KERMIT  ▸ V1 2023 ▸ V2 2025 ▸ [V3 2026]
+ * Built automatically — add `lineage: { family, version, order }` to each project.
+ */
+import { Image } from 'astro:assets';
+import type { Project } from '../../lib/content';
+import { year } from '../../lib/dates';
+
+interface Props {
+  current: Project;
+  versions: Project[];
+}
+const { current, versions } = Astro.props;
+const family = current.data.lineage?.family ?? '';
+---
+
+{
+  versions.length > 1 && (
+    <nav class="lineage" aria-label={`${family} version history`}>
+      <p class="label lineage__family">
+        Lineage <span class="lineage__name">/ {family}</span>
+      </p>
+      <ol>
+        {versions.map((v, i) => {
+          const isCurrent = v.id === current.id;
+          return (
+            <li class:list={{ 'is-current': isCurrent }}>
+              <a href={`/projects/${v.id}`} aria-current={isCurrent ? 'page' : undefined}>
+                <span class="lineage__thumb">
+                  <Image src={v.data.cover} alt="" widths={[160, 320]} sizes="160px" />
+                </span>
+                <span class="lineage__text">
+                  <span class="label">
+                    {v.data.lineage!.version} · {year(v.data.end ?? v.data.start)}
+                  </span>
+                  <span class="lineage__title">{v.data.title}</span>
+                </span>
+              </a>
+              {i < versions.length - 1 && <span class="lineage__arrow" aria-hidden="true">→</span>}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  )
+}
+
+<style>
+  .lineage {
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+  }
+
+  .lineage__name {
+    color: var(--text-2);
+  }
+
+  ol {
+    display: flex;
+    gap: var(--s-3);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--s-4);
+    overflow-x: auto;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    flex: 1 1 0;
+    min-width: 200px;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    flex: 1;
+    padding: var(--s-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: border-color var(--dur-2) var(--ease);
+  }
+
+  a:hover {
+    border-color: var(--line-strong);
+  }
+
+  .is-current a {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .lineage__thumb {
+    width: 64px;
+    aspect-ratio: 4 / 3;
+    flex: none;
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .lineage__thumb :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .lineage__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .lineage__title {
+    font-size: var(--step--1);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lineage__arrow {
+    color: var(--text-3);
+    font-family: var(--font-mono);
+  }
+</style>

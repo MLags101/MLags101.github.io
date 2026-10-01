@@ -1,0 +1,32 @@
+title: EEVi 2025 communications architecture
+description: >-
+  Telemetry and video paths from the aircraft to the ground station. A Pixhawk streams
+  MAVLink over RFD900x radios; a Raspberry Pi 4 running OpenHD sends digital video from an
+  Arducam over Wi-Fi. Both links land on an Intel NUC at the auto-tracking antenna, which
+  relays them to the ground station.
+groups:
+  - { id: air, label: 'EEVi · aircraft' }
+  - { id: ground, label: 'Ground segment' }
+nodes:
+  - { id: pixhawk, label: Pixhawk, sub: ArduPilot flight ctrl, group: air, col: 0, row: 0 }
+  - { id: rfd-air, label: RFD900x, sub: telemetry radio, group: air, col: 1, row: 0 }
+  - { id: cam, label: Arducam, sub: camera module, group: air, col: 0, row: 1 }
+  - { id: pi, label: Raspberry Pi 4, sub: OpenHD air unit, group: air, col: 1, row: 1 }
+  - { id: pdb, label: PDB, sub: power distribution, group: air, col: 0, row: 2 }
+  - { id: wifi-air, label: ASUS AC56, sub: Wi-Fi adapter, group: air, col: 1, row: 2 }
+  - { id: rfd-gnd, label: RFD900x, sub: ground radio, group: ground, col: 2, row: 0 }
+  - { id: wifi-gnd, label: Wi-Fi radio, sub: OpenHD ground, group: ground, col: 2, row: 2 }
+  - { id: tracker, label: Antenna tracker, sub: 2-axis · ArduPilot, group: ground, col: 3, row: 0 }
+  - { id: nuc, label: Intel NUC, sub: receive + relay, group: ground, col: 3, row: 1 }
+  - { id: gcs, label: Ground station, sub: Mission Planner + video, group: ground, col: 4, row: 1 }
+edges:
+  - { from: pixhawk, to: rfd-air, label: MAVLink, kind: data }
+  - { from: rfd-air, to: rfd-gnd, label: 900 MHz, kind: rf }
+  - { from: cam, to: pi, label: CSI, kind: video }
+  - { from: pi, to: wifi-air, kind: video }
+  - { from: pdb, to: wifi-air, kind: power }
+  - { from: wifi-air, to: wifi-gnd, label: Wi-Fi, kind: rf }
+  - { from: rfd-gnd, to: nuc, kind: data }
+  - { from: wifi-gnd, to: nuc, kind: video }
+  - { from: nuc, to: tracker, label: pointing, kind: data }
+  - { from: nuc, to: gcs, kind: data }

@@ -1,0 +1,58 @@
+---
+import Icon from '../ui/Icon.astro';
+---
+
+<button class="theme-toggle" type="button" aria-label="Switch color theme" data-theme-toggle>
+  <Icon name="sun" class="theme-toggle__sun" />
+  <Icon name="moon" class="theme-toggle__moon" />
+</button>
+
+<style>
+  .theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    color: var(--text-2);
+    transition:
+      color var(--dur-2) var(--ease),
+      border-color var(--dur-2) var(--ease);
+  }
+
+  .theme-toggle:hover {
+    color: var(--text);
+    border-color: var(--line-strong);
+  }
+
+  .theme-toggle :global(svg) {
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--dur-2) var(--ease),
+      transform var(--dur-3) var(--ease);
+  }
+
+  :global(:root[data-theme='light']) .theme-toggle :global(.theme-toggle__sun),
+  :global(:root:not([data-theme='light'])) .theme-toggle :global(.theme-toggle__moon) {
+    opacity: 0;
+    transform: rotate(-60deg) scale(0.6);
+  }
+</style>
+
+<script>
+  // The initial theme is applied by the inline script in <head> (no flash). This only handles clicks.
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
+    const sync = () => btn.setAttribute('aria-pressed', String(document.documentElement.dataset.theme === 'light'));
+    sync();
+    btn.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = next;
+      try {
+        localStorage.setItem('theme', next);
+      } catch {}
+      sync();
+      document.dispatchEvent(new CustomEvent('themechange', { detail: next }));
+    });
+  }
+</script>

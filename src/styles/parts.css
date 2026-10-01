@@ -1,0 +1,215 @@
+/*
+ * Shared styles for labeled-part viewers (<ImageHotspots> and <ModelViewer>):
+ * a stage with numbered markers + a numbered parts list that doubles as the
+ * accessible / no-JS fallback.
+ */
+.parts {
+  counter-increment: fig;
+  container-type: inline-size;
+}
+
+.parts__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-4);
+}
+
+/* Parts list beside the stage only when the figure itself is wide; otherwise below, in columns. */
+@container (min-width: 1040px) {
+  .parts__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+    gap: var(--s-5);
+    align-items: start;
+  }
+}
+
+@container (min-width: 560px) and (max-width: 1039px) {
+  .parts__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--s-5);
+  }
+}
+
+.parts > .parts__caption {
+  margin-top: var(--s-3);
+}
+
+.parts__stage {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--surface-2) 70%, transparent), transparent 70%),
+    var(--surface);
+  overflow: hidden;
+}
+
+.parts__hud {
+  position: absolute;
+  inset: var(--s-3) var(--s-3) auto var(--s-3);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-3);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.parts__hud > * {
+  pointer-events: auto;
+}
+
+.parts__marker {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border: 1.5px solid var(--accent);
+  color: var(--text);
+  font: 600 0.68rem/1 var(--font-mono);
+  box-shadow: 0 0 0 4px rgb(0 0 0 / 0.25);
+  backdrop-filter: blur(4px);
+  transition:
+    background-color var(--dur-2) var(--ease),
+    color var(--dur-2) var(--ease),
+    transform var(--dur-2) var(--ease),
+    opacity var(--dur-2) var(--ease);
+}
+
+.parts__marker::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  opacity: 0;
+  transform: scale(0.7);
+  transition:
+    opacity var(--dur-3) var(--ease),
+    transform var(--dur-3) var(--ease);
+}
+
+.parts__marker:hover,
+.parts__marker[aria-pressed='true'],
+.parts__marker.is-hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+  transform: scale(1.1);
+}
+
+.parts__marker[aria-pressed='true']::after {
+  opacity: 0.7;
+  transform: scale(1);
+}
+
+/* model-viewer hides hotspots that are behind the model */
+.parts__marker[data-visible='false'],
+.parts__marker:not([data-visible]):is([slot]) {
+  opacity: 0.25;
+}
+
+.parts__list {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.parts__list li {
+  border-bottom: 1px solid var(--line);
+}
+
+.parts__item {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: var(--s-1) var(--s-3);
+  width: 100%;
+  padding: var(--s-3) var(--s-2);
+  text-align: left;
+  transition: background-color var(--dur-2) var(--ease);
+}
+
+.parts__item:hover,
+.parts__item.is-hover {
+  background: var(--surface);
+}
+
+.parts__item[aria-expanded='true'] {
+  background: var(--accent-soft);
+}
+
+.parts__num {
+  font: 600 0.72rem/1.6 var(--font-mono);
+  color: var(--accent);
+}
+
+.parts__name {
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.parts__pn {
+  grid-column: 2;
+  margin-top: -2px;
+}
+
+.parts__detail {
+  grid-column: 2;
+  font-size: var(--step--1);
+  color: var(--text-2);
+  line-height: 1.55;
+  display: none;
+  padding-top: var(--s-1);
+}
+
+.parts__item[aria-expanded='true'] .parts__detail {
+  display: block;
+}
+
+/* Without JS every detail is shown — the list reads as a complete parts callout. */
+html:not(.js) .parts__detail {
+  display: block;
+}
+
+.parts__caption {
+  display: flex;
+  gap: var(--s-3);
+  font-size: var(--step--1);
+  color: var(--text-3);
+  grid-column: 1 / -1;
+}
+
+.parts__caption .label::before {
+  content: 'FIG.\00a0' counter(fig, decimal-leading-zero);
+  color: var(--accent);
+}
+
+.parts__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  height: 2rem;
+  padding-inline: var(--s-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg) 75%, transparent);
+  backdrop-filter: blur(6px);
+  font: 500 var(--step--2) var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.parts__btn:hover {
+  border-color: var(--accent);
+}
+
+.parts__btn[hidden] {
+  display: none;
+}

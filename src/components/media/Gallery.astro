@@ -1,0 +1,130 @@
+---
+/**
+ * <Gallery items={[{ src: 'a.jpg', alt: '…', caption: '…' }, …]} />
+ * Thumbnails in a grid; click opens the zoomable lightbox (pinch/scroll zoom for schematics).
+ * `fit="contain"` letterboxes instead of cropping — use it for PCB layouts and drawings.
+ */
+import { Image, getImage } from 'astro:assets';
+import { resolveImage, type ImageSrc } from '../../lib/media';
+
+interface Item {
+  src: ImageSrc;
+  alt: string;
+  caption?: string;
+}
+interface Props {
+  items: Item[];
+  columns?: 2 | 3 | 4;
+  fit?: 'cover' | 'contain';
+  /** Aspect ratio of each tile, e.g. "4/3", "1/1", "3/4". */
+  aspect?: string;
+  caption?: string;
+}
+
+const { items, columns = 2, fit = 'cover', aspect = '4/3', caption } = Astro.props;
+const slug = Astro.locals.projectSlug;
+const resolved = await Promise.all(
+  items.map(async (item) => {
+    const img = resolveImage(item.src, slug);
+    const full = await getImage({ src: img, width: Math.min(img.width, 2000), quality: 80 });
+    return { ...item, img, full };
+  }),
+);
+---
+
+<figure class="gallery wide" data-gallery style={`--cols:${columns}; --aspect:${aspect}`}>
+  <ul class:list={['gallery__grid', `gallery__grid--${fit}`]}>
+    {
+      resolved.map((item) => (
+        <li>
+          <a
+            href={item.full.src}
+            data-pswp-width={item.full.attributes.width ?? item.img.width}
+            data-pswp-height={item.full.attributes.height ?? item.img.height}
+            data-caption={item.caption}
+            aria-label={`Enlarge: ${item.alt}`}
+          >
+            <Image src={item.img} alt={item.alt} widths={[400, 700, 1000]} sizes={`(min-width: 1100px) ${Math.round(1100 / columns)}px, ${columns > 2 ? 50 : 100}vw`} />
+          </a>
+          {item.caption && <span class="gallery__cap">{item.caption}</span>}
+        </li>
+      ))
+    }
+  </ul>
+  {
+    caption && (
+      <figcaption>
+        <span class="label gallery__num" />
+        <span>{caption}</span>
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .gallery {
+    counter-increment: fig;
+  }
+
+  .gallery__grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: var(--s-3);
+  }
+
+  @media (max-width: 640px) {
+    .gallery__grid {
+      grid-template-columns: repeat(min(var(--cols), 2), minmax(0, 1fr));
+    }
+  }
+
+  .gallery__grid a {
+    display: block;
+    aspect-ratio: var(--aspect);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+    cursor: zoom-in;
+  }
+
+  .gallery__grid :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--dur-4) var(--ease);
+  }
+
+  .gallery__grid--contain :global(img) {
+    object-fit: contain;
+    padding: var(--s-3);
+  }
+
+  .gallery__grid a:hover :global(img) {
+    transform: scale(1.03);
+  }
+
+  .gallery__cap {
+    display: block;
+    margin-top: var(--s-2);
+    font-size: var(--step--1);
+    color: var(--text-3);
+    line-height: 1.45;
+  }
+
+  figcaption {
+    display: flex;
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+    font-size: var(--step--1);
+    color: var(--text-3);
+  }
+
+  .gallery__num::before {
+    content: 'FIG.\00a0' counter(fig, decimal-leading-zero);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+</style>

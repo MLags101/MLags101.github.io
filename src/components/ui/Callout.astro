@@ -1,0 +1,50 @@
+---
+/** <Callout title="Lesson learned">…</Callout> — an aside inside a write-up. */
+interface Props {
+  title?: string;
+  tone?: 'note' | 'lesson' | 'result';
+}
+const { title, tone = 'note' } = Astro.props;
+const defaults = { note: 'Note', lesson: 'Lesson learned', result: 'Result' };
+---
+
+<aside class:list={['callout', `callout--${tone}`]}>
+  <p class="label">{title ?? defaults[tone]}</p>
+  <div class="callout__body"><slot /></div>
+</aside>
+
+<style>
+  .callout {
+    max-width: var(--prose);
+    padding: var(--s-4) var(--s-5);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+  }
+
+  .callout--lesson .label {
+    color: var(--warn);
+  }
+
+  .callout--lesson {
+    border-left-color: var(--warn);
+  }
+
+  .callout--result {
+    border-left-color: var(--ok);
+  }
+
+  .callout--result .label {
+    color: var(--ok);
+  }
+
+  .callout__body {
+    margin-top: var(--s-2);
+    color: var(--text);
+  }
+
+  .callout__body :global(p + p) {
+    margin-top: var(--s-3);
+  }
+</style>

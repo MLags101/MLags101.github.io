@@ -1,0 +1,428 @@
+---
+/**
+ * Project case-study page. Everything in the header/sidebar comes from frontmatter —
+ * the MDX body is only the write-up, so nothing is ever stated twice.
+ */
+import { Image } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import Icon from '../components/ui/Icon.astro';
+import SpecSheet from '../components/data/SpecSheet.astro';
+import BuildLog from '../components/data/BuildLog.astro';
+import LineageStrip from '../components/data/LineageStrip.astro';
+import ProjectCard from '../components/cards/ProjectCard.astro';
+import ModelViewer from '../components/media/ModelViewer.astro';
+import Lightbox from '../components/media/Lightbox.astro';
+import {
+  CATEGORY_LABELS,
+  getLineage,
+  getRelated,
+  getProjects,
+  resolveSkills,
+  getExperienceEntry,
+  type Project,
+} from '../lib/content';
+import { range, duration } from '../lib/dates';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const { data } = project;
+const skills = await resolveSkills(data.skills);
+const lineage = await getLineage(project);
+const related = await getRelated(project);
+const context = data.context ? await getExperienceEntry(data.context.id) : undefined;
+const all = await getProjects();
+const idx = all.findIndex((p) => p.id === project.id);
+const prev = all[idx - 1];
+const next = all[idx + 1];
+
+const singleMonth = !!data.end && data.end.getTime() === data.start.getTime();
+const STATUS = { complete: 'Complete', 'in-progress': 'In progress', paused: 'Paused', concept: 'Concept' } as const;
+const linkIcon = (kind: string) => (kind === 'github' ? 'github' : 'arrow-up-right');
+---
+
+<BaseLayout title={data.title} description={data.summary} image={data.cover} type="article">
+  <article class="project">
+    {data.draft && <div class="draft-ribbon label">Draft — hidden in production</div>}
+
+    <header class="project__head container">
+      <nav class="project__crumbs label" aria-label="Breadcrumb">
+        <a href="/projects"><Icon name="arrow-left" size={12} /> All work</a>
+        <span aria-hidden="true">/</span>
+        <a href={`/projects?category=${data.category}`}>{CATEGORY_LABELS[data.category]}</a>
+      </nav>
+
+      <h1>{data.title}</h1>
+      <p class="lede">{data.summary}</p>
+
+      <dl class="project__meta">
+        <div>
+          <dt class="label">Role</dt>
+          <dd>{data.role}</dd>
+        </div>
+        <div>
+          <dt class="label">Timeline</dt>
+          <dd class="mono">
+            {range(data.start, data.end)}
+            {singleMonth ? null : <span class="muted"> · {duration(data.start, data.end)}</span>}
+          </dd>
+        </div>
+        {
+          context && (
+            <div>
+              <dt class="label">Context</dt>
+              <dd>
+                <a href={`/experience#${context.id}`}>{context.data.org}</a>
+              </dd>
+            </div>
+          )
+        }
+        <div>
+          <dt class="label">Status</dt>
+          <dd class="project__status">
+            <span class:list={['dot', data.status === 'in-progress' && 'dot--accent']} />
+            {STATUS[data.status]}
+          </dd>
+        </div>
+      </dl>
+    </header>
+
+    <div class="project__hero container">
+      {
+        data.model ? (
+          <ModelViewer id={data.model.id} />
+        ) : data.heroVideo ? (
+          <div class="project__hero-media crop-marks">
+            <video
+              src={data.heroVideo}
+              poster={data.heroVideo.replace(/\.mp4$/, '.jpg')}
+              controls
+              playsinline
+              preload="none"
+              style={`view-transition-name: cover-${project.id}`}
+            />
+          </div>
+        ) : (
+          <div class="project__hero-media crop-marks">
+            <Image
+              src={data.cover}
+              alt={data.coverAlt}
+              widths={[800, 1200, 1600, 2000]}
+              sizes="(min-width: 1300px) 1240px, 100vw"
+              loading="eager"
+              fetchpriority="high"
+              style={`view-transition-name: cover-${project.id}`}
+            />
+          </div>
+        )
+      }
+    </div>
+
+    <div class="project__body container">
+      <div class="prose">
+        <slot />
+      </div>
+
+      <aside class="project__aside" aria-label="Project details">
+        <div class="project__aside-inner">
+          <SpecSheet specs={data.specs} title="Specifications" />
+
+          <section>
+            <p class="label">Skills & tools</p>
+            <ul class="chip-list">
+              {
+                skills.map((s) => (
+                  <li>
+                    <a class="chip" href={`/projects?skill=${s.id}`}>
+                      {s.data.name}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </section>
+
+          {
+            data.team && (
+              <section>
+                <p class="label">Team</p>
+                <p class="project__aside-text">{data.team}</p>
+              </section>
+            )
+          }
+
+          {
+            data.links.length > 0 && (
+              <section>
+                <p class="label">Links</p>
+                <ul class="project__links">
+                  {data.links.map((l) => (
+                    <li>
+                      <a class="link-ext" href={l.url} target="_blank" rel="noopener">
+                        {l.label}
+                        <Icon name={linkIcon(l.kind)} size={14} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )
+          }
+        </div>
+      </aside>
+    </div>
+
+    {
+      (data.log.length > 0 || lineage.length > 1) && (
+        <div class="project__after container">
+          {lineage.length > 1 && <LineageStrip current={project} versions={lineage} />}
+          <BuildLog log={data.log} />
+        </div>
+      )
+    }
+
+    {
+      related.length > 0 && (
+        <section class="section project__related" aria-labelledby="related">
+          <div class="container">
+            <p id="related" class="label label--accent eyebrow">
+              Related work
+            </p>
+            <div class="related-grid">
+              {related.map((p, i) => (
+                <ProjectCard project={p} index={i} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <nav class="pager container" aria-label="More projects">
+      {
+        prev ? (
+          <a href={`/projects/${prev.id}`} class="pager__link">
+            <span class="label">← Newer</span>
+            <span>{prev.data.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next && (
+          <a href={`/projects/${next.id}`} class="pager__link pager__link--next">
+            <span class="label">Older →</span>
+            <span>{next.data.title}</span>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+  <Lightbox />
+</BaseLayout>
+
+<style>
+  .draft-ribbon {
+    position: fixed;
+    bottom: var(--s-4);
+    left: var(--s-4);
+    z-index: 60;
+    padding: var(--s-2) var(--s-3);
+    background: var(--warn);
+    color: #000;
+    border-radius: var(--radius);
+  }
+
+  .project__head {
+    padding-top: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+  }
+
+  .project__crumbs {
+    display: flex;
+    gap: var(--s-2);
+    align-items: center;
+  }
+
+  .project__crumbs a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    text-decoration: none;
+    color: var(--text-3);
+  }
+
+  .project__crumbs a:hover {
+    color: var(--text);
+  }
+
+  h1 {
+    margin-top: var(--s-5);
+    font-size: var(--step-6);
+    letter-spacing: -0.04em;
+    max-width: 18ch;
+  }
+
+  .lede {
+    margin-top: var(--s-5);
+  }
+
+  .project__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--s-5);
+    margin-top: var(--s-7);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .project__meta dd {
+    margin-top: var(--s-2);
+    font-size: var(--step--1);
+    color: var(--text);
+  }
+
+  .project__meta a {
+    text-decoration-color: var(--accent);
+  }
+
+  .project__status {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .project__hero {
+    margin-top: var(--s-7);
+  }
+
+  .project__hero-media {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+    aspect-ratio: 16 / 9;
+  }
+
+  .project__hero-media :global(img),
+  .project__hero-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .project__hero-media video {
+    object-fit: contain;
+    background: #000;
+  }
+
+  .project__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-8);
+    margin-top: var(--s-8);
+  }
+
+  @media (min-width: 1000px) {
+    .project__body {
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: var(--s-8);
+    }
+    .project__aside {
+      order: 2;
+    }
+    .project__aside-inner {
+      position: sticky;
+      top: calc(var(--header-h) + var(--s-5));
+    }
+  }
+
+  @media (max-width: 999px) {
+    .project__aside {
+      order: -1;
+    }
+  }
+
+  .project__aside-inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+
+  .project__aside .chip-list {
+    margin-top: var(--s-3);
+  }
+
+  .project__aside-text {
+    margin-top: var(--s-2);
+    font-size: var(--step--1);
+    color: var(--text-2);
+  }
+
+  .project__links {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--s-2);
+  }
+
+  .link-ext {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--step--1);
+    text-decoration: none;
+  }
+
+  .link-ext:hover {
+    color: var(--accent);
+  }
+
+  .project__after {
+    display: grid;
+    gap: var(--s-7);
+    margin-top: var(--s-9);
+  }
+
+  .project__related {
+    margin-top: var(--s-9);
+    border-top: 1px solid var(--line);
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: var(--s-6);
+    margin-top: var(--s-6);
+  }
+
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-5);
+    padding-block: var(--s-7);
+    border-top: 1px solid var(--line);
+    margin-top: var(--s-8);
+  }
+
+  .pager__link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    text-decoration: none;
+    font-weight: 600;
+    max-width: 45%;
+  }
+
+  .pager__link:hover span:last-child {
+    color: var(--accent);
+  }
+
+  .pager__link--next {
+    text-align: right;
+    margin-left: auto;
+  }
+</style>

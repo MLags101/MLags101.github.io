@@ -1,0 +1,76 @@
+---
+title: Typhoon Brushless Gimbal Controller
+summary: >-
+  A compact, low-cost brushless motor controller for UAV camera gimbals — two board
+  revisions from a Teensy test rig to an integrated ATmega328 design now flying on EEVi v3.
+category: personal
+start: 2026-02
+end: 2026-02
+featured: true
+order: 70
+cover: ./images/typhoonbgc.png
+coverAlt: 3D render of the Typhoon V2 gimbal controller PCB
+role: Sole designer
+skills: [altium, arduino, bldc-control, pcb-fab, soldering]
+specs:
+  - { label: Driver IC, value: ST L6234 3-phase }
+  - { label: MCU (V1), value: Teensy (external) }
+  - { label: MCU (V2), value: ATmega328 on-board }
+  - { label: PCB (V2), value: Double-sided, fab-house }
+  - { label: Control, value: Velocity + position }
+  - { label: Deployed, value: EEVi v3 gimbal }
+related: [eevi, stm-remote]
+---
+
+## Why build one
+
+I started this project to fill a gap in small-UAV prototyping: a compact, low-cost brushless controller made for camera gimbals. Existing options were either expensive and oversized (ODrive, Moteus) or plagued with software issues (STorM32).
+
+<Figure src="storm.jpg" alt="STorM32 gimbal controller board" caption="The STorM32 — the existing solution I set out to improve on." contain />
+
+## V1 — Teensy + L6234
+
+I began by researching brushless control principles and studying the open-source schematics of the STorM32, ODrive and Moteus. The first board tested the **L6234** three-phase driver with a Teensy generating the control signals. I drew the schematic from the datasheet and had the board fabricated by JLCPCB.
+
+<Gallery
+  columns={3}
+  fit="contain"
+  aspect="1/1"
+  items={[
+    { src: 'l2634-sch.png', alt: 'Schematic of the L6234 driver stage', caption: 'L6234 driver schematic.' },
+    { src: 'teensy-2d.png', alt: 'Two-dimensional PCB layout of the V1 Teensy carrier board', caption: 'V1 layout.' },
+    { src: 'teensy-driver.png', alt: '3D render of the V1 driver board', caption: 'V1 3D render.' },
+  ]}
+/>
+
+### Testing & setback
+
+Assembly was hard without a reflow oven — I hand-soldered every SMD part. Initial results were promising, but before I could go further I accidentally shorted the power supply through the microcontroller and destroyed my only Teensy. I took what had worked and moved straight to a fully integrated design.
+
+<Figure src="img-7389.jpg" alt="Assembled V1 driver board with the Teensy attached" caption="V1, assembled and on the bench." />
+
+<Callout tone="lesson">
+A $25 dev board as the only copy is a single point of failure. V2 put the microcontroller on the board itself.
+</Callout>
+
+## V2 — integrated ATmega328
+
+The current revision puts an **ATmega328** directly on a double-sided PCB alongside the L6234 to maximize compactness. The schematic was informed by ElectroNoobs' work on sensorless, slow-speed brushless control.
+
+<Gallery
+  columns={2}
+  fit="contain"
+  aspect="4/3"
+  items={[
+    { src: 'atm-driver.png', alt: '3D render of the V2 ATmega328 gimbal controller', caption: 'V2 render.' },
+    { src: 'atm-driver-2d.png', alt: 'Two-layer PCB layout of the V2 board', caption: 'V2 layout, both copper layers.' },
+  ]}
+/>
+
+I assembled and tested the boards in the Student Competition Center. After some troubleshooting they proved effective at **velocity and position control** of the gimbal's brushless motor, and they're now integrated into EEVi v3.
+
+<Figure src="img-7873.jpg" alt="Finished V2 gimbal controller board held in hand" caption="The finished V2 board — small enough to sit inside the gimbal." />
+
+<Callout tone="result">
+Solidified PCB design, AVR programming and brushless motor control — and gave the drone team a gimbal controller we can repair and modify ourselves.
+</Callout>

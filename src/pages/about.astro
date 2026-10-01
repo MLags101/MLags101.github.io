@@ -1,0 +1,171 @@
+---
+import { Image } from 'astro:assets';
+import PageLayout from '../layouts/PageLayout.astro';
+import Icon from '../components/ui/Icon.astro';
+import { site } from '../site.config';
+import portrait from '../assets/site/portrait.jpg';
+import team from '../assets/site/robojackets-team.jpg';
+import studio from '../assets/site/invention-studio.jpg';
+---
+
+<PageLayout
+  title="About"
+  eyebrow="Profile"
+  lede="Aerospace engineering student at Georgia Tech who learns fastest with hardware in hand — prototyping, testing, breaking and rebuilding, especially UAVs and mechatronics."
+  image={portrait}
+>
+  <div class="container about">
+    <div class="about__grid">
+      <figure class="about__portrait crop-marks">
+        <Image src={portrait} alt="Michael Lagana in the Utah desert at the University Rover Challenge" widths={[400, 700, 1000]} sizes="(min-width: 900px) 420px, 100vw" loading="eager" />
+        <figcaption class="label">URC · Utah</figcaption>
+      </figure>
+
+      <div class="about__text">
+        <p>
+          I'm an Aerospace Engineering undergraduate at Georgia Tech, minoring in Robotics in the BS/MS Honors Program. I
+          have a deep curiosity and a relentless drive to master skills across many fields — so whatever I want to
+          build next, I know I can make it real.
+        </p>
+        <p>
+          Most of what I know I learned by building: drones from a box of salvaged parts, gimbal controllers that
+          let the magic smoke out, and rovers sketched on lined paper before they ever touched CAD. Along the way
+          I've worked on sUAS flight test at AV's MacCready Works, debugged UAV avionics in the field at GTRI, and
+          now build research vehicles in Georgia Tech's Aerospace Robotics Laboratory.
+        </p>
+        <p>
+          In the Invention Studio and on RoboNav, I share ideas, troubleshoot designs and co-develop prototypes with
+          engineers from every background. As a leader in those spaces I mentor others — teaching prototyping
+          techniques, guiding them through iterative design, and building the kind of collaborative environment
+          that ships hardware.
+        </p>
+
+        <dl class="facts">
+          <div>
+            <dt class="label">Studying</dt>
+            <dd>{site.education.degree}<br /><span class="muted">{site.education.detail}</span></dd>
+          </div>
+          <div>
+            <dt class="label">Graduation</dt>
+            <dd>{site.education.graduation}</dd>
+          </div>
+          <div>
+            <dt class="label">Based in</dt>
+            <dd>{site.location}</dd>
+          </div>
+          {
+            site.availability && (
+              <div>
+                <dt class="label">Looking for</dt>
+                <dd>{site.availability}</dd>
+              </div>
+            )
+          }
+        </dl>
+
+        <div class="about__links">
+          <a class="btn btn--primary" href={`mailto:${site.email}`}><Icon name="mail" /> Email me</a>
+          <a class="btn" href={site.links.linkedin} target="_blank" rel="me noopener"><Icon name="linkedin" /> LinkedIn</a>
+          <a class="btn" href={site.resumePdf} download><Icon name="download" /> Resume</a>
+        </div>
+      </div>
+    </div>
+
+    <section class="about__gallery" aria-label="Where the work happens">
+      <figure class="crop-marks">
+        <Image src={team} alt="The RoboJackets RoboNav team in front of the team trailer" widths={[600, 900, 1300]} sizes="(min-width: 900px) 60vw, 100vw" />
+        <figcaption class="label">RoboNav · RoboJackets</figcaption>
+      </figure>
+      <figure class="crop-marks">
+        <Image src={studio} alt="Workbenches and machines inside the Georgia Tech Invention Studio" widths={[500, 800]} sizes="(min-width: 900px) 35vw, 100vw" />
+        <figcaption class="label">Invention Studio · Georgia Tech</figcaption>
+      </figure>
+    </section>
+  </div>
+</PageLayout>
+
+<style>
+  .about {
+    padding-block: var(--s-8) var(--section);
+  }
+
+  .about__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--s-8);
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .about__grid {
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+    }
+  }
+
+  .about__portrait :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+  }
+
+  figcaption {
+    margin-top: var(--s-2);
+  }
+
+  .about__text p {
+    font-size: var(--step-1);
+    line-height: 1.6;
+    color: var(--text-2);
+    max-width: 60ch;
+  }
+
+  .about__text p + p {
+    margin-top: var(--s-5);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-5);
+    margin-top: var(--s-7);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .facts dd {
+    margin-top: var(--s-2);
+    font-size: var(--step--1);
+  }
+
+  .about__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-7);
+  }
+
+  .about__gallery {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: var(--s-5);
+    margin-top: var(--s-9);
+  }
+
+  .about__gallery :global(img) {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+  }
+
+  @media (max-width: 700px) {
+    .about__gallery {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

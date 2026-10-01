@@ -1,0 +1,411 @@
+---
+/**
+ * System / block diagram rendered to SVG at build time — zero runtime JS except the
+ * ~20-line hover highlighter. Data: src/content/diagrams/<id>.yaml
+ *
+ *   <Diagram id="eevi-signal-chain" caption="…" />
+ *
+ * Nodes are placed on a grid with `col` / `row` (rows may be fractional, e.g. 0.5);
+ * edges route orthogonally between them. Edge `kind` sets the line style:
+ * data (solid) · rf (dashed, wireless) · video (accent) · power (heavy, muted).
+ */
+import { getEntry } from 'astro:content';
+
+interface Props {
+  id: string;
+  caption?: string;
+}
+
+const { id, caption } = Astro.props;
+const entry = await getEntry('diagrams', id);
+if (!entry) throw new Error(`<Diagram id="${id}">: no src/content/diagrams/${id}.yaml`);
+const d = entry.data;
+
+const W = 214; // node width
+const H = 74; // node height
+const GX = 96; // horizontal gap
+const GY = 44; // vertical gap
+const PAD = 36;
+const GROUP_PAD = 18;
+
+type Box = { x: number; y: number; w: number; h: number; cx: number; cy: number };
+const boxes = new Map<string, Box>();
+for (const n of d.nodes) {
+  const x = PAD + n.col * (W + GX);
+  const y = PAD + 24 + n.row * (H + GY);
+  boxes.set(n.id, { x, y, w: W, h: H, cx: x + W / 2, cy: y + H / 2 });
+}
+
+const groups = d.groups.map((g) => {
+  const members = d.nodes.filter((n) => n.group === g.id).map((n) => boxes.get(n.id)!);
+  const x0 = Math.min(...members.map((b) => b.x)) - GROUP_PAD;
+  const y0 = Math.min(...members.map((b) => b.y)) - GROUP_PAD - 14;
+  const x1 = Math.max(...members.map((b) => b.x + b.w)) + GROUP_PAD;
+  const y1 = Math.max(...members.map((b) => b.y + b.h)) + GROUP_PAD;
+  return { ...g, x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+});
+
+const width = Math.max(...[...boxes.values()].map((b) => b.x + b.w), ...groups.map((g) => g.x + g.w)) + PAD;
+const height = Math.max(...[...boxes.values()].map((b) => b.y + b.h), ...groups.map((g) => g.y + g.h)) + PAD;
+
+/** Orthogonal route: horizontal out of the facing side, vertical jog at the midpoint, horizontal in. */
+const edges = d.edges.map((e, i) => {
+  const a = boxes.get(e.from)!;
+  const b = boxes.get(e.to)!;
+  let pts: [number, number][];
+  if (Math.abs(a.cx - b.cx) < 1) {
+    const down = b.cy > a.cy;
+    pts = [
+      [a.cx, down ? a.y + a.h : a.y],
+      [b.cx, down ? b.y : b.y + b.h],
+    ];
+  } else {
+    const right = b.cx > a.cx;
+    const x1 = right ? a.x + a.w : a.x;
+    const x2 = right ? b.x : b.x + b.w;
+    const mx = (x1 + x2) / 2;
+    pts = Math.abs(a.cy - b.cy) < 1 ? [[x1, a.cy], [x2, b.cy]] : [[x1, a.cy], [mx, a.cy], [mx, b.cy], [x2, b.cy]];
+  }
+  // Label on the longest horizontal run.
+  let best = 0;
+  let lx = (pts[0]![0] + pts.at(-1)![0]) / 2;
+  let ly = (pts[0]![1] + pts.at(-1)![1]) / 2;
+  for (let k = 0; k < pts.length - 1; k++) {
+    const [p, q] = [pts[k]!, pts[k + 1]!];
+    const len = Math.hypot(q[0] - p[0], q[1] - p[1]);
+    if (len > best) {
+      best = len;
+      lx = (p[0] + q[0]) / 2;
+      ly = (p[1] + q[1]) / 2;
+    }
+  }
+  const path = 'M' + pts.map((p) => p.join(' ')).join(' L');
+  const labelW = e.label ? e.label.length * 8.6 + 18 : 0;
+  return { ...e, i, path, lx, ly, labelW };
+});
+
+const nodeLabel = (nid: string) => d.nodes.find((n) => n.id === nid)?.label ?? nid;
+const uid = `dg-${id}`;
+---
+
+<figure class="diagram wide" data-diagram>
+  <div class="diagram__scroll crop-marks">
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      style={`--min-w:${Math.round(width * 0.8)}px`}
+      role="img"
+      aria-labelledby={`${uid}-t ${uid}-d`}
+      font-family="var(--font-mono)"
+    >
+      <title id={`${uid}-t`}>{d.title}</title>
+      <desc id={`${uid}-d`}>{d.description}</desc>
+      <defs>
+        <marker id={`${uid}-arrow`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path>
+        </marker>
+        <pattern id={`${uid}-grid`} width="24" height="24" patternUnits="userSpaceOnUse">
+          <path d="M24 0H0V24" fill="none" stroke="var(--grid-line)"></path>
+        </pattern>
+      </defs>
+
+      <rect width={width} height={height} fill={`url(#${uid}-grid)`}></rect>
+
+      {
+        groups.map((g) => (
+          <g class="dg-group">
+            <rect x={g.x} y={g.y} width={g.w} height={g.h} rx="4" />
+            <text x={g.x + 14} y={g.y + 22}>
+              {g.label.toUpperCase()}
+            </text>
+          </g>
+        ))
+      }
+
+      {
+        edges.map((e) => (
+          <g class={`dg-edge dg-edge--${e.kind}`} data-from={e.from} data-to={e.to}>
+            <path d={e.path} marker-end={`url(#${uid}-arrow)`} />
+            {e.label && (
+              <g class="dg-edge__label">
+                <rect x={e.lx - e.labelW / 2} y={e.ly - 13} width={e.labelW} height="26" rx="2" />
+                <text x={e.lx} y={e.ly + 5} text-anchor="middle">
+                  {e.kind === 'rf' ? '⌁ ' : ''}
+                  {e.label}
+                </text>
+              </g>
+            )}
+          </g>
+        ))
+      }
+
+      {
+        d.nodes.map((n) => {
+          const b = boxes.get(n.id)!;
+          return (
+            <g class="dg-node" tabindex="0" data-node={n.id} aria-label={`${n.label}${n.sub ? `, ${n.sub}` : ''}`}>
+              <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="3" />
+              <text class="dg-node__label" x={b.x + 16} y={b.y + (n.sub ? 32 : 43)}>
+                {n.label}
+              </text>
+              {n.sub && (
+                <text class="dg-node__sub" x={b.x + 16} y={b.y + 55}>
+                  {n.sub}
+                </text>
+              )}
+            </g>
+          );
+        })
+      }
+    </svg>
+  </div>
+
+  <div class="diagram__foot">
+    <ul class="diagram__legend" aria-label="Legend">
+      <li><span class="sw sw--data"></span>Data / control</li>
+      <li><span class="sw sw--rf"></span>RF link</li>
+      <li><span class="sw sw--video"></span>Video</li>
+      <li><span class="sw sw--power"></span>Power</li>
+    </ul>
+    <details class="diagram__list">
+      <summary class="label">View connections as list</summary>
+      <ul>
+        {
+          d.edges.map((e) => (
+            <li>
+              {nodeLabel(e.from)} → {nodeLabel(e.to)}
+              {e.label && <span class="muted"> ({e.label})</span>}
+            </li>
+          ))
+        }
+      </ul>
+    </details>
+  </div>
+
+  {
+    caption && (
+      <figcaption>
+        <span class="label diagram__num" />
+        <span>{caption}</span>
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .diagram {
+    counter-increment: fig;
+  }
+
+  .diagram__scroll {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-elev);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  svg {
+    width: 100%;
+    min-width: min(var(--min-w), 900px);
+    height: auto;
+  }
+
+  .dg-group rect {
+    fill: none;
+    stroke: var(--line-strong);
+    stroke-dasharray: 2 4;
+  }
+
+  .dg-group text {
+    fill: var(--text-3);
+    font-size: 12.5px;
+    letter-spacing: 0.1em;
+  }
+
+  .dg-node {
+    cursor: default;
+    outline: none;
+  }
+
+  .dg-node rect {
+    fill: var(--surface);
+    stroke: var(--line-strong);
+    transition:
+      stroke var(--dur-2) var(--ease),
+      fill var(--dur-2) var(--ease);
+  }
+
+  .dg-node__label {
+    fill: var(--text);
+    font-size: 17px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+  }
+
+  .dg-node__sub {
+    fill: var(--text-3);
+    font-size: 13px;
+  }
+
+  .dg-node:hover rect,
+  .dg-node:focus-visible rect,
+  .dg-node.is-on rect {
+    stroke: var(--accent);
+    fill: var(--surface-2);
+  }
+
+  .dg-edge path {
+    fill: none;
+    stroke: var(--text-3);
+    stroke-width: 1.4;
+    transition:
+      opacity var(--dur-2) var(--ease),
+      stroke var(--dur-2) var(--ease);
+  }
+
+  .dg-edge--rf path {
+    stroke-dasharray: 5 4;
+    stroke: var(--text-2);
+  }
+
+  .dg-edge--video path {
+    stroke: var(--accent);
+  }
+
+  .dg-edge--power path {
+    stroke-width: 2.6;
+    stroke: var(--line-strong);
+  }
+
+  .dg-edge__label rect {
+    fill: var(--bg-elev);
+    stroke: var(--line);
+  }
+
+  .dg-edge__label text {
+    fill: var(--text-2);
+    font-size: 13.5px;
+  }
+
+  /* Hover/focus a node → its links light up, everything else recedes. */
+  [data-diagram].is-focus .dg-edge {
+    opacity: 0.18;
+  }
+
+  [data-diagram].is-focus .dg-edge.is-on {
+    opacity: 1;
+  }
+
+  [data-diagram].is-focus .dg-edge.is-on path {
+    stroke: var(--accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    [data-diagram].is-focus .dg-edge.is-on path {
+      stroke-dasharray: 6 4;
+      animation: flow 0.9s linear infinite;
+    }
+  }
+
+  @keyframes flow {
+    to {
+      stroke-dashoffset: -20;
+    }
+  }
+
+  .diagram__foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: var(--s-4);
+    flex-wrap: wrap;
+    margin-top: var(--s-3);
+  }
+
+  .diagram__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+    list-style: none;
+    padding: 0;
+    font: var(--step--2) var(--font-mono);
+    color: var(--text-3);
+  }
+
+  .diagram__legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .sw {
+    width: 22px;
+    height: 0;
+    border-top: 1.5px solid var(--text-3);
+  }
+
+  .sw--rf {
+    border-top-style: dashed;
+    border-color: var(--text-2);
+  }
+
+  .sw--video {
+    border-color: var(--accent);
+  }
+
+  .sw--power {
+    border-top-width: 3px;
+    border-color: var(--line-strong);
+  }
+
+  .diagram__list summary {
+    cursor: pointer;
+  }
+
+  .diagram__list ul {
+    margin-top: var(--s-2);
+    padding-left: 1.1em;
+    font-size: var(--step--1);
+    color: var(--text-2);
+  }
+
+  figcaption {
+    display: flex;
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+    font-size: var(--step--1);
+    color: var(--text-3);
+  }
+
+  .diagram__num::before {
+    content: 'FIG.\00a0' counter(fig, decimal-leading-zero);
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-diagram]')) {
+    const edges = [...root.querySelectorAll<SVGGElement>('.dg-edge')];
+    const nodes = [...root.querySelectorAll<SVGGElement>('.dg-node')];
+    const on = (id: string) => {
+      root.classList.add('is-focus');
+      for (const e of edges) e.classList.toggle('is-on', e.dataset.from === id || e.dataset.to === id);
+      for (const n of nodes) {
+        const linked = edges.some(
+          (e) => e.classList.contains('is-on') && (e.dataset.from === n.dataset.node || e.dataset.to === n.dataset.node),
+        );
+        n.classList.toggle('is-on', linked);
+      }
+    };
+    const off = () => {
+      root.classList.remove('is-focus');
+      [...edges, ...nodes].forEach((el) => el.classList.remove('is-on'));
+    };
+    for (const n of nodes) {
+      n.addEventListener('mouseenter', () => on(n.dataset.node!));
+      n.addEventListener('focus', () => on(n.dataset.node!));
+      n.addEventListener('mouseleave', off);
+      n.addEventListener('blur', off);
+    }
+  }
+</script>

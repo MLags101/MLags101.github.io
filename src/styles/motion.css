@@ -1,0 +1,50 @@
+/*
+ * Motion rules — restrained on purpose.
+ * Allowed: ≤3px hover lifts, a one-time reveal, page view transitions, 3D camera moves.
+ * Not used: parallax, cursor effects, scroll-jacking, typewriter text.
+ * Everything collapses to instant under prefers-reduced-motion (durations are 0 in tokens.css).
+ */
+
+/* Cross-document view transitions (Chrome/Edge 126+, Safari 18.2+). Others navigate normally. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: var(--ease);
+}
+
+::view-transition-group(*) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+/* One-time reveal on scroll. JS adds .is-in; without JS everything is visible. */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity var(--dur-4) var(--ease),
+    transform var(--dur-4) var(--ease);
+  transition-delay: calc(var(--reveal-i, 0) * 70ms);
+}
+
+.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,0 +1,31 @@
+---
+import { render } from 'astro:content';
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import { getProjects } from '../../lib/content';
+import Figure from '../../components/media/Figure.astro';
+import Gallery from '../../components/media/Gallery.astro';
+import Video from '../../components/media/Video.astro';
+import CompareSlider from '../../components/media/CompareSlider.astro';
+import ImageHotspots from '../../components/media/ImageHotspots.astro';
+import ModelViewer from '../../components/media/ModelViewer.astro';
+import Diagram from '../../components/data/Diagram.astro';
+import SpecSheet from '../../components/data/SpecSheet.astro';
+import Callout from '../../components/ui/Callout.astro';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props;
+// Lets MDX components resolve `src="photo.jpg"` against this project's images/ folder.
+Astro.locals.projectSlug = project.id;
+const { Content } = await render(project);
+
+/** Every component available inside project MDX without an import. See docs/CONTENT.md. */
+const components = { Figure, Gallery, Video, CompareSlider, ImageHotspots, ModelViewer, Diagram, SpecSheet, Callout };
+---
+
+<ProjectLayout project={project}>
+  <Content components={components} />
+</ProjectLayout>

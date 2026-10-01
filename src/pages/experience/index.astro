@@ -1,0 +1,513 @@
+---
+import { render } from 'astro:content';
+import { Image } from 'astro:assets';
+import PageLayout from '../../layouts/PageLayout.astro';
+import Gantt from '../../components/data/Gantt.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { site } from '../../site.config';
+import { getExperience, getProjects, getProjectsFor, resolveSkills, EXPERIENCE_LABELS } from '../../lib/content';
+import { range, duration, mono } from '../../lib/dates';
+
+const experience = await getExperience();
+const projects = await getProjects();
+const entries = await Promise.all(
+  experience.map(async (e) => ({
+    entry: e,
+    skills: await resolveSkills(e.data.skills),
+    projects: await getProjectsFor(e.id),
+    Content: (await render(e)).Content,
+  })),
+);
+// Internships and co-ops share one 'Industry' filter.
+const filterType = (t: string) => (t === 'co-op' ? 'internship' : t);
+const types = [...new Set(experience.map((e) => filterType(e.data.type)))];
+const FILTER_LABELS: Record<string, string> = { ...EXPERIENCE_LABELS, internship: 'Industry' };
+const ticks = projects.map((p) => ({ date: p.data.end ?? p.data.start, label: p.data.title }));
+---
+
+<PageLayout
+  title="Experience"
+  eyebrow="Timeline / roles & teams"
+  lede="Industry internships, research and the student teams where I learned to lead. Select a bar to jump to that role; diamonds mark when projects shipped."
+>
+  <div class="container exp">
+    <Gantt entries={experience} ticks={ticks} />
+
+    <div class="exp__filters" role="group" aria-label="Filter by type" data-exp-filters>
+      <button type="button" class="fchip" data-type="" aria-pressed="true">All</button>
+      {
+        types.map((t) => (
+          <button type="button" class="fchip" data-type={t} aria-pressed="false">
+            {FILTER_LABELS[t]}
+          </button>
+        ))
+      }
+    </div>
+
+    <ol class="tl">
+      {
+        entries.map(({ entry: e, skills, projects: related, Content }) => (
+          <li class="tl__item" id={e.id} data-type={filterType(e.data.type)} data-reveal>
+            <div class="tl__when">
+              <p class="mono tl__dates">{range(e.data.start, e.data.end)}</p>
+              <p class="label">{duration(e.data.start, e.data.end)}</p>
+              <p class="label tl__loc">
+                <Icon name="pin" size={11} /> {e.data.location}
+              </p>
+            </div>
+
+            <div class="tl__rail" aria-hidden="true">
+              <span class:list={['tl__node', !e.data.end && 'is-now']} />
+            </div>
+
+            <article class="tl__card">
+              <header class="tl__head">
+                {e.data.logo ? (
+                  <Image src={e.data.logo} alt="" class="tl__logo" widths={[96]} sizes="48px" />
+                ) : (
+                  <span class="tl__mark mono" aria-hidden="true">
+                    {e.data.mark}
+                  </span>
+                )}
+                <div>
+                  <p class="label">{EXPERIENCE_LABELS[e.data.type]}</p>
+                  <h2>
+                    {e.data.orgUrl ? (
+                      <a href={e.data.orgUrl} target="_blank" rel="noopener">
+                        {e.data.org}
+                      </a>
+                    ) : (
+                      e.data.org
+                    )}
+                  </h2>
+                </div>
+              </header>
+
+              <ol class:list={['tl__positions', e.data.positions.length > 1 && 'is-ladder']}>
+                {e.data.positions.map((p, i) => (
+                  <li class:list={{ 'is-current': i === 0 }}>
+                    <span class="tl__pos-title">{p.title}</span>
+                    {p.start && <span class="label">{range(p.start, p.end)}</span>}
+                  </li>
+                ))}
+              </ol>
+
+              <p class="tl__summary">{e.data.summary}</p>
+
+              {e.data.highlights.length > 0 && (
+                <ul class="tl__highlights">
+                  {e.data.highlights.map((h) => (
+                    <li>{h}</li>
+                  ))}
+                </ul>
+              )}
+
+              <div class="prose tl__body">
+                <Content />
+              </div>
+
+              {skills.length > 0 && (
+                <ul class="chip-list tl__skills" aria-label="Skills used">
+                  {skills.map((s) => (
+                    <li class="chip">{s.data.name}</li>
+                  ))}
+                </ul>
+              )}
+
+              {related.length > 0 && (
+                <div class="tl__projects">
+                  <p class="label">Projects from here</p>
+                  <ul>
+                    {related.map((p) => (
+                      <li>
+                        <a href={`/projects/${p.id}`}>
+                          <Image src={p.data.cover} alt="" widths={[120, 240]} sizes="80px" />
+                          <span>
+                            <span class="tl__proj-title">{p.data.title}</span>
+                            <span class="label">{mono(p.data.end ?? p.data.start)}</span>
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </article>
+          </li>
+        ))
+      }
+
+      <li class="tl__item tl__item--edu" data-type="education">
+        <div class="tl__when">
+          <p class="mono tl__dates">{site.education.graduation}</p>
+          <p class="label tl__loc"><Icon name="pin" size={11} /> {site.education.location}</p>
+        </div>
+        <div class="tl__rail" aria-hidden="true"><span class="tl__node" /></div>
+        <article class="tl__card">
+          <header class="tl__head">
+            <span class="tl__mark mono" aria-hidden="true">GT</span>
+            <div>
+              <p class="label">Education</p>
+              <h2>{site.education.school}</h2>
+            </div>
+          </header>
+          <ol class="tl__positions">
+            <li class="is-current"><span class="tl__pos-title">{site.education.degree}</span></li>
+          </ol>
+          <p class="tl__summary">{site.education.detail} · GPA {site.education.gpa}</p>
+          <ul class="chip-list tl__skills" aria-label="Related coursework">
+            {site.education.coursework.map((c) => <li class="chip">{c}</li>)}
+          </ul>
+        </article>
+      </li>
+    </ol>
+  </div>
+</PageLayout>
+
+<style>
+  .exp {
+    padding-top: var(--s-7);
+    padding-bottom: var(--section);
+  }
+
+  .exp__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-top: var(--s-8);
+  }
+
+  .fchip {
+    height: 2.1rem;
+    padding-inline: var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-size: var(--step--1);
+    color: var(--text-2);
+  }
+
+  .fchip:hover {
+    color: var(--text);
+    border-color: var(--line-strong);
+  }
+
+  .fchip[aria-pressed='true'] {
+    color: var(--accent-ink);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .tl {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--s-6);
+  }
+
+  .tl__item {
+    display: grid;
+    grid-template-columns: 11rem 2.5rem minmax(0, 1fr);
+    scroll-margin-top: calc(var(--header-h) + var(--s-6));
+  }
+
+  .tl__item[hidden] {
+    display: none;
+  }
+
+  .tl__when {
+    padding-top: var(--s-6);
+    text-align: right;
+  }
+
+  .tl__dates {
+    font-size: var(--step--1);
+    color: var(--text);
+  }
+
+  .tl__when .label {
+    margin-top: var(--s-1);
+  }
+
+  .tl__loc {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+  }
+
+  .tl__rail {
+    position: relative;
+  }
+
+  .tl__rail::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--line-strong);
+  }
+
+  .tl__item:first-child .tl__rail::before {
+    top: var(--s-7);
+  }
+
+  .tl__item:last-child .tl__rail::before {
+    bottom: calc(100% - var(--s-7));
+  }
+
+  .tl__node {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--s-6) + 0.3rem);
+    width: 11px;
+    height: 11px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid var(--text-3);
+  }
+
+  .tl__node.is-now {
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: 0 0 0 5px var(--accent-soft);
+  }
+
+  .tl__card {
+    margin-block: var(--s-4);
+    padding: var(--s-6);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elev);
+    transition: border-color var(--dur-2) var(--ease);
+  }
+
+  .tl__item:target .tl__card {
+    border-color: var(--accent);
+  }
+
+  .tl__head {
+    display: flex;
+    gap: var(--s-4);
+    align-items: center;
+  }
+
+  .tl__mark,
+  .tl__head :global(.tl__logo) {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    flex: none;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    object-fit: contain;
+    background: var(--surface);
+  }
+
+  .tl__head h2 {
+    margin-top: 2px;
+    font-size: var(--step-2);
+  }
+
+  .tl__head h2 a {
+    text-decoration: none;
+  }
+
+  .tl__head h2 a:hover {
+    color: var(--accent);
+  }
+
+  .tl__positions {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--s-5);
+  }
+
+  .tl__positions li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+
+  .tl__pos-title {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* Promotion ladder: older titles step down a rail, newest on top. */
+  .tl__positions.is-ladder li {
+    position: relative;
+    padding-left: var(--s-5);
+    padding-block: 0.3rem;
+  }
+
+  .tl__positions.is-ladder li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 0.85rem;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: 1.5px solid var(--text-3);
+    background: var(--bg-elev);
+    z-index: 1;
+  }
+
+  .tl__positions.is-ladder li::after {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0.85rem;
+    bottom: -0.85rem;
+    width: 1px;
+    background: var(--line-strong);
+  }
+
+  .tl__positions.is-ladder li:last-child::after {
+    display: none;
+  }
+
+  .tl__positions.is-ladder li.is-current::before {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .tl__positions.is-ladder li:not(.is-current) .tl__pos-title {
+    font-weight: 500;
+    color: var(--text-2);
+  }
+
+  .tl__summary {
+    margin-top: var(--s-4);
+    color: var(--text-2);
+    max-width: 70ch;
+  }
+
+  .tl__highlights {
+    margin-top: var(--s-4);
+    padding-left: 1.1em;
+    color: var(--text);
+    font-size: var(--step--1);
+    max-width: 75ch;
+  }
+
+  .tl__highlights li + li {
+    margin-top: var(--s-2);
+  }
+
+  .tl__highlights li::marker {
+    color: var(--accent);
+  }
+
+  .tl__body:empty {
+    display: none;
+  }
+
+  .tl__body:not(:empty) {
+    margin-top: var(--s-4);
+  }
+
+  .tl__skills {
+    margin-top: var(--s-5);
+  }
+
+  .tl__projects {
+    margin-top: var(--s-5);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--line);
+  }
+
+  .tl__projects ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--s-3);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--s-3);
+  }
+
+  .tl__projects a {
+    display: flex;
+    gap: var(--s-3);
+    align-items: center;
+    padding: var(--s-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: border-color var(--dur-2) var(--ease);
+  }
+
+  .tl__projects a:hover {
+    border-color: var(--accent);
+  }
+
+  .tl__projects :global(img) {
+    width: 64px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex: none;
+  }
+
+  .tl__projects a > span {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .tl__proj-title {
+    font-size: var(--step--1);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 760px) {
+    .tl__item {
+      grid-template-columns: 1.5rem minmax(0, 1fr);
+    }
+    .tl__when {
+      grid-column: 2;
+      grid-row: 1;
+      text-align: left;
+      padding-top: var(--s-5);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 var(--s-3);
+      align-items: baseline;
+    }
+    .tl__rail {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+    }
+    .tl__card {
+      grid-column: 2;
+      margin-top: var(--s-2);
+      padding: var(--s-5);
+    }
+    .tl__node {
+      top: calc(var(--s-5) + 0.3rem);
+    }
+  }
+</style>
+
+<script>
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('[data-exp-filters] [data-type]')];
+  const items = [...document.querySelectorAll<HTMLElement>('.tl__item')];
+  chips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      const t = chip.dataset.type;
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      items.forEach((it) => {
+        it.hidden = !!t && it.dataset.type !== t;
+        if (!it.hidden) it.classList.add('is-in');
+      });
+    }),
+  );
+</script>

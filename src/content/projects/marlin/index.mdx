@@ -1,0 +1,69 @@
+---
+title: Marlin & Nemo
+summary: >-
+  AE 3030 final project: an RC plane on a custom-milled flight PCB, and a glider with
+  swappable wings to demonstrate how airfoil choice changes flight.
+category: coursework
+start: 2024-12
+end: 2024-12
+order: 30
+cover: ./images/img-6210.jpg
+coverAlt: The project's two printed aircraft resting together on a recycling bin lid
+role: Designer · AE 3030 Aerodynamics
+skills: [kicad, arduino, solidworks, 3d-printing, pcb-fab, aero-design]
+specs:
+  - { label: Course, value: AE 3030 Aerodynamics }
+  - { label: Marlin MCU, value: Arduino Nano }
+  - { label: Radio, value: HC-12 · 433 MHz }
+  - { label: PCB, value: KiCad · milled in-house (FlatCAM) }
+  - { label: Nemo airfoils, value: NACA 2412 · flat-bottom · inverted }
+  - { label: Airframes, value: SolidWorks · printed PLA }
+---
+
+## Overview
+
+For the final project in AE 3030 (Aerodynamics) at Georgia Tech, I designed and built two aircraft to demonstrate the effects of different airfoils: **Marlin**, a fully functional RC plane, and **Nemo**, an unpowered glider with interchangeable wings. Marlin flew on a custom milled PCB carrying an Arduino Nano and an HC-12 radio.
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  items={[
+    { src: 'img-6189.jpg', alt: 'SolidWorks model of the Marlin airframe', caption: 'Marlin in SolidWorks.' },
+    { src: 'img-6194.jpg', alt: 'Alternate view of the Marlin CAD model', caption: 'Fuselage and tail layout.' },
+  ]}
+/>
+
+## Marlin — the RC plane
+
+I designed a custom PCB in KiCad to integrate the Arduino Nano and HC-12 radio (433 MHz) for flight control, and milled it on the Invention Studio's PCB mill — using my FlatCAM experience to generate the G-code. I adapted the ground-control code from QuadFrog to run on the Nano. The airframe was designed in SolidWorks and printed in PLA.
+
+<Gallery
+  columns={2}
+  fit="contain"
+  aspect="4/3"
+  items={[
+    { src: 'plane-pcb.png', alt: 'KiCad layout of the Marlin flight PCB with Arduino Nano footprint and servo headers', caption: 'Flight PCB layout — Nano, radio and servo channels.' },
+    { src: 'img-6199.jpg', alt: 'Milled flight PCB wired to the Arduino Nano, radio and servos on a workbench', caption: 'Milled board under test.' },
+  ]}
+/>
+
+## Nemo — the glider
+
+Nemo is a smaller, unpowered glider whose wings swap between three airfoils — **NACA 2412**, **flat-bottom** and **inverted** — via a slot-and-tab joint, so they could be changed quickly mid-demo. In testing it showed the effects clearly, like the roll induced by an upside-down wing.
+
+<Gallery
+  columns={3}
+  aspect="3/4"
+  items={[
+    { src: 'img-6200.jpg', alt: 'Purple printed fuselage open with electronics installed, next to green tail parts' },
+    { src: 'img-6202.jpg', alt: 'Holding the purple fuselage with green tail surfaces attached' },
+    { src: 'img-6208.jpg', alt: 'Orange-winged airframe with a green tail on a workbench' },
+  ]}
+  caption="Printed airframes coming together."
+/>
+
+## Results
+
+Both aircraft met the project goals and earned strong feedback for function and creativity. My particular contribution was Marlin's custom PCB — a reusable flight board whose control code adapts to other airframes.
+
+<Figure src="img-6211.jpg" alt="Both aircraft together after the final presentation" caption="Marlin and Nemo at the final presentation." />

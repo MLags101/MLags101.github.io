@@ -1,0 +1,93 @@
+---
+/** Dated milestones from a project's `log` frontmatter, rendered as a compact vertical timeline. */
+import { mono } from '../../lib/dates';
+
+interface Props {
+  log: { date: Date; title: string; note?: string }[];
+}
+const { log } = Astro.props;
+const sorted = [...log].sort((a, b) => a.date.getTime() - b.date.getTime());
+---
+
+{
+  sorted.length > 0 && (
+    <section class="log" aria-labelledby="build-log">
+      <h2 id="build-log" class="label">
+        Build log
+      </h2>
+      <ol>
+        {sorted.map((e, i) => (
+          <li data-reveal style={`--reveal-i:${i}`}>
+            <time class="label" datetime={e.date.toISOString().slice(0, 7)}>
+              {mono(e.date)}
+            </time>
+            <div>
+              <p class="log__title">{e.title}</p>
+              {e.note && <p class="log__note">{e.note}</p>}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
+
+<style>
+  ol {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--s-4);
+    position: relative;
+  }
+
+  ol::before {
+    content: '';
+    position: absolute;
+    left: 4.6rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 1px;
+    background: var(--line-strong);
+  }
+
+  li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4.6rem minmax(0, 1fr);
+    gap: var(--s-5);
+    padding-block: var(--s-3);
+  }
+
+  li::before {
+    content: '';
+    position: absolute;
+    left: calc(4.6rem - 3.5px);
+    top: calc(var(--s-3) + 0.45rem);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid var(--accent);
+  }
+
+  li:last-child::before {
+    background: var(--accent);
+  }
+
+  time {
+    padding-top: 0.2rem;
+  }
+
+  .log__title {
+    font-weight: 600;
+    font-size: var(--step--1);
+    color: var(--text);
+  }
+
+  .log__note {
+    margin-top: var(--s-1);
+    font-size: var(--step--1);
+    color: var(--text-2);
+    line-height: 1.55;
+  }
+</style>

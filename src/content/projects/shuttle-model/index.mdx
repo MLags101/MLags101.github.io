@@ -1,0 +1,49 @@
+---
+title: Space Shuttle Model
+summary: >-
+  ME 1670: an interlocking Space Shuttle stack — orbiter, external tank and boosters —
+  modeled in SolidWorks from NASA drawings and printed on an SLS machine.
+category: coursework
+start: 2023-04
+end: 2023-04
+order: 5
+cover: ./images/img-5869.jpg
+coverAlt: Small white SLS-printed Space Shuttle stack standing on a desk
+role: Designer · ME 1670
+skills: [solidworks, tolerancing, 3d-printing]
+specs:
+  - { label: Course, value: ME 1670 }
+  - { label: Parts, value: Orbiter · external tank · 2× SRB }
+  - { label: Process, value: Stratasys SLS }
+  - { label: Reference, value: NASA three-view drawings }
+---
+
+## Overview
+
+For the SolidWorks unit of ME 1670, I modeled the Space Shuttle as interlocking components — the Solid Rocket Boosters, External Tank and orbiter — and printed them on a Stratasys SLS printer with tolerances designed for the process.
+
+<Figure src="3-6-m.jpg" alt="NASA three-view technical drawing of the Space Shuttle orbiter with dimensions" caption="NASA three-view drawing used as the dimensional reference." contain />
+
+## Design process
+
+I worked from NASA's technical drawings to keep proportions accurate, turning them into SolidWorks sketches for each part. Then I picked the best places to add custom interlocks so the SRBs, tank and orbiter would connect cleanly.
+
+<Figure src="img-5819.jpg" alt="SolidWorks model of the full Shuttle stack" caption="The assembled stack in SolidWorks." />
+
+## Tolerancing & fabrication
+
+The key challenge was designing for SLS. I respected minimum feature thicknesses and adjusted dimensions to keep thin features strong. Some features — like the SRB attachment points — took a few rounds of refinement because they started out too tight.
+
+## Results
+
+The printed model worked: all three components interlocked once the unsintered powder was cleared from the interlock voids. The SLS printer's detail made the hand-sized model turn out beautifully.
+
+<Gallery
+  columns={2}
+  aspect="3/4"
+  items={[
+    { src: 'img-5867.jpg', alt: 'Holding the printed Shuttle stack between two fingers' },
+    { src: 'img-5868.jpg', alt: 'The printed orbiter held up to show its underside' },
+  ]}
+  caption="The finished SLS print, hand-sized."
+/>

@@ -1,0 +1,181 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import ProjectCard from '../components/cards/ProjectCard.astro';
+import { getExperience, getProjects, getResearch, resolveSkills } from '../lib/content';
+import { range, mono } from '../lib/dates';
+
+const labs = (await getExperience()).filter((e) => e.data.type === 'research');
+const research = await getResearch();
+const projects = (await getProjects()).filter((p) => p.data.category === 'research');
+const labSkills = await Promise.all(labs.map((l) => resolveSkills(l.data.skills)));
+
+const KIND = { paper: 'Paper', poster: 'Poster', talk: 'Talk', thesis: 'Thesis', report: 'Report', ongoing: 'Ongoing' } as const;
+---
+
+<PageLayout
+  title="Research"
+  eyebrow="Lab work / ongoing"
+  lede="Building the vehicles autonomy research depends on — motion-capture-tracked aerial testbeds today, an underwater manipulation platform next."
+>
+  <div class="container research">
+    {
+      labs.map((lab, i) => (
+        <section class="lab" aria-labelledby={`lab-${lab.id}`}>
+          <div class="lab__meta">
+            <p class="label label--accent">{range(lab.data.start, lab.data.end)}</p>
+            <h2 id={`lab-${lab.id}`}>{lab.data.org}</h2>
+            <p class="lab__role">{lab.data.positions[0]!.title}</p>
+            <p class="label">{lab.data.location}</p>
+          </div>
+          <div class="lab__body">
+            <p class="lede">{lab.data.summary}</p>
+            <ul class="chip-list">
+              {labSkills[i]!.map((s) => (
+                <li class="chip">{s.data.name}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ))
+    }
+
+    <section class="threads" aria-labelledby="threads">
+      <p id="threads" class="label label--accent eyebrow">Research threads</p>
+      <ol>
+        {
+          research.map((r, i) => (
+            <li data-reveal style={`--reveal-i:${i}`}>
+              <span class="threads__num mono">{String(i + 1).padStart(2, '0')}</span>
+              <div>
+                <p class="label">
+                  {KIND[r.data.kind]} · since {mono(r.data.date)} {r.data.venue && <>· {r.data.venue}</>}
+                </p>
+                <h3>{r.data.title}</h3>
+                <p class="muted">{r.data.summary}</p>
+                {r.data.links.length > 0 && (
+                  <p class="threads__links">
+                    {r.data.links.map((l) => (
+                      <a class="link-arrow" href={l.url}>
+                        {l.label}
+                      </a>
+                    ))}
+                  </p>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="note label">Publications and posters will appear here as they're released.</p>
+    </section>
+
+    {
+      projects.length > 0 && (
+        <section class="threads" aria-labelledby="rp">
+          <p id="rp" class="label label--accent eyebrow">
+            Research projects
+          </p>
+          <div class="grid">
+            {projects.map((p, i) => (
+              <ProjectCard project={p} index={i} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </div>
+</PageLayout>
+
+<style>
+  .research {
+    padding-block: var(--s-8) var(--section);
+  }
+
+  .lab {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    gap: var(--s-7);
+    padding: var(--s-7);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elev);
+  }
+
+  .lab h2 {
+    margin-top: var(--s-3);
+    font-size: var(--step-3);
+  }
+
+  .lab__role {
+    margin-top: var(--s-3);
+    font-weight: 600;
+  }
+
+  .lab__meta .label:last-child {
+    margin-top: var(--s-2);
+  }
+
+  .lab__body .chip-list {
+    margin-top: var(--s-5);
+  }
+
+  @media (max-width: 860px) {
+    .lab {
+      grid-template-columns: 1fr;
+      padding: var(--s-5);
+      gap: var(--s-5);
+    }
+  }
+
+  .threads {
+    margin-top: var(--s-9);
+  }
+
+  .threads ol {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .threads li {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    gap: var(--s-4);
+    padding-block: var(--s-6);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .threads__num {
+    font-size: var(--step-2);
+    color: var(--accent);
+    line-height: 1.2;
+  }
+
+  .threads h3 {
+    margin-top: var(--s-2);
+    font-size: var(--step-2);
+  }
+
+  .threads .muted {
+    margin-top: var(--s-3);
+    max-width: 70ch;
+  }
+
+  .threads__links {
+    margin-top: var(--s-3);
+    display: flex;
+    gap: var(--s-4);
+  }
+
+  .note {
+    margin-top: var(--s-4);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: var(--s-6);
+    margin-top: var(--s-5);
+  }
+</style>

@@ -1,0 +1,58 @@
+---
+# Everything above the line is metadata — the page header, sidebar, cards, filters and
+# resume all read from here. Field reference: docs/CONTENT.md
+title: {{title}}
+summary: >-
+  TODO one or two sentences: what it is, why it's interesting. Shown on cards (≤220 chars).
+category: {{category}}            # research | professional | team | personal | coursework
+start: {{start}}                  # YYYY-MM
+{{end}}
+status: {{status}}                # complete | in-progress | paused | concept
+featured: {{featured}}            # true = on the home page
+order: 0                          # higher sorts first among featured / ties
+draft: true                       # visible in `npm run dev` only — set false to publish
+cover: ./images/cover.jpg         # replace this placeholder with a real photo/render
+coverAlt: TODO describe the cover image for screen readers
+role: {{role}}
+{{context}}
+skills: [{{skills}}]              # ids from src/content/skills.yaml
+specs:
+  - { label: TODO, value: TODO }
+{{lineage}}
+# related: [other-project-slug]
+# links:
+#   - { label: Code on GitHub, url: 'https://github.com/…', kind: github }
+# log:
+#   - { date: 2026-01, title: First flight, note: Optional detail. }
+# model: my-model-id             # 3D hero (see docs/3D-MODELS.md)
+# heroVideo: /media/{{slug}}/clip.mp4
+---
+
+## Overview
+
+TODO: The problem, the goal, and your role. Put photos in `./images/` and reference them by file name.
+
+{/*
+  Components available here without importing (cheat sheet: docs/CONTENT.md):
+
+  <Figure src="photo.jpg" alt="…" caption="…" />                 single image (add `contain` for schematics)
+  <Gallery items={[{ src: 'a.jpg', alt: '…' }, { src: 'b.jpg', alt: '…' }]} columns={2} caption="…" />
+  <Video src="/media/{{slug}}/clip.mp4" caption="…" />           encode with `npm run media:videos`
+  <ImageHotspots src="render.png" alt="…" points={[{ x: 40, y: 20, label: 'Part', detail: '…' }]} />
+  <ModelViewer id="model-id" caption="…" />                      3D with labeled parts
+  <Diagram id="diagram-id" caption="…" />                         block diagram from src/content/diagrams/
+  <CompareSlider before="v1.jpg" after="v2.jpg" alt="…" />
+  <Callout tone="lesson">…</Callout>                               tone: note | lesson | result
+*/}
+
+## Design
+
+TODO
+
+## Build & test
+
+TODO
+
+## Results
+
+TODO

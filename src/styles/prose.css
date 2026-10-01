@@ -1,0 +1,101 @@
+/* Long-form project write-ups (MDX bodies). Components inside manage their own layout. */
+.prose {
+  counter-reset: fig;
+  color: var(--text-2);
+  font-size: var(--step-0);
+  line-height: 1.75;
+}
+
+.prose > * + * {
+  margin-top: var(--s-5);
+}
+
+.prose > :where(p, ul, ol, blockquote, h2, h3, h4) {
+  max-width: var(--prose);
+}
+
+.prose h2 {
+  margin-top: var(--s-8);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--line);
+  font-size: var(--step-3);
+  color: var(--text);
+}
+
+.prose h3 {
+  margin-top: var(--s-7);
+  font-size: var(--step-2);
+  color: var(--text);
+}
+
+.prose h2 + *,
+.prose h3 + * {
+  margin-top: var(--s-4);
+}
+
+.prose > :first-child {
+  margin-top: 0;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.prose strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.prose a {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+}
+
+.prose a:hover {
+  color: var(--accent);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.2em;
+}
+
+.prose li + li {
+  margin-top: var(--s-2);
+}
+
+.prose li::marker {
+  color: var(--accent);
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.prose blockquote {
+  border-left: 2px solid var(--accent);
+  padding-left: var(--s-5);
+  color: var(--text);
+  font-size: var(--step-1);
+}
+
+/* Markdown images (![alt](./images/x.jpg)) get the frame treatment too. */
+.prose > p > img,
+.prose > img {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+/* Wide components break out of the prose measure. */
+.prose > .wide {
+  margin-top: var(--s-7);
+  margin-bottom: var(--s-7);
+}
+
+.prose > .wide + .wide {
+  margin-top: var(--s-5);
+}

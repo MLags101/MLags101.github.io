@@ -1,0 +1,102 @@
+---
+title: Mr Toad's Wild Rover
+summary: >-
+  A throwable, autonomy-capable scout rover inspired by the iRobot FirstLook — my third
+  Invention Studio Maker Grant, with climbing stilts and ArduRover navigation.
+category: personal
+start: 2026-01
+end: 2026-01
+featured: true
+order: 80
+cover: ./images/rovercad.png
+coverAlt: SolidWorks render of the Mr Toad rover with antenna, GNSS puck and climbing stilts
+role: Sole designer · Maker Grant recipient
+context: invention-studio
+skills: [solidworks, ros2, ardupilot, python, raspberry-pi, 3d-printing]
+specs:
+  - { label: Class, value: Throwable scout rover }
+  - { label: Inspiration, value: iRobot 110 FirstLook }
+  - { label: Autonomy, value: ArduRover }
+  - { label: Compute, value: Raspberry Pi }
+  - { label: Mobility, value: 4 paddle wheels + climbing stilts }
+  - { label: Funding, value: Invention Studio Maker Grant }
+links:
+  - { label: Full build write-up on Behance, url: 'https://www.behance.net/gallery/242445025/Mr-Toad-Maker-Grant-Invention-Studio', kind: behance }
+---
+
+## Overview
+
+Mr Toad's Wild Rover is my third project funded by the Invention Studio's Maker Grant program. The goal: a durable, autonomy-capable rover in the spirit of the iRobot FirstLook — the small robot first responders throw into dangerous spaces to scout ahead.
+
+<Figure src="irobot.jpg" alt="iRobot 110 FirstLook rover in rubble" caption="The iRobot 110 FirstLook that inspired the project." />
+
+## Inspiration & goals
+
+I found the FirstLook while researching harsh-environment rovers for my robotics team. It amazed me how versatile such a small device could be — compact enough to throw, durable enough to survive the landing, and carrying a full sensor and comms package. I'm also using the project to learn **ArduRover** for autonomous path planning and navigation.
+
+<Gallery
+  columns={3}
+  aspect="3/4"
+  fit="contain"
+  items={[
+    { src: 'img-7544.jpg', alt: 'Hand sketch of the internal component layout, top view' },
+    { src: 'img-7545.jpg', alt: 'Second layout sketch with antenna, camera, floodlight and battery placement annotated' },
+    { src: 'img-7543.jpg', alt: 'Sketch of the stilt mechanism and drivetrain' },
+  ]}
+  caption="Paper first: component layout and stilt sketches."
+/>
+
+## Design
+
+<ImageHotspots
+  src="rovercad.png"
+  alt="SolidWorks render of the complete Mr Toad rover"
+  caption="Exterior layout. Select a part to inspect it."
+  points={[
+    { x: 40.5, y: 9, label: 'Radio antenna', detail: 'Mast antenna for the telemetry / control link, kept tall and central so the body doesn\'t shadow it.' },
+    { x: 43, y: 43, label: 'GNSS puck', detail: 'Lid-mounted GNSS receiver — the position source for ArduRover waypoint navigation.' },
+    { x: 30.5, y: 63.5, label: 'Nose camera', detail: 'Forward-facing camera module on the front plate for teleoperation and scouting.' },
+    { x: 30, y: 73.5, label: 'Nose ports', detail: 'Twin openings in the front plate, laid out in the early sketches alongside the camera for lighting.' },
+    { x: 84, y: 42, label: 'Climbing stilts', detail: 'Pivoting arms that lever the chassis over obstacles. They carry the full rover weight, so shaft shear stress drove their design.' },
+    { x: 55, y: 60, label: 'Paddle wheels', detail: 'Open-spoke wheels with block treads for loose terrain; the stilts meant the front wheels couldn\'t share a through-shaft.' },
+  ]}
+/>
+
+Laying the rover out in SolidWorks was mostly straightforward — except for the motors. The ones I'd acquired forced an awkward placement that needed power transmitted through gears or rope. Both would have overcomplicated the system, so I changed motors instead.
+
+The climbing stilts were the most interesting problem. Their presence meant I couldn't use a shaft to retain the front wheels, and the long shafts raise shear-stress concerns since the stilts must lift the rover's full weight.
+
+<ImageHotspots
+  src="rover-1.png"
+  alt="Cutaway render of the rover's interior components"
+  caption="Interior packaging, early motor layout."
+  points={[
+    { x: 11, y: 51, label: 'Camera & mount', detail: 'Camera module on a printed bracket behind the nose plate.' },
+    { x: 43, y: 56, label: 'Raspberry Pi', detail: 'Onboard computer, centered between the drivetrain and the nose.' },
+    { x: 74, y: 42, label: 'Drive motors + spur gears', detail: 'The first motors I sourced had to sit offset from the wheels, driving through spur gears — the layout I later abandoned by changing motors.' },
+    { x: 27, y: 79, label: 'Servo', detail: 'Hobby servo mounted to the side wall of the chassis.' },
+  ]}
+/>
+
+<Gallery
+  columns={2}
+  fit="contain"
+  aspect="4/3"
+  items={[
+    { src: 'rover-2.png', alt: 'Close-up render of the camera mount', caption: 'Camera mount detail.' },
+    { src: 'rover-3.png', alt: 'Render of the motor and gear arrangement', caption: 'Motor and gear arrangement.' },
+  ]}
+/>
+
+## Results
+
+The rover was completed and built. The full build log — fabrication, testing and the finished hardware — lives on Behance.
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  items={[
+    { src: 'img-7791.jpg', alt: 'The finished rover held up, with magenta wheels and black body', caption: 'The built rover.' },
+    { src: 'rover2.jpg', alt: 'Top view of the rover next to a game controller', caption: 'Teleop with a gamepad.' },
+  ]}
+/>

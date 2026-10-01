@@ -1,0 +1,157 @@
+---
+/**
+ * <CompareSlider before="v1.png" after="v2.png" beforeLabel="V1" afterLabel="V2" />
+ * Drag (or use arrow keys) to wipe between two aligned images — e.g. render vs. built
+ * hardware, or two board revisions shot from the same angle. No dependencies.
+ */
+import { Image } from 'astro:assets';
+import { resolveImage, type ImageSrc } from '../../lib/media';
+
+interface Props {
+  before: ImageSrc;
+  after: ImageSrc;
+  beforeLabel?: string;
+  afterLabel?: string;
+  alt: string;
+  caption?: string;
+}
+
+const { before, after, beforeLabel = 'Before', afterLabel = 'After', alt, caption } = Astro.props;
+const slug = Astro.locals.projectSlug;
+const a = resolveImage(before, slug);
+const b = resolveImage(after, slug);
+---
+
+<figure class="compare wide" data-compare>
+  <div class="compare__stage crop-marks" style="--pos: 50%">
+    <Image src={b} alt={`${afterLabel}: ${alt}`} widths={[600, 1000, 1400]} sizes="(min-width: 1100px) 1000px, 100vw" />
+    <div class="compare__before" aria-hidden="true">
+      <Image src={a} alt="" widths={[600, 1000, 1400]} sizes="(min-width: 1100px) 1000px, 100vw" />
+    </div>
+    <span class="compare__tag compare__tag--l label">{beforeLabel}</span>
+    <span class="compare__tag compare__tag--r label">{afterLabel}</span>
+    <div class="compare__handle" aria-hidden="true"></div>
+    <input type="range" min="0" max="100" value="50" step="0.5" aria-label={`Compare ${beforeLabel} and ${afterLabel}`} />
+  </div>
+  {
+    caption && (
+      <figcaption>
+        <span class="label compare__num" />
+        <span>{caption}</span>
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .compare {
+    counter-increment: fig;
+  }
+
+  .compare__stage {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .compare__stage :global(img) {
+    width: 100%;
+    display: block;
+  }
+
+  .compare__before {
+    position: absolute;
+    inset: 0;
+    clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+  }
+
+  .compare__before :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .compare__handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--pos);
+    width: 1px;
+    background: var(--accent);
+    pointer-events: none;
+  }
+
+  .compare__handle::after {
+    content: '⟷';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: 0.9rem;
+  }
+
+  .compare input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: ew-resize;
+    margin: 0;
+  }
+
+  .compare input:focus-visible + .compare__handle,
+  .compare__stage:has(input:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .compare__tag {
+    position: absolute;
+    top: var(--s-3);
+    padding: 0.25rem 0.5rem;
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    color: var(--text);
+    border-radius: var(--radius);
+    z-index: 1;
+  }
+
+  .compare__tag--l {
+    left: var(--s-3);
+  }
+
+  .compare__tag--r {
+    right: var(--s-3);
+  }
+
+  figcaption {
+    display: flex;
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+    font-size: var(--step--1);
+    color: var(--text-3);
+  }
+
+  .compare__num::before {
+    content: 'FIG.\00a0' counter(fig, decimal-leading-zero);
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-compare]')) {
+    const stage = root.querySelector<HTMLElement>('.compare__stage')!;
+    const input = root.querySelector<HTMLInputElement>('input')!;
+    input.addEventListener('input', () => stage.style.setProperty('--pos', `${input.value}%`));
+  }
+</script>

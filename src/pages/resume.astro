@@ -1,0 +1,233 @@
+---
+/**
+ * HTML resume generated from the same content collections as the rest of the site,
+ * so it can never drift from the Experience page. Prints to one page (Ctrl+P).
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/ui/Icon.astro';
+import { site } from '../site.config';
+import { getExperience, getSkills, SKILL_GROUP_LABELS } from '../lib/content';
+import { monthYear } from '../lib/dates';
+
+const experience = (await getExperience()).filter((e) => e.data.onResume);
+const skills = (await getSkills()).filter((s) => s.data.featured);
+const groups = Object.entries(SKILL_GROUP_LABELS)
+  .map(([key, label]) => ({ label, items: skills.filter((s) => s.data.group === key).map((s) => s.data.name) }))
+  .filter((g) => g.items.length);
+const dates = (s: Date, e?: Date) => `${monthYear(s)} – ${e ? monthYear(e) : 'Present'}`;
+---
+
+<BaseLayout title="Resume" description={`Resume of ${site.name} — ${site.education.degree}, ${site.education.school}.`}>
+  <div class="container resume-wrap">
+    <div class="toolbar no-print">
+      <p class="label label--accent eyebrow">Resume</p>
+      <div class="toolbar__actions">
+        <a class="btn btn--primary" href={site.resumePdf} download><Icon name="download" /> Download PDF</a>
+        <button type="button" class="btn" onclick="window.print()">Print</button>
+      </div>
+    </div>
+
+    <article class="resume">
+      <header class="resume__head">
+        <h1>{site.name}</h1>
+        <p class="resume__contact mono">
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+          <span aria-hidden="true">·</span>
+          <a href={site.links.linkedin}>linkedin.com/in/mlagana6</a>
+          <span aria-hidden="true">·</span>
+          <a href="/">mlags101.github.io</a>
+        </p>
+      </header>
+
+      <section>
+        <h2 class="label">Education</h2>
+        <div class="entry">
+          <div class="entry__row">
+            <p><strong>{site.education.school}</strong> | <em>{site.education.degree}</em></p>
+            <p class="entry__date">{site.education.location} · {site.education.graduation}</p>
+          </div>
+          <ul>
+            <li class="entry__row"><span>{site.education.detail}</span><span>GPA {site.education.gpa}</span></li>
+            <li>Related coursework: {site.education.coursework.join(', ')}</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="label">Experience</h2>
+        {
+          experience.map((e) => (
+            <div class="entry">
+              <div class="entry__row">
+                <p>
+                  <strong>{e.data.org.replace(' · ', ', ')}</strong> | <em>{e.data.positions[0]!.title}</em>
+                </p>
+                <p class="entry__date">
+                  {e.data.location} · {dates(e.data.start, e.data.end)}
+                </p>
+              </div>
+              <ul>
+                {e.data.highlights.map((h) => (
+                  <li>{h}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </section>
+
+      <section>
+        <h2 class="label">Skills</h2>
+        <dl class="skills">
+          {
+            groups.map((g) => (
+              <div>
+                <dt>{g.label}:</dt>
+                <dd>{g.items.join(', ')}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </section>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .resume-wrap {
+    padding-block: var(--s-8) var(--section);
+    max-width: calc(860px + var(--gutter) * 2);
+  }
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--s-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-6);
+  }
+
+  .toolbar__actions {
+    display: flex;
+    gap: var(--s-3);
+  }
+
+  .resume {
+    padding: clamp(1.5rem, 1rem + 3vw, 3.5rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elev);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+
+  .resume__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    padding-bottom: var(--s-4);
+  }
+
+  .resume__head h1 {
+    font-size: var(--step-4);
+  }
+
+  .resume__contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    font-size: var(--step--2);
+    color: var(--text-2);
+  }
+
+  .resume__contact a {
+    text-decoration: none;
+  }
+
+  section {
+    margin-top: var(--s-5);
+  }
+
+  h2 {
+    padding-bottom: var(--s-1);
+    border-bottom: 1px solid var(--line-strong);
+    color: var(--text);
+  }
+
+  .entry {
+    margin-top: var(--s-3);
+  }
+
+  .entry__row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-4);
+    flex-wrap: wrap;
+  }
+
+  .entry__date {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .entry em {
+    color: var(--text-2);
+  }
+
+  .entry ul {
+    margin-top: var(--s-1);
+    padding-left: 1.2em;
+    color: var(--text-2);
+  }
+
+  .entry ul li.entry__row {
+    list-style: disc;
+  }
+
+  .skills {
+    margin-top: var(--s-3);
+  }
+
+  .skills div {
+    display: flex;
+    gap: var(--s-2);
+  }
+
+  .skills div + div {
+    margin-top: var(--s-1);
+  }
+
+  .skills dt {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .skills dd {
+    color: var(--text-2);
+  }
+
+  @media print {
+    @page {
+      size: letter;
+      margin: 0.5in;
+    }
+    .resume-wrap {
+      padding: 0;
+      max-width: none;
+    }
+    .resume {
+      border: 0;
+      padding: 0;
+      font-size: 10pt;
+    }
+    .resume__head h1 {
+      font-size: 22pt;
+    }
+    h2.label {
+      font-size: 9pt;
+    }
+  }
+</style>
