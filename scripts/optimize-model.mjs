@@ -2,7 +2,10 @@
 /**
  * Optimize a CAD export for the web and register it with the site.
  *
- *   npm run model:optimize -- path/to/export.glb <model-id> [--ratio 0.5]
+ *   npm run model:optimize -- path/to/export.glb <model-id> [--ratio 0.5] [--error 0.001]
+ *
+ * Big assemblies: lower --ratio (fraction of triangles kept) and raise --error (allowed
+ * deviation, as a fraction of the model size) until it fits the 5 MB budget.
  *
  * 1. Cleans and compresses the GLB (dedupe, weld, simplify, quantize, meshopt, WebP
  *    textures) → public/models/<id>/model.glb. Part names and animations are kept.
@@ -26,9 +29,11 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 const BUDGET_MB = 5;
 
 const args = process.argv.slice(2);
-const [input, id] = args.filter((a, i) => !a.startsWith('--') && args[i - 1] !== '--ratio');
+const [input, id] = args.filter((a, i) => !a.startsWith('--') && !['--ratio', '--error'].includes(args[i - 1]));
 const ratioArg = args.indexOf('--ratio');
 const ratio = ratioArg >= 0 ? Number(args[ratioArg + 1]) : 0.5;
+const errorArg = args.indexOf('--error');
+const simplifyError = errorArg >= 0 ? Number(args[errorArg + 1]) : 0.001;
 
 if (!input || !id || !/^[a-z0-9-]+$/.test(id)) {
   console.error('Usage: npm run model:optimize -- <input.glb> <model-id>   (id: kebab-case, e.g. kermit-v3)');
@@ -110,7 +115,7 @@ if (recolored) console.log(`✓ appearance: ${recolored} material/part override(
 
 // Stage 1 — geometry cleanup. Named nodes (CAD part names) are kept — no flatten/join —
 // so parts stay addressable for hotspots and animations.
-await doc.transform(dedup(), resample(), prune(), weld(), simplify({ simplifier: MeshoptSimplifier, ratio, error: 0.001 }));
+await doc.transform(dedup(), resample(), prune(), weld(), simplify({ simplifier: MeshoptSimplifier, ratio, error: simplifyError }));
 
 // Parts map from the (still uncompressed) geometry.
 const parts = buildPartsMap(doc);

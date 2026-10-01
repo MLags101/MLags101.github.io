@@ -181,10 +181,11 @@ const config = JSON.stringify({
     const poseBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-pose]')];
     const playBtn = root.querySelector<HTMLButtonElement>('[data-play]')!;
 
-    const [THREE, { OrbitControls }, { GLTFLoader }, { default: URDFLoader }] = await Promise.all([
+    const [THREE, { OrbitControls }, { GLTFLoader }, { MeshoptDecoder }, { default: URDFLoader }] = await Promise.all([
       import('three'),
       import('three/examples/jsm/controls/OrbitControls.js'),
       import('three/examples/jsm/loaders/GLTFLoader.js'),
+      import('three/examples/jsm/libs/meshopt_decoder.module.js'),
       import('urdf-loader'),
     ]);
 
@@ -211,7 +212,8 @@ const config = JSON.stringify({
     manager.onError = (url) => console.warn('[robot] failed to load', url);
     const loader = new URDFLoader(manager);
     loader.packages = cfg.packages;
-    const gltf = new GLTFLoader();
+    // npm run robot:import writes meshopt-compressed GLBs.
+    const gltf = new GLTFLoader(manager).setMeshoptDecoder(MeshoptDecoder); // same manager, so onLoad waits for the meshes
     const defaultLoad = loader.defaultMeshLoader.bind(loader);
     loader.loadMeshCb = (url, manager, material, done) => {
       if (/\.(glb|gltf)$/i.test(url)) gltf.load(url, (g) => done(g.scene), undefined, (e) => done(new THREE.Object3D(), e as Error));

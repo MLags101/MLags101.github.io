@@ -27,6 +27,20 @@ const schema = z.object({
     graduation: z.string(),
     gpa: z.coerce.string(),
   }),
+  heroSlides: z
+    .array(
+      z
+        .object({
+          image: z.string().optional(),
+          video: z.string().optional(),
+          poster: z.string().optional(),
+          caption: z.string(),
+          href: z.string().optional(),
+          seconds: z.number().positive().default(7),
+        })
+        .refine((s) => !!s.image !== !!s.video, 'each slide needs exactly one of image or video'),
+    )
+    .min(1),
   nav: z.array(z.object({ href: z.string(), label: z.string() })),
 });
 

@@ -1,11 +1,12 @@
 # 3D models, robots and CAD animation
 
-The site has two 3D viewers. Both download nothing until they scroll into view, and both respect reduced-motion settings.
+The site has two 3D viewers (plus a PCB viewer, Part 3). Both download nothing until they scroll into view, and both respect reduced-motion settings.
 
 | Viewer          | Use it for                                                                 | Data                               | Files                         |
 | --------------- | -------------------------------------------------------------------------- | ---------------------------------- | ----------------------------- |
 | `<ModelViewer>` | A CAD assembly (GLB): orbit it, labeled parts, baked animations            | `src/data/models/<id>.yaml`        | `public/models/<id>/`         |
 | `<RobotViewer>` | An articulated robot (URDF): joint sliders, named poses, looping sequences | `src/data/robots/<id>.yaml`        | `public/robots/<id>/`         |
+| `<PcbViewer>`   | A circuit board from its Gerbers: top/bottom, layer toggles, 3D from STEP   | `src/data/pcbs/<id>.yaml`          | `public/pcbs/<id>/`           |
 
 ---
 
@@ -40,7 +41,7 @@ npm run model:parts -- kermit-v3          # list the CAD part names
 
 The optimizer simplifies, quantizes and meshopt-compresses the mesh, converts textures to WebP, and writes three files:
 
-- `public/models/<id>/model.glb`, targeting ≤ 5 MB (ideally ≤ 3). If it's over budget, re-run with `--ratio 0.25`.
+- `public/models/<id>/model.glb`, targeting ≤ 5 MB (ideally ≤ 3). If it's over budget, re-run with `--ratio 0.25`. For very dense exports (EEVi was 125 MB) also loosen the simplifier's error limit: `--ratio 0.08 --error 0.01`.
 - `public/models/<id>/parts.json`, which records where every named part's surfaces are.
 - `src/data/models/<id>.yaml`, the first time only. Later runs update only `sizeMB`.
 
@@ -115,19 +116,26 @@ For anything with joints: arms, legged robots, gimbals, folding mechanisms.
 
 **Fusion 360:** use `fusion2urdf`.
 
-Lower the STL mesh quality in the exporter; binary STL isn't compressed, so detail is expensive. Meshes can also be `.glb` files, which come out much smaller.
+Any exporter that writes a ROS package (URDF plus STL or DAE meshes) works.
 
-### 2. Add the files
+### 2. Import it
 
-Copy the whole exported folder to `public/robots/<id>/`, so that you have `public/robots/<id>/urdf/<id>.urdf` and `public/robots/<id>/meshes/…`.
+```bash
+npm run robot:import -- _archive/cad-src/dum_i_s_description dum-i
+```
 
-The URDF refers to meshes as `package://<name>/meshes/…`. Map that package name in the YAML.
+The importer reads the URDF, converts every mesh (STL or DAE) to a compressed GLB (DUM-I went from 11 MB to 0.5 MB), and writes:
 
-### 3. Create `src/data/robots/<id>.yaml`
+- `public/robots/<id>/<id>.urdf`, with mesh paths rewritten to `meshes/<link>.glb`.
+- `public/robots/<id>/meshes/*.glb`.
+- `src/data/robots/<id>.yaml`, the first time only.
+
+Colors come from `appearance` in the YAML (below), falling back to the URDF's material colors. Change a color and re-run the import. Use `--ratio 0.3` to simplify meshes further.
+
+### 3. Edit `src/data/robots/<id>.yaml`
 
 ```yaml
-urdf: /robots/dum-i/urdf/dum-i.urdf
-packages: { dum-i: /robots/dum-i }   # package://dum-i/… → /robots/dum-i/…
+urdf: /robots/dum-i/dum-i.urdf
 alt: DUM-I robot arm
 up: +z                               # URDFs are usually Z-up; +y if yours isn't
 sliders: true                        # a slider for every movable joint (uses URDF limits)
@@ -136,6 +144,9 @@ poses:                               # radians (meters for prismatic joints)
   - { id: scan, label: Scan,  joints: { base_yaw: 0.8, shoulder: 0.6, elbow: 1.1 } }
   - { id: stow, label: Stow,  joints: { base_yaw: 0, shoulder: -0.4, elbow: 2.2 } }
 sequence: { poses: [home, scan, stow], seconds: 1.4, hold: 0.5, autoplay: false }
+appearance:                          # baked in by robot:import
+  default: '#9aa0a8'
+  links: { base_plate_link: '#2c4fb8', gimbal_link: '#d63a76' }
 ```
 
 Joint names must match the URDF. The sliders display them, so you can read them off the page.
@@ -145,3 +156,47 @@ Joint names must match the URDF. The sliders display them, so you can read them 
 `<RobotViewer id="dum-i" caption="…" />` in the write-up. Pose buttons ease the joints between configurations, and "Play sequence" loops through `sequence.poses`.
 
 `npm run lint:content` checks that every registered model and robot has its files, and that every `part:` name exists.
+
+---
+
+## Part 3 — Circuit boards (`<PcbViewer>`)
+
+Shows a PCB from its fabrication files: rendered top and bottom, an x-ray view where each copper, mask, silkscreen and drill layer can be turned on and off, and an optional 3D view from the board's STEP model. Visitors can drag to pan and Ctrl + scroll (or pinch) to zoom.
+
+### 1. Export
+
+- **Gerbers:** Altium, KiCad or EasyEDA. Gerber X2 is best, because each file says which layer it is. Older exports are recognized by their extension (`.GTL`, `.GBL`, `.GTO`, `.GKO`…). Include the drill files.
+- **STEP (optional):** the 3D board model, which becomes the 3D tab.
+
+Put both in one folder, e.g. `_archive/cad-src/typhoon-pcb/`.
+
+### 2. Import
+
+```bash
+npm run pcb:import -- _archive/cad-src/typhoon-pcb typhoon
+```
+
+This writes:
+
+- `public/pcbs/<id>/top.svg` and `bottom.svg`, the rendered board faces.
+- One SVG per layer, plus `manifest.json` (size, layer list, colors).
+- From the STEP, if present, a GLB that goes through `model:optimize` as `<id>-board`. That gives `public/models/<id>-board/` and `src/data/models/<id>-board.yaml`.
+- `src/data/pcbs/<id>.yaml`, the first time only:
+
+```yaml
+name: Typhoon gimbal controller
+alt: Typhoon gimbal controller PCB, 45 × 30 mm, four copper layers
+model: typhoon-board      # the 3D tab; remove to hide it
+```
+
+The import prints the layers it found. If one is missing, check that its file has a standard extension or X2 attributes.
+
+### 3. Show it
+
+`<PcbViewer id="typhoon" caption="…" />` in the write-up.
+
+The layers view starts with top copper, the outline and the holes. Inner layers are usually solid planes and would wash out the traces, so visitors turn them on themselves.
+
+### Posters
+
+A model shows its poster (`public/models/<id>/poster.webp`) until the 3D loads. To make one, open the page in `npm run dev` with `?author` on the URL, frame the view, and click "Save poster". Save the file into the model's folder.

@@ -1,0 +1,46 @@
+# 3D model — used by <ModelViewer id="kermit-v2" /> in the Kermit V2 write-up.
+# Guide: docs/3D-MODELS.md · list part names: npm run model:parts -- kermit-v2
+src: /models/kermit-v2/model.glb
+poster: /models/kermit-v2/poster.webp
+alt: Kermit V2 quadcopter CAD assembly with carbon arms, printed frame plates and landing struts
+sizeMB: 0.8
+forward: -z          # the camera end
+cameraOrbit: -30deg 62deg 95%
+hotspots:
+  - id: camera
+    part: Arducam16MPCamera-1
+    from: front
+    label: Camera
+    partNo: Arducam
+    detail: Front camera for the OpenHD video link.
+  - id: pi
+    part: RaspberryPi4ModelB-1
+    from: top
+    label: Companion computer
+    partNo: Raspberry Pi 4
+    detail: Runs OpenHD for digital video and telemetry.
+  - id: rails
+    part: Rail-1
+    from: bottom
+    label: Picatinny rails
+    detail: Printed rails under the frame for antennas or other payloads.
+  - id: gps
+    part: GPS Mount-1
+    from: top
+    label: GPS mast
+    detail: Raises the GPS above the frame electronics.
+  - id: arms
+    part: CF_Arm-1
+    from: top
+    label: Carbon arms
+    detail: Cut from carbon fiber bar stock and clamped between the printed plates with through-bolts.
+  - id: legs
+    part: landing_strut-1
+    from: front
+    label: Landing struts
+    detail: Angled carbon struts with printed feet and buffers.
+
+appearance:
+  defaultColor: '#3c4046'
+  parts:
+    - { match: ['CF_Arm*', 'landing_strut*'], color: '#1b1d21', roughness: 0.45 }

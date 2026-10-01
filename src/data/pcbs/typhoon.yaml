@@ -1,0 +1,5 @@
+# PCB — used by <PcbViewer id="typhoon" />.
+# Re-import after a new export: npm run pcb:import -- <design folder> typhoon
+name: Typhoon gimbal controller
+alt: Typhoon brushless gimbal controller PCB, 45 by 30 mm, four copper layers
+model: typhoon-board   # 3D board from the STEP file (the "3D" tab)

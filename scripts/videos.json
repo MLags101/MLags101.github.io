@@ -93,5 +93,28 @@
     "maxWidth": 720,
     "audio": false,
     "note": "portrait"
+  },
+  {
+    "in": "_archive/media-src/update/kermitv3_flight.mp4",
+    "out": "public/media/kermit-v3/flight.mp4",
+    "maxWidth": 1600,
+    "crf": 26,
+    "audio": false,
+    "rotate": "ccw",
+    "note": "Phone clip tagged with the wrong rotation; ccw restores landscape. Also a hero slide."
+  },
+  {
+    "in": "_archive/media-src/update/mrtoad_working.mp4",
+    "out": "public/media/mr-toad/driving.mp4",
+    "maxWidth": 720,
+    "audio": false,
+    "note": "portrait"
+  },
+  {
+    "in": "_archive/media-src/update/ARL_flight.mp4",
+    "out": "public/media/arl-swarm-testbeds/flight.mp4",
+    "maxWidth": 720,
+    "audio": false,
+    "note": "portrait — testbed flight in the motion capture arena"
   }
 ]

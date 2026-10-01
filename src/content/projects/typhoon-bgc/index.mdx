@@ -31,7 +31,7 @@ With only one Teensy, one short stopped testing. V2 puts the microcontroller on 
 
 ## V2 — integrated ATmega328
 
-The current revision puts an **ATmega328** directly on a double-sided PCB alongside the L6234 to maximize compactness. The schematic was informed by ElectroNoobs' work on sensorless, slow-speed brushless control.
+The current revision puts an **ATmega328** directly on a four-layer PCB (copper on both faces plus two inner layers) alongside the L6234 to maximize compactness. The schematic was informed by ElectroNoobs' work on sensorless, slow-speed brushless control.
 
 <Gallery
   columns={2}
@@ -39,11 +39,17 @@ The current revision puts an **ATmega328** directly on a double-sided PCB alongs
   aspect="4/3"
   items={[
     { src: 'atm-driver.png', alt: '3D render of the V2 ATmega328 gimbal controller', caption: 'V2 render.' },
-    { src: 'atm-driver-2d.png', alt: 'Two-layer PCB layout of the V2 board', caption: 'V2 layout, both copper layers.' },
+    { src: 'atm-driver-2d.png', alt: 'PCB layout of the V2 board showing the top and bottom copper', caption: 'V2 layout, top and bottom copper.' },
   ]}
 />
 
 I assembled and tested the boards in the Student Competition Center. After some troubleshooting they proved effective at **velocity and position control** of the gimbal's brushless motor, and they're now integrated into EEVi v3.
+
+### Explore the board
+
+The board below is rendered from its Gerber and STEP files. Switch between the top and bottom, turn individual copper, mask and silkscreen layers on and off, or open the 3D view.
+
+<PcbViewer id="typhoon" caption="Typhoon board, rendered from the Altium Gerber X2 and STEP exports." />
 
 <Figure src="img-7873.jpg" alt="Finished V2 gimbal controller board held in hand" caption="The finished V2 board — small enough to sit inside the gimbal." />
 

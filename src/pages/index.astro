@@ -1,4 +1,5 @@
 ---
+import fs from 'node:fs';
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/cards/ProjectCard.astro';
@@ -33,29 +34,56 @@ const groups = Object.entries(SKILL_GROUP_LABELS).map(([key, label]) => ({
     .sort((a, b) => b.count - a.count || a.data.name.localeCompare(b.data.name)),
 }));
 
+// Hero slideshow (site.yaml → heroSlides). A missing file fails the build instead of showing black.
+const slides = site.heroSlides.map((s) => ({ ...s, poster: s.video ? (s.poster ?? s.video.replace(/\.mp4$/, '.jpg')) : undefined }));
+for (const s of slides)
+  for (const p of [s.image, s.video, s.poster])
+    if (p && !fs.existsSync(`public${p}`)) throw new Error(`site.yaml → heroSlides: "${p}" not found in public/`);
+const firstStill = slides[0]!.image ?? slides[0]!.poster!;
+
 const firstYear = Math.min(...projects.map((p) => p.data.start.getUTCFullYear()));
 const stats = [
   { value: String(projects.length), label: 'Projects' },
   { value: String(experience.length), label: 'Roles' },
-  { value: '3', label: 'Maker Grants' },
+  { value: String(projects.filter((p) => p.data.makerGrant).length), label: 'Maker Grants' },
   { value: String(new Date().getUTCFullYear() - firstYear + 1), label: 'Years of projects' },
 ];
 ---
 
 <BaseLayout hasHero>
-  <link slot="head" rel="preload" as="image" href="/media/site/hero-urc.webp" fetchpriority="high" />
+  <link slot="head" rel="preload" as="image" href={firstStill} fetchpriority="high" />
   <!-- ── Hero ─────────────────────────────────────────────── -->
   <section class="hero" aria-labelledby="hero-title">
-    <div class="hero__media" aria-hidden="true">
-      <video
-        src="/media/site/hero-urc.mp4"
-        poster="/media/site/hero-urc.webp"
-        muted
-        loop
-        playsinline
-        preload="none"
-        data-ambient
-        data-hero-video></video>
+    <div class="hero__media" aria-hidden="true" data-hero-slides>
+      {
+        slides.map((s, i) =>
+          s.video ? (
+            <video
+              class:list={['hero__slide', i === 0 && 'is-active']}
+              data-slide
+              data-seconds={s.seconds}
+              src={i === 0 ? s.video : undefined}
+              data-src={i === 0 ? undefined : s.video}
+              poster={i === 0 ? s.poster : undefined}
+              data-poster={i === 0 ? undefined : s.poster}
+              muted
+              loop
+              playsinline
+              preload="none"
+            />
+          ) : (
+            <img
+              class:list={['hero__slide', i === 0 && 'is-active']}
+              data-slide
+              data-seconds={s.seconds}
+              src={i === 0 ? s.image : undefined}
+              data-src={i === 0 ? undefined : s.image}
+              alt=""
+              decoding="async"
+            />
+          ),
+        )
+      }
       <div class="hero__scrim"></div>
       <div class="hero__grid"></div>
     </div>
@@ -107,7 +135,30 @@ const stats = [
         }
         <div class="hero__hud-footage">
           <span class="label">Footage</span>
-          <span>EEVi · URC 2025 · Utah desert</span>
+          <a class="hero__caption" href={slides[0]!.href ?? '/projects'} data-hero-caption>{slides[0]!.caption}</a>
+          {
+            slides.length > 1 && (
+              <div class="hero__controls">
+                <button type="button" class="hero__toggle" data-hero-toggle aria-label="Pause slideshow" aria-pressed="false">
+                  <Icon name="pause" size={14} class="hero__icon-pause" />
+                  <Icon name="play" size={12} class="hero__icon-play" />
+                </button>
+                <div class="hero__dots" role="group" aria-label="Choose footage">
+                  {slides.map((s, i) => (
+                    <button
+                      type="button"
+                      class:list={['hero__dot', i === 0 && 'is-active']}
+                      data-hero-dot={i}
+                      data-caption={s.caption}
+                      data-href={s.href ?? '/projects'}
+                      aria-label={`Show ${s.caption}`}
+                      aria-current={i === 0 ? 'true' : undefined}
+                    />
+                  ))}
+                </div>
+              </div>
+            )
+          }
         </div>
       </div>
     </div>
@@ -245,11 +296,42 @@ const stats = [
     z-index: -1;
   }
 
-  .hero__media video {
+  .hero__slide {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     filter: saturate(0.85) contrast(1.05);
+    opacity: 0;
+    transition: opacity 1.2s var(--ease);
+  }
+
+  .hero__slide.is-active {
+    opacity: 1;
+  }
+
+  /* Slow push-in on stills while they're up. */
+  img.hero__slide.is-active {
+    animation: hero-drift var(--slide-s, 7s) linear both;
+  }
+
+  @keyframes hero-drift {
+    from {
+      transform: scale(1.06);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__slide {
+      transition: none;
+    }
+    img.hero__slide.is-active {
+      animation: none;
+    }
   }
 
   .hero__scrim {
@@ -363,7 +445,106 @@ const stats = [
   }
 
   .hero__hud-footage {
+    align-items: flex-end;
     text-align: right;
+  }
+
+  .hero__caption {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .hero__caption:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .hero__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    margin-top: var(--s-1);
+  }
+
+  .hero__toggle {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid rgb(255 255 255 / 0.25);
+    border-radius: 50%;
+    background: none;
+    color: #c9ced5;
+    cursor: pointer;
+  }
+
+  .hero__toggle:hover {
+    border-color: rgb(255 255 255 / 0.6);
+    color: #fff;
+  }
+
+  .hero__toggle :global(.hero__icon-play),
+  .hero__toggle[aria-pressed='true'] :global(.hero__icon-pause) {
+    display: none;
+  }
+
+  .hero__toggle[aria-pressed='true'] :global(.hero__icon-play) {
+    display: block;
+  }
+
+  .hero__dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .hero__dot {
+    position: relative;
+    width: 22px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  /* The visible bar is 3px tall; the button keeps a 24px touch target. */
+  .hero__dot::before,
+  .hero__dot::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 3px;
+    margin-top: -1.5px;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 0.25);
+  }
+
+  .hero__dot::after {
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .hero__dot:hover::before {
+    background: rgb(255 255 255 / 0.55);
+  }
+
+  .hero__dot.is-active::after {
+    transform: scaleX(1);
+  }
+
+  .hero__dot.is-running::after {
+    animation: hero-progress var(--slide-s, 7s) linear both;
+  }
+
+  @keyframes hero-progress {
+    from {
+      transform: scaleX(0);
+    }
   }
 
   @media (max-width: 760px) {
@@ -372,7 +553,8 @@ const stats = [
       gap: var(--s-3);
     }
     .hero__hud-footage {
-      display: none !important;
+      align-items: flex-start;
+      text-align: left;
     }
   }
 
@@ -600,11 +782,108 @@ const stats = [
     counters.forEach((c) => io.observe(c));
   }
 
-  const v = document.querySelector<HTMLVideoElement>('[data-hero-video]');
-  if (v && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    v.preload = 'auto';
-    void v.play().catch(() => {});
-    // Pause when scrolled away to save battery/CPU.
-    new IntersectionObserver(([e]) => (e?.isIntersecting ? v.play().catch(() => {}) : v.pause())).observe(v);
+  // ── Hero slideshow: crossfades through site.yaml → heroSlides. A slide's media loads just
+  // before it's shown. Nothing auto-advances under reduced motion (the dots still work).
+  const stage = document.querySelector<HTMLElement>('[data-hero-slides]');
+  const slideEls = stage ? [...stage.querySelectorAll<HTMLImageElement | HTMLVideoElement>('[data-slide]')] : [];
+  const dots = [...document.querySelectorAll<HTMLButtonElement>('[data-hero-dot]')];
+  const caption = document.querySelector<HTMLAnchorElement>('[data-hero-caption]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-hero-toggle]');
+  if (stage && slideEls.length) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let current = 0;
+    let timer: number | undefined;
+    let primeTimer: number | undefined;
+    let paused = reduce;
+    let onScreen = true;
+    let started = false;
+
+    const isVideo = (el: Element): el is HTMLVideoElement => el instanceof HTMLVideoElement;
+    const prime = (el: HTMLElement) => {
+      if (el.dataset.poster) (el as HTMLVideoElement).poster = el.dataset.poster;
+      if (el.dataset.src) {
+        el.setAttribute('src', el.dataset.src);
+        delete el.dataset.src;
+      }
+    };
+
+    const run = () => {
+      if (!started) return;
+      window.clearTimeout(timer);
+      window.clearTimeout(primeTimer);
+      const el = slideEls[current]!;
+      const dot = dots[current];
+      const secs = Number(el.dataset.seconds) || 7;
+      stage.style.setProperty('--slide-s', `${secs}s`);
+      dot?.style.setProperty('--slide-s', `${secs}s`);
+      dot?.classList.remove('is-running');
+      if (paused || !onScreen || document.hidden) {
+        if (isVideo(el)) el.pause();
+        return;
+      }
+      if (isVideo(el)) {
+        el.preload = 'auto';
+        void el.play().catch(() => {});
+      }
+      if (slideEls.length > 1) {
+        if (dot) {
+          void dot.offsetWidth; // restart the progress bar
+          dot.classList.add('is-running');
+        }
+        timer = window.setTimeout(() => show(current + 1), secs * 1000);
+        // Fetch the next slide a few seconds before it shows, not while this one is loading.
+        const next = slideEls[(current + 1) % slideEls.length]!;
+        primeTimer = window.setTimeout(() => prime(next), Math.max(0, secs - 3) * 1000);
+      }
+    };
+
+    const show = (n: number) => {
+      const prev = slideEls[current]!;
+      current = (n + slideEls.length) % slideEls.length;
+      const el = slideEls[current]!;
+      prime(el);
+      if (isVideo(el)) el.currentTime = 0;
+      if (prev !== el) {
+        prev.classList.remove('is-active');
+        el.classList.add('is-active');
+        // Stop the outgoing video once it has faded out.
+        if (isVideo(prev)) window.setTimeout(() => !prev.classList.contains('is-active') && prev.pause(), 1300);
+      }
+      dots.forEach((d, i) => {
+        d.classList.toggle('is-active', i === current);
+        if (i === current) d.setAttribute('aria-current', 'true');
+        else d.removeAttribute('aria-current');
+      });
+      const dot = dots[current];
+      if (caption && dot) {
+        caption.textContent = dot.dataset.caption ?? '';
+        caption.href = dot.dataset.href ?? '/projects';
+      }
+      run();
+    };
+
+    const setPaused = (p: boolean) => {
+      paused = p;
+      toggle?.setAttribute('aria-pressed', String(p));
+      toggle?.setAttribute('aria-label', p ? 'Play slideshow' : 'Pause slideshow');
+      run();
+    };
+
+    dots.forEach((d, i) => d.addEventListener('click', () => show(i)));
+    toggle?.addEventListener('click', () => setPaused(!paused));
+    if (reduce) setPaused(true);
+    // Pause when scrolled away or the tab is hidden to save battery/CPU.
+    new IntersectionObserver(([e]) => {
+      onScreen = !!e?.isIntersecting;
+      run();
+    }).observe(stage);
+    document.addEventListener('visibilitychange', run);
+    // Start after the page has loaded so the first video doesn't compete with first paint.
+    const start = () => {
+      started = true;
+      run();
+    };
+    if (document.readyState === 'complete') start();
+    else window.addEventListener('load', start, { once: true });
   }
 </script>

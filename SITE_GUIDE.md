@@ -31,7 +31,10 @@ Everything else is plumbing you rarely touch.
 | Add a video                                  | add a job to `scripts/videos.json` → `npm run media:videos` → `<Video src="/media/…" />`     |
 | Add a 3D CAD model with labeled parts        | `npm run model:optimize -- file.glb <id>` → edit `src/data/models/<id>.yaml` ([guide](docs/3D-MODELS.md)) |
 | Recolor a 3D model                           | `appearance:` in `src/data/models/<id>.yaml` → re-run `model:optimize`                      |
-| Add an articulated robot (URDF)              | files in `public/robots/<id>/` + `src/data/robots/<id>.yaml` ([guide](docs/3D-MODELS.md#part-2--robots-from-urdf-robotviewer)) |
+| Add an articulated robot (URDF)              | `npm run robot:import -- <ros-package-folder> <id>` → edit `src/data/robots/<id>.yaml` ([guide](docs/3D-MODELS.md#part-2--robots-from-urdf-robotviewer)) |
+| Add an interactive PCB (Gerbers + STEP)      | `npm run pcb:import -- <design-folder> <id>` → `<PcbViewer id="<id>" />` ([guide](docs/3D-MODELS.md#part-3--circuit-boards-pcbviewer)) |
+| Change the home page slideshow               | `heroSlides:` in `src/data/site.yaml` (files in `public/media/`)                           |
+| Make a lab the big section on /research      | `featured: true` (+ `gallery`, `video`, `advisor`, `orgUrl`) in `src/data/experience.yaml` |
 | Draw / edit a block diagram                  | `src/data/diagrams/<id>.yaml` → `<Diagram id="<id>" />`                                     |
 | Change colors, fonts, spacing                | `src/styles/tokens.css`                                                                     |
 | Check everything before pushing              | `npm run lint:content` then `npm run build`                                                 |
@@ -44,17 +47,18 @@ Everything else is plumbing you rarely touch.
 ├─ docs/
 │   ├─ CONTENT.md           every field in every data file, component cheat sheet
 │   ├─ MEDIA.md             photos, video encoding, the _archive folder
-│   └─ 3D-MODELS.md         CAD → GLB → labels, coloring, animations, URDF robots
+│   └─ 3D-MODELS.md         CAD → GLB → labels, coloring, animations, URDF robots, PCBs
 │
 ├─ src/
 │   ├─ data/                ★ FACTS — hand-editable YAML
-│   │   ├─ site.yaml          name, identity line, contact, education, nav
+│   │   ├─ site.yaml          name, identity line, contact, education, nav, home slideshow
 │   │   ├─ projects.yaml      one block per project (dates, specs, cover…)
 │   │   ├─ experience.yaml    jobs, labs, teams (promotion ladders, resume bullets)
 │   │   ├─ research.yaml      papers, posters, talks, ongoing work
 │   │   ├─ skills.yaml        tools, and which projects used each one
 │   │   ├─ models/<id>.yaml   3D model: hotspots, camera, colors, animations
-│   │   ├─ robots/<id>.yaml   URDF robot: poses, sequence
+│   │   ├─ robots/<id>.yaml   URDF robot: poses, sequence, colors
+│   │   ├─ pcbs/<id>.yaml     circuit board: name, alt text, which 3D model
 │   │   └─ diagrams/<id>.yaml block diagram: nodes, links, traceable flows
 │   │
 │   ├─ content/projects/<slug>/   ★ WRITE-UPS
@@ -64,7 +68,7 @@ Everything else is plumbing you rarely touch.
 │   ├─ assets/              site photos (portrait, team) and logos/ — optimized at build
 │   ├─ components/
 │   │   ├─ media/           Figure, Gallery, Video, CompareSlider, ImageHotspots,
-│   │   │                   ModelViewer (GLB), RobotViewer (URDF), Lightbox
+│   │   │                   ModelViewer (GLB), RobotViewer (URDF), PcbViewer (Gerber), Lightbox
 │   │   ├─ data/            Diagram, Gantt, SpecSheet, BuildLog, LineageStrip
 │   │   ├─ cards/ layout/ ui/   ProjectCard · Header/Footer/Theme · Callout, Columns, Icon
 │   ├─ layouts/             BaseLayout (every page), PageLayout, ProjectLayout
@@ -77,7 +81,8 @@ Everything else is plumbing you rarely touch.
 ├─ public/                  served as-is at the site root
 │   ├─ media/<slug>/        encoded videos + poster frames
 │   ├─ models/<id>/         model.glb, parts.json, poster.webp
-│   ├─ robots/<id>/         URDF + meshes
+│   ├─ robots/<id>/         URDF + compressed meshes (from robot:import)
+│   ├─ pcbs/<id>/           board renders, per-layer SVGs, manifest.json (from pcb:import)
 │   └─ resume/              the PDF
 │
 ├─ scripts/                 the tools behind `npm run …` (see below) + templates/
@@ -116,6 +121,8 @@ Change a date once and every place updates.
 | `npm run media:videos`                          | Encode the jobs in `scripts/videos.json` (needs ffmpeg)         |
 | `npm run model:optimize -- in.glb <id>`         | Compress a CAD export, record its parts, apply `appearance:`    |
 | `npm run model:parts -- <id> [filter]`          | List a model's CAD part names (for hotspot `part:`)             |
+| `npm run robot:import -- <folder> <id>`         | URDF package (STL/DAE meshes) → compressed GLB meshes + YAML    |
+| `npm run pcb:import -- <folder> <id>`           | Gerbers (+ STEP) → board renders, layer views, 3D board model   |
 
 **Dev-only extras:**
 - Add `?author` to any page URL in `npm run dev` for the hotspot and poster capture helpers.

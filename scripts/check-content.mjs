@@ -3,7 +3,7 @@
  * Content lint — catches what the schemas can't. Runs in CI; run locally with
  *   npm run lint:content
  *
- * Errors (exit 1): referenced videos / models / robots missing from public/, a project in
+ * Errors (exit 1): referenced videos / models / robots / PCBs missing from public/, a project in
  *   projects.yaml without a write-up folder (or the reverse), a cover file that doesn't exist.
  * Warnings: images nobody uses, TODO markers, drafts, featured count outside 3–6.
  */
@@ -93,7 +93,41 @@ for (const f of fs.existsSync(modelsDir) ? fs.readdirSync(modelsDir).filter((f) 
 const robotsDir = path.join(DATA, 'robots');
 for (const f of fs.existsSync(robotsDir) ? fs.readdirSync(robotsDir).filter((f) => f.endsWith('.yaml')) : []) {
   const r = load(path.join(robotsDir, f));
-  if (!fs.existsSync(path.join(ROOT, 'public', r.urdf))) errors.push(`robot ${f}: missing ${r.urdf}`);
+  const urdf = path.join(ROOT, 'public', r.urdf);
+  if (!fs.existsSync(urdf)) {
+    errors.push(`robot ${f}: missing ${r.urdf}`);
+    continue;
+  }
+  for (const [, mesh] of fs.readFileSync(urdf, 'utf8').matchAll(/<mesh\s+filename="([^"]+)"/g))
+    if (!mesh.startsWith('package://') && !fs.existsSync(path.join(path.dirname(urdf), mesh)))
+      errors.push(`robot ${f}: URDF mesh ${mesh} not found (re-run npm run robot:import)`);
+}
+
+// PCBs: renders + every layer in the manifest present; the 3D model is registered.
+const pcbsDir = path.join(DATA, 'pcbs');
+for (const f of fs.existsSync(pcbsDir) ? fs.readdirSync(pcbsDir).filter((f) => f.endsWith('.yaml')) : []) {
+  const id = f.replace('.yaml', '');
+  const p = load(path.join(pcbsDir, f));
+  const dir = path.join(ROOT, 'public/pcbs', id);
+  const manifest = path.join(dir, 'manifest.json');
+  if (!fs.existsSync(manifest)) {
+    errors.push(`pcb ${f}: missing ${rel(manifest)} (npm run pcb:import -- <folder> ${id})`);
+    continue;
+  }
+  const m = JSON.parse(fs.readFileSync(manifest, 'utf8'));
+  for (const file of ['top.svg', 'bottom.svg', ...m.layers.map((l) => l.file)])
+    if (!fs.existsSync(path.join(dir, file))) errors.push(`pcb ${f}: missing public/pcbs/${id}/${file}`);
+  if (p.model && !fs.existsSync(path.join(modelsDir, `${p.model}.yaml`))) errors.push(`pcb ${f}: model "${p.model}" has no src/data/models/${p.model}.yaml`);
+}
+
+// Experience: featured-lab gallery images and videos exist.
+const experience = load(path.join(DATA, 'experience.yaml'));
+for (const [id, e] of Object.entries(experience)) {
+  for (const g of e.gallery ?? []) {
+    const [slug, file] = g.src.split('/');
+    if (!fs.existsSync(path.join(PROJECTS, slug, 'images', file))) errors.push(`experience.yaml → ${id}.gallery: ${g.src} not found in src/content/projects/${slug}/images/`);
+  }
+  if (e.video && !fs.existsSync(path.join(ROOT, 'public', e.video))) errors.push(`experience.yaml → ${id}.video: missing public file ${e.video}`);
 }
 
 // Tools: every project should appear on at least one tool's `projects:` list.

@@ -1,0 +1,438 @@
+---
+/**
+ * Interactive PCB viewer built from the board's Gerbers (and STEP, if provided).
+ * Data: src/data/pcbs/<id>.yaml · files: public/pcbs/<id>/ (made by `npm run pcb:import`).
+ *
+ *   <PcbViewer id="typhoon" caption="…" />
+ *
+ * Views: Top / Bottom (realistic renders), Layers (x-ray: toggle each copper, mask,
+ * silkscreen and drill layer), and 3D (the STEP board in the model viewer).
+ * Drag to pan; zoom with the +/− buttons, Ctrl/⌘ + scroll, or pinch.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import { getEntry } from 'astro:content';
+import ModelViewer from './ModelViewer.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  id: string;
+  caption?: string;
+}
+
+const { id, caption } = Astro.props;
+const entry = await getEntry('pcbs', id);
+if (!entry) throw new Error(`<PcbViewer id="${id}">: no src/data/pcbs/${id}.yaml`);
+const manifestFile = path.join(process.cwd(), 'public/pcbs', id, 'manifest.json');
+if (!fs.existsSync(manifestFile)) throw new Error(`<PcbViewer id="${id}">: run npm run pcb:import first (no ${manifestFile})`);
+const m = JSON.parse(fs.readFileSync(manifestFile, 'utf8')) as {
+  width: number;
+  height: number;
+  units: string;
+  copperLayers: number;
+  layers: { id: string; label: string; type: string; side: string; color: string; file: string }[];
+};
+const base = `/pcbs/${id}`;
+const aspect = `${m.width} / ${m.height}`;
+const size = `${+m.width.toFixed(1)} × ${+m.height.toFixed(1)} ${m.units}`;
+const groups = [
+  { label: 'Top', items: m.layers.filter((l) => l.side === 'top') },
+  { label: 'Inner', items: m.layers.filter((l) => l.side === 'inner') },
+  { label: 'Bottom', items: m.layers.filter((l) => l.side === 'bottom') },
+  { label: 'Board', items: m.layers.filter((l) => l.side === 'all') },
+].filter((g) => g.items.length);
+// Layers shown when the Layers view first opens: all copper + drills + outline.
+// Start with one copper layer: stacked ground pours wash out the traces. The presets add the rest.
+const onByDefault = (l: { type: string; side: string }) => ['drill', 'outline'].includes(l.type) || (l.type === 'copper' && l.side === 'top');
+---
+
+<figure class="pcb wide" data-pcb style={`--aspect:${aspect}`}>
+  <div class="pcb__bar">
+    <div class="pcb__tabs" role="tablist" aria-label="PCB view">
+      <button type="button" role="tab" class="pcb__tab" data-view="top" aria-selected="true">Top</button>
+      <button type="button" role="tab" class="pcb__tab" data-view="bottom" aria-selected="false">Bottom</button>
+      <button type="button" role="tab" class="pcb__tab" data-view="layers" aria-selected="false">Layers</button>
+      {entry.data.model && <button type="button" role="tab" class="pcb__tab" data-view="3d" aria-selected="false">3D</button>}
+    </div>
+    <p class="pcb__meta label">{size} · {m.copperLayers} copper layers</p>
+  </div>
+
+  <div class="pcb__body">
+    <div class="pcb__stage crop-marks" data-stage role="img" aria-label={entry.data.alt}>
+      <div class="pcb__canvas" data-canvas>
+        <img class="pcb__view" data-for="top" src={`${base}/top.svg`} alt="" loading="lazy" draggable="false" />
+        <img class="pcb__view" data-for="bottom" src={`${base}/bottom.svg`} alt="" loading="lazy" draggable="false" hidden />
+        <div class="pcb__view pcb__layers" data-for="layers" hidden>
+          {
+            m.layers.map((l) => (
+              <img
+                data-layer={l.id}
+                data-src={`${base}/${l.file}`}
+                class:list={[`is-${l.type}`, l.side === 'inner' && 'is-inner']}
+                alt=""
+                draggable="false"
+                hidden={!onByDefault(l)}
+              />
+            ))
+          }
+        </div>
+      </div>
+      <div class="pcb__zoom" data-zoom>
+        <button type="button" class="parts__btn" data-z="in" aria-label="Zoom in">+</button>
+        <button type="button" class="parts__btn" data-z="out" aria-label="Zoom out">−</button>
+        <button type="button" class="parts__btn" data-z="reset" aria-label="Reset view"><Icon name="reset" size={14} /></button>
+      </div>
+      <p class="pcb__hint label" aria-hidden="true">Drag to pan · Ctrl + scroll to zoom</p>
+    </div>
+
+    <fieldset class="pcb__panel" data-panel hidden>
+      <legend class="label">Layers</legend>
+      <div class="pcb__presets">
+        <button type="button" class="parts__btn" data-preset="all">All</button>
+        <button type="button" class="parts__btn" data-preset="top">Top</button>
+        <button type="button" class="parts__btn" data-preset="bottom">Bottom</button>
+        <button type="button" class="parts__btn" data-preset="copper">Copper</button>
+      </div>
+      {
+        groups.map((g) => (
+          <div class="pcb__group">
+            <p class="label">{g.label}</p>
+            {g.items.map((l) => (
+              <label class="pcb__layer">
+                <input type="checkbox" data-toggle={l.id} data-type={l.type} data-side={l.side} checked={onByDefault(l)} />
+                <span class="pcb__swatch" style={`--c:${l.color}`} />
+                {l.label}
+              </label>
+            ))}
+          </div>
+        ))
+      }
+    </fieldset>
+
+    {
+      entry.data.model && (
+        <div class="pcb__3d" data-for="3d" hidden>
+          <ModelViewer id={entry.data.model.id} />
+        </div>
+      )
+    }
+  </div>
+
+  {
+    caption && (
+      <figcaption>
+        <span class="label pcb__num" />
+        <span>{caption}</span>
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .pcb {
+    counter-increment: fig;
+    container-type: inline-size;
+  }
+
+  .pcb__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-bottom: var(--s-3);
+  }
+
+  .pcb__tabs {
+    display: inline-flex;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .pcb__tab {
+    height: 2.1rem;
+    padding-inline: var(--s-4);
+    font-size: var(--step--1);
+    color: var(--text-2);
+    border-right: 1px solid var(--line);
+    transition:
+      color var(--dur-2) var(--ease),
+      background-color var(--dur-2) var(--ease);
+  }
+
+  .pcb__tab:last-child {
+    border-right: 0;
+  }
+
+  .pcb__tab:hover {
+    color: var(--text);
+  }
+
+  .pcb__tab[aria-selected='true'] {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .pcb__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-4);
+  }
+
+  @container (min-width: 900px) {
+    .pcb:has(.pcb__panel:not([hidden])) .pcb__body {
+      grid-template-columns: minmax(0, 1fr) 240px;
+    }
+  }
+
+  .pcb__stage {
+    position: relative;
+    aspect-ratio: var(--aspect);
+    max-height: 72vh;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #0b0c0e;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .pcb__stage.is-dragging {
+    cursor: grabbing;
+  }
+
+  .pcb__stage[hidden],
+  .pcb__view[hidden],
+  .pcb__layers img[hidden],
+  .pcb__panel[hidden],
+  .pcb__3d[hidden] {
+    display: none;
+  }
+
+  .pcb__canvas {
+    position: absolute;
+    inset: 4%;
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+
+  .pcb__view,
+  .pcb__layers img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+  }
+
+  /* X-ray: layers glow through each other; holes punch through everything. */
+  .pcb__layers img {
+    mix-blend-mode: screen;
+    opacity: 0.92;
+  }
+
+  .pcb__layers img.is-soldermask {
+    opacity: 0.45;
+  }
+
+  .pcb__layers img.is-inner {
+    opacity: 0.4;
+  }
+
+  .pcb__layers img.is-drill {
+    mix-blend-mode: normal;
+    opacity: 1;
+  }
+
+  .pcb__zoom {
+    position: absolute;
+    right: var(--s-3);
+    bottom: var(--s-3);
+    display: flex;
+    gap: var(--s-1);
+  }
+
+  .pcb__zoom .parts__btn {
+    min-width: 2rem;
+    justify-content: center;
+  }
+
+  .pcb__hint {
+    position: absolute;
+    left: var(--s-3);
+    bottom: var(--s-3);
+    color: #8b929c;
+    pointer-events: none;
+  }
+
+  .pcb__panel {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--s-4);
+    margin: 0;
+    min-width: 0;
+  }
+
+  .pcb__panel legend {
+    padding-inline: var(--s-1);
+  }
+
+  .pcb__presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    margin-bottom: var(--s-3);
+  }
+
+  .pcb__group + .pcb__group {
+    margin-top: var(--s-3);
+  }
+
+  .pcb__group .label {
+    margin-bottom: var(--s-1);
+  }
+
+  .pcb__layer {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding-block: 0.2rem;
+    font-size: var(--step--1);
+    color: var(--text-2);
+    cursor: pointer;
+  }
+
+  .pcb__layer input {
+    accent-color: var(--accent);
+  }
+
+  .pcb__swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background: var(--c);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.15);
+  }
+
+  .pcb__3d :global(.parts) {
+    margin: 0;
+  }
+
+  figcaption {
+    display: flex;
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+    font-size: var(--step--1);
+    color: var(--text-3);
+  }
+
+  .pcb__num::before {
+    content: 'FIG.\00a0' counter(fig, decimal-leading-zero);
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-pcb]')) {
+    const stage = root.querySelector<HTMLElement>('[data-stage]')!;
+    const canvas = root.querySelector<HTMLElement>('[data-canvas]')!;
+    const panel = root.querySelector<HTMLElement>('[data-panel]')!;
+    const three = root.querySelector<HTMLElement>('.pcb__3d');
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-view]')];
+    const views = [...root.querySelectorAll<HTMLElement>('.pcb__view')];
+    const layerImgs = [...root.querySelectorAll<HTMLImageElement>('[data-layer]')];
+    const toggles = [...root.querySelectorAll<HTMLInputElement>('[data-toggle]')];
+
+    // ── view switching ──
+    const show = (view: string) => {
+      tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.view === view)));
+      const is3d = view === '3d';
+      stage.hidden = is3d;
+      if (three) three.hidden = !is3d;
+      panel.hidden = view !== 'layers';
+      views.forEach((v) => (v.hidden = v.dataset.for !== view));
+      if (view === 'layers') layerImgs.forEach((img) => !img.src && (img.src = img.dataset.src!)); // load on first open
+    };
+    tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.view!)));
+
+    // ── layer toggles ──
+    const sync = () => toggles.forEach((t) => (root.querySelector<HTMLImageElement>(`[data-layer="${t.dataset.toggle}"]`)!.hidden = !t.checked));
+    toggles.forEach((t) => t.addEventListener('change', sync));
+    root.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const p = b.dataset.preset;
+        toggles.forEach((t) => {
+          const { type, side } = t.dataset;
+          t.checked =
+            p === 'all' ||
+            (p === 'copper' && (type === 'copper' || type === 'drill' || type === 'outline')) ||
+            ((p === 'top' || p === 'bottom') && (side === p || side === 'all'));
+        });
+        sync();
+      }),
+    );
+
+    // ── pan / zoom ──
+    let scale = 1, tx = 0, ty = 0;
+    const apply = () => (canvas.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`);
+    const zoomAt = (factor: number, cx: number, cy: number) => {
+      const next = Math.min(12, Math.max(1, scale * factor));
+      const k = next / scale;
+      const r = canvas.offsetParent!.getBoundingClientRect();
+      const ox = cx - r.left - canvas.offsetLeft, oy = cy - r.top - canvas.offsetTop;
+      tx = ox - (ox - tx) * k;
+      ty = oy - (oy - ty) * k;
+      scale = next;
+      if (scale === 1) tx = ty = 0;
+      apply();
+    };
+    const center = () => {
+      const r = stage.getBoundingClientRect();
+      return [r.left + r.width / 2, r.top + r.height / 2] as const;
+    };
+    root.querySelector('[data-z="in"]')!.addEventListener('click', () => zoomAt(1.5, ...center()));
+    root.querySelector('[data-z="out"]')!.addEventListener('click', () => zoomAt(1 / 1.5, ...center()));
+    root.querySelector('[data-z="reset"]')!.addEventListener('click', () => ((scale = 1), (tx = ty = 0), apply()));
+    stage.addEventListener(
+      'wheel',
+      (e) => {
+        if (!e.ctrlKey && !e.metaKey) return; // plain scroll keeps scrolling the page
+        e.preventDefault();
+        zoomAt(Math.exp(-e.deltaY * 0.002), e.clientX, e.clientY);
+      },
+      { passive: false },
+    );
+    const pts = new Map<number, { x: number; y: number }>();
+    let pinch = 0;
+    stage.addEventListener('pointerdown', (e) => {
+      if ((e.target as HTMLElement).closest('button')) return;
+      stage.setPointerCapture(e.pointerId);
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      stage.classList.add('is-dragging');
+    });
+    stage.addEventListener('pointermove', (e) => {
+      const prev = pts.get(e.pointerId);
+      if (!prev) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 2) {
+        const [a, b] = [...pts.values()];
+        const d = Math.hypot(a!.x - b!.x, a!.y - b!.y);
+        if (pinch) zoomAt(d / pinch, (a!.x + b!.x) / 2, (a!.y + b!.y) / 2);
+        pinch = d;
+      } else if (scale > 1) {
+        tx += e.clientX - prev.x;
+        ty += e.clientY - prev.y;
+        apply();
+      }
+    });
+    const end = (e: PointerEvent) => {
+      pts.delete(e.pointerId);
+      if (pts.size < 2) pinch = 0;
+      if (!pts.size) stage.classList.remove('is-dragging');
+    };
+    stage.addEventListener('pointerup', end);
+    stage.addEventListener('pointercancel', end);
+  }
+</script>

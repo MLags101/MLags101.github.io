@@ -1,0 +1,12 @@
+# 3D board — generated from the Altium STEP export by `npm run pcb:import`.
+# Shown in the "3D" tab of <PcbViewer id="typhoon" />.
+src: /models/typhoon-board/model.glb
+poster: /models/typhoon-board/poster.webp
+alt: 3D model of the Typhoon gimbal controller board with its components
+sizeMB: 0.7
+forward: +z
+cameraOrbit: 20deg 55deg 85%
+hotspots: []
+
+appearance:
+  defaultColor: '#2b2d31'

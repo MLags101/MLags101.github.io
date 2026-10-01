@@ -2,8 +2,6 @@
 
 Mr Toad is a rover built for robust navigation, using GPS, lidar obstacle avoidance and a 16 MP front camera. It's my third project funded by the Invention Studio's Maker Grant program, and a chance to sharpen my **ROS 2 and controls** skills in a form factor I hadn't built before, after a run of UAV projects.
 
-The model above is the final assembly — select a part to inspect it.
-
 ## Inspiration
 
 The design is inspired by the iRobot FirstLook 110, a neat UGV made for emergency services to scout dangerous places. I found it while researching harsh-environment rovers for my robotics team. I liked how compact and durable it was — small enough to throw, tough enough to survive the landing, and carrying a full sensor and comms package — so I set out to emulate some of those features.
@@ -23,6 +21,8 @@ The design is inspired by the iRobot FirstLook 110, a neat UGV made for emergenc
 />
 
 ## Design
+
+<ModelViewer id="mr-toad" caption="The final assembly in SolidWorks. Select a part to inspect it." />
 
 Laying the rover out in SolidWorks was mostly straightforward — except for the motors. The ones I first acquired forced an awkward placement, with power transmitted through gears or rope. Both would have overcomplicated the system, so I changed motors. Drag across to compare the early layout with the final one.
 
@@ -94,6 +94,8 @@ On the ground-station (laptop) side, I wanted to learn how to build a GUI for cu
 ## Results
 
 It was very satisfying to finally see it work off the bench and drive around responsively. The design process was fun, and the controls work was an interesting challenge.
+
+<Video src="/media/mr-toad/driving.mp4" aspect="9/16" size="prose" caption="Mr Toad driving under teleop." />
 
 <Gallery
   columns={2}

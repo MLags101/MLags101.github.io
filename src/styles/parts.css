@@ -213,3 +213,10 @@ html:not(.js) .parts__detail {
 .parts__btn[hidden] {
   display: none;
 }
+
+/* Viewers without a parts list (e.g. a 3D PCB) use the full width. */
+@container (min-width: 1040px) {
+  .parts__layout--solo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

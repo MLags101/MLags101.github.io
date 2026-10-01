@@ -61,6 +61,8 @@ const projects = defineCollection({
       end: monthOpt,
       status: z.enum(['complete', 'in-progress', 'paused', 'concept']).default('complete'),
       featured: z.boolean().default(false),
+      /** Funded by an Invention Studio Maker Grant (counted on the home page). */
+      makerGrant: z.boolean().default(false),
       /** Higher sorts first within listings (ties broken by date). */
       order: z.number().default(0),
       draft: z.boolean().default(false),
@@ -92,6 +94,14 @@ const experience = defineCollection({
     logo: z.string().optional(),
     /** Optional photo, file name in src/assets/site/. */
     photo: z.string().optional(),
+    /** Research: show this lab as the large feature on /research. */
+    featured: z.boolean().default(false),
+    /** Research: PI / advisor shown with the lab. */
+    advisor: z.string().optional(),
+    /** Extra media for the Research page: project images as "project-slug/file.jpg". */
+    gallery: list(z.object({ src: z.string(), alt: z.string() })),
+    /** A video (public/ path) shown with the lab on /research. */
+    video: z.string().optional(),
     orgUrl: z.string().optional(),
     location: z.string(),
     type: z.enum(['internship', 'co-op', 'research', 'team', 'leadership']),
@@ -212,6 +222,19 @@ const robots = defineCollection({
     sequence: z
       .object({ poses: z.array(z.string()).min(2), seconds: z.number().default(1.6), hold: z.number().default(0.6), autoplay: z.boolean().default(false) })
       .optional(),
+    /** Link colors baked in by `npm run robot:import` (not read at runtime). */
+    appearance: z.object({ default: z.string().optional(), links: z.record(z.string(), z.string()).default({}) }).optional(),
+  }),
+});
+
+/** PCB designs imported with `npm run pcb:import` — files in public/pcbs/<id>/. */
+const pcbs = defineCollection({
+  loader: glob({ pattern: '*.yaml', base: './src/data/pcbs' }),
+  schema: z.object({
+    name: z.string(),
+    alt: z.string(),
+    /** 3D board (a model id) shown in the viewer's 3D tab. */
+    model: reference('models').optional(),
   }),
 });
 
@@ -273,4 +296,4 @@ const projectBodies = defineCollection({
   schema: z.object({}).passthrough(),
 });
 
-export const collections = { skills, projects, experience, research, models, robots, diagrams, projectBodies };
+export const collections = { skills, projects, experience, research, models, robots, pcbs, diagrams, projectBodies };

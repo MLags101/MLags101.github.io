@@ -12,8 +12,9 @@ quadcopter-testbeds:
   summary: >-
     Autonomy-capable quadcopters designed and fabricated as shared lab testbeds for swarm
     coordination, mapping and localization research, with flight code and procedures that
-    close the loop on a motion capture system for high-precision localization.
+    fly with a motion capture system for high-precision localization.
   experience: aerospace-robotics-lab
+  project: arl-swarm-testbeds
 
 underwater-vehicle:
   title: Small underwater vehicle for autonomous manipulation

@@ -6,6 +6,9 @@ import { site } from '../site.config';
 import portrait from '../assets/site/portrait.jpg';
 import team from '../assets/site/robojackets-team.jpg';
 import studio from '../assets/site/invention-studio.jpg';
+import shop from '../assets/site/machine-shop.jpg';
+import rook from '../assets/site/lathe-rook.jpg';
+import field from '../assets/site/urc-selfie.jpg';
 ---
 
 <PageLayout
@@ -77,6 +80,20 @@ import studio from '../assets/site/invention-studio.jpg';
       <figure class="crop-marks">
         <Image src={studio} alt="Workbenches and machines inside the Georgia Tech Invention Studio" widths={[500, 800]} sizes="(min-width: 900px) 35vw, 100vw" />
         <figcaption class="label">Invention Studio · Georgia Tech</figcaption>
+      </figure>
+    </section>
+    <section class="about__gallery about__gallery--row" aria-label="More photos">
+      <figure class="crop-marks">
+        <Image src={shop} alt="Michael and two friends in safety glasses in a machine shop, next to a manual mill" widths={[500, 800, 1100]} sizes="(min-width: 900px) 48vw, 100vw" />
+        <figcaption class="label">In the machine shop</figcaption>
+      </figure>
+      <figure class="crop-marks">
+        <Image src={rook} alt="A small aluminum chess rook, freshly turned on a lathe, held up in hand" widths={[400, 700]} sizes="(min-width: 900px) 26vw, 100vw" />
+        <figcaption class="label">A rook turned on the lathe</figcaption>
+      </figure>
+      <figure class="crop-marks">
+        <Image src={field} alt="Michael in a camo bucket hat and sunglasses under a canopy tent at a field site" widths={[400, 700]} sizes="(min-width: 900px) 26vw, 100vw" />
+        <figcaption class="label">Out in the field</figcaption>
       </figure>
     </section>
   </div>
@@ -161,7 +178,27 @@ import studio from '../assets/site/invention-studio.jpg';
     border: 1px solid var(--line);
   }
 
+  /* Landscape 4:3 + two 3:4 portraits at the same height: columns in a 16 : 9 : 9 ratio. */
+  .about__gallery--row {
+    grid-template-columns: 16fr 9fr 9fr;
+    margin-top: var(--s-7);
+  }
+
+  .about__gallery--row figure:first-child :global(img) {
+    aspect-ratio: 4 / 3;
+  }
+
+  .about__gallery--row figure:not(:first-child) :global(img) {
+    aspect-ratio: 3 / 4;
+  }
+
   @media (max-width: 700px) {
+    .about__gallery.about__gallery--row {
+      grid-template-columns: 1fr 1fr;
+    }
+    .about__gallery--row figure:first-child {
+      grid-column: 1 / -1;
+    }
     .about__gallery {
       grid-template-columns: 1fr;
     }

@@ -1,0 +1,19 @@
+# Robot — used by <RobotViewer id="dum-i" /> in the DUM-I(S) write-up.
+# Guide: docs/3D-MODELS.md → "Robots (URDF)" · regenerate meshes: npm run robot:import
+urdf: /robots/dum-i/dum-i.urdf
+alt: DUM-I(S) robot arm with a stacked base, two-link arm and a gimbaled lidar head
+up: +z
+poses:
+  - { id: home, label: Home, joints: { main_yaw_link_joint: 0, bicep_link_joint: 0, forearm_link_joint: 0, wrist_link_joint: 0, gimbal_link_joint: 0, optic_link_joint: 0 } }
+
+# Colors per link, baked in by `npm run robot:import` (matched to the built arm).
+appearance:
+  default: '#9aa0a8'
+  links:
+    base_plate_link: '#2c4fb8'
+    main_yaw_link: '#e9b928'
+    bicep_link: '#9aa0a8'
+    forearm_link: '#9aa0a8'
+    wrist_link: '#3a3d42'
+    gimbal_link: '#d63a76'
+    optic_link: '#24272c'

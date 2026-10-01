@@ -1,89 +1,205 @@
 ---
+/**
+ * Research. The lab marked `featured: true` in experience.yaml gets a large section with its
+ * photos (gallery), video, research threads and project pages; other labs follow as cards.
+ */
+import { Image, getImage } from 'astro:assets';
 import PageLayout from '../layouts/PageLayout.astro';
 import ProjectCard from '../components/cards/ProjectCard.astro';
+import Video from '../components/media/Video.astro';
+import Lightbox from '../components/media/Lightbox.astro';
+import Icon from '../components/ui/Icon.astro';
 import { getExperience, getProjects, getResearch, resolveSkills } from '../lib/content';
+import { resolveImage } from '../lib/media';
 import { range, mono } from '../lib/dates';
 
 const labs = (await getExperience()).filter((e) => e.data.type === 'research');
 const research = await getResearch();
 const projects = (await getProjects()).filter((p) => p.data.category === 'research');
-const labSkills = await Promise.all(labs.map((l) => resolveSkills(l.data.skills)));
-
 const KIND = { paper: 'Paper', poster: 'Poster', talk: 'Talk', thesis: 'Thesis', report: 'Report', ongoing: 'Ongoing' } as const;
+
+const shortOrg = (org: string) => org.replace(/\s*·\s*Georgia Tech$/, '');
+
+const features = await Promise.all(
+  labs
+    .filter((l) => l.data.featured)
+    .map(async (lab) => ({
+      lab,
+      skills: await resolveSkills(lab.data.skills),
+      threads: research.filter((r) => r.data.experience?.id === lab.id),
+      projects: projects.filter((p) => p.data.context?.id === lab.id),
+      gallery: await Promise.all(
+        lab.data.gallery.map(async (g) => {
+          const img = resolveImage(g.src);
+          // Lightbox gets a 2000px version; the original isn't published.
+          const full = await getImage({ src: img, width: Math.min(img.width, 2000), quality: 80 });
+          return { ...g, img, full };
+        }),
+      ),
+    })),
+);
+const others = labs.filter((l) => !l.data.featured);
+const featuredIds = new Set(features.map((f) => f.lab.id));
+const otherThreads = research.filter((r) => !featuredIds.has(r.data.experience?.id ?? ''));
+const otherProjects = projects.filter((p) => !featuredIds.has(p.data.context?.id ?? ''));
 ---
 
-<PageLayout
-  title="Research"
-  eyebrow="Labs"
-  lede="Research positions and ongoing work."
->
+<PageLayout title="Research" eyebrow="Labs" lede="Research positions and ongoing work.">
   <div class="container research">
     {
-      labs.map((lab, i) => (
-        <section class="lab" aria-labelledby={`lab-${lab.id}`}>
-          <div class="lab__meta">
-            <p class="label label--accent">{range(lab.data.start, lab.data.end)}</p>
-            <h2 id={`lab-${lab.id}`}>{lab.data.org}</h2>
-            <p class="lab__role">{lab.data.positions[0]!.title}</p>
-            <p class="label">{lab.data.location}</p>
-          </div>
-          <div class="lab__body">
+      features.map(({ lab, skills, threads, projects: labProjects, gallery }) => (
+        <section class="feature" aria-labelledby={`lab-${lab.id}`}>
+          <header class="feature__head">
+            <div>
+              <p class="label label--accent">
+                {lab.data.end ? 'Research' : 'Current research'} · {range(lab.data.start, lab.data.end)}
+              </p>
+              <h2 id={`lab-${lab.id}`}>{shortOrg(lab.data.org)}</h2>
+              <p class="feature__sub">
+                {lab.data.positions[0]!.title}
+                {lab.data.advisor && <> · advised by {lab.data.advisor}</>} · Georgia Tech
+              </p>
+            </div>
+            <div class="feature__actions">
+              {lab.data.orgUrl && (
+                <a class="btn btn--primary" href={lab.data.orgUrl} target="_blank" rel="noopener">
+                  Lab website <Icon name="arrow-up-right" size={14} />
+                </a>
+              )}
+              {labProjects.length === 1 && (
+                <a class="btn" href={`/projects/${labProjects[0]!.id}`}>
+                  Project page <Icon name="arrow-right" size={14} />
+                </a>
+              )}
+            </div>
+          </header>
+
+          {(lab.data.video || gallery.length > 0) && (
+            <div class:list={['feature__media', !lab.data.video && 'feature__media--photos']}>
+              {lab.data.video && (
+                <div class="feature__video">
+                  <Video src={lab.data.video} aspect="9/16" size="prose" label={`${shortOrg(lab.data.org)} test flight`} />
+                </div>
+              )}
+              <div class="feature__photos" data-gallery>
+                {gallery.map((g) => (
+                  <a class="feature__photo crop-marks" href={g.full.src} data-pswp-width={g.full.attributes.width ?? g.img.width} data-pswp-height={g.full.attributes.height ?? g.img.height}>
+                    <Image src={g.img} alt={g.alt} widths={[480, 800, 1200]} sizes="(min-width: 1000px) 34vw, 100vw" />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div class="feature__body">
             <p class="lede">{lab.data.summary}</p>
-            <ul class="chip-list">
-              {labSkills[i]!.map((s) => (
-                <li class="chip">{s.data.name}</li>
-              ))}
-            </ul>
+            {skills.length > 0 && (
+              <ul class="chip-list">
+                {skills.map((s) => (
+                  <li class="chip">{s.data.name}</li>
+                ))}
+              </ul>
+            )}
           </div>
+
+          {threads.length > 0 && (
+            <div class="threads">
+              <p class="label">Research threads</p>
+              <ol>
+                {threads.map((r, i) => (
+                  <li>
+                    <span class="threads__num mono">{String(i + 1).padStart(2, '0')}</span>
+                    <div>
+                      <p class="label">
+                        {KIND[r.data.kind]} · since {mono(r.data.date)}
+                      </p>
+                      <h3>{r.data.project ? <a href={`/projects/${r.data.project.id}`}>{r.data.title}</a> : r.data.title}</h3>
+                      <p class="muted">{r.data.summary}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {labProjects.length > 0 && (
+            <div class="feature__projects">
+              <p class="label">Projects</p>
+              <div class="grid">
+                {labProjects.map((p, i) => (
+                  <ProjectCard project={p} index={i} />
+                ))}
+              </div>
+            </div>
+          )}
         </section>
       ))
     }
 
-    <section class="threads" aria-labelledby="threads">
-      <p id="threads" class="label label--accent eyebrow">Research threads</p>
-      <ol>
-        {
-          research.map((r, i) => (
-            <li data-reveal style={`--reveal-i:${i}`}>
-              <span class="threads__num mono">{String(i + 1).padStart(2, '0')}</span>
-              <div>
-                <p class="label">
-                  {KIND[r.data.kind]} · since {mono(r.data.date)} {r.data.venue && <>· {r.data.venue}</>}
-                </p>
-                <h3>{r.data.title}</h3>
-                <p class="muted">{r.data.summary}</p>
-                {r.data.links.length > 0 && (
-                  <p class="threads__links">
-                    {r.data.links.map((l) => (
-                      <a class="link-arrow" href={l.url}>
-                        {l.label}
-                      </a>
-                    ))}
-                  </p>
-                )}
-              </div>
-            </li>
-          ))
-        }
-      </ol>
-      <p class="note label">Publications and posters will appear here as they're released.</p>
-    </section>
-
     {
-      projects.length > 0 && (
-        <section class="threads" aria-labelledby="rp">
-          <p id="rp" class="label label--accent eyebrow">
-            Research projects
-          </p>
-          <div class="grid">
-            {projects.map((p, i) => (
-              <ProjectCard project={p} index={i} />
+      others.length > 0 && (
+        <section class="others" aria-labelledby="other-labs">
+          <h2 id="other-labs" class="others__title">
+            Other research
+          </h2>
+          <div class="others__grid">
+            {others.map((lab) => (
+              <article class="lab">
+                {lab.data.photo && (
+                  <Image src={lab.data.photo} alt="" class="lab__photo" widths={[400, 700]} sizes="(min-width: 900px) 30vw, 100vw" />
+                )}
+                <div class="lab__text">
+                  <p class="label label--accent">{range(lab.data.start, lab.data.end)}</p>
+                  <h3>{shortOrg(lab.data.org)}</h3>
+                  <p class="lab__role">{lab.data.positions[0]!.title}</p>
+                  <p class="muted">{lab.data.summary}</p>
+                  {lab.data.orgUrl && (
+                    <a class="link-arrow" href={lab.data.orgUrl} target="_blank" rel="noopener">
+                      Lab website
+                    </a>
+                  )}
+                </div>
+              </article>
             ))}
           </div>
         </section>
       )
     }
+
+    {
+      otherThreads.length > 0 && (
+        <section class="threads" aria-label="Other research outputs">
+          <ol>
+            {otherThreads.map((r, i) => (
+              <li>
+                <span class="threads__num mono">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <p class="label">
+                    {KIND[r.data.kind]} · {mono(r.data.date)} {r.data.venue && <>· {r.data.venue}</>}
+                  </p>
+                  <h3>{r.data.project ? <a href={`/projects/${r.data.project.id}`}>{r.data.title}</a> : r.data.title}</h3>
+                  <p class="muted">{r.data.summary}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+
+    {
+      otherProjects.length > 0 && (
+        <div class="grid">
+          {otherProjects.map((p, i) => (
+            <ProjectCard project={p} index={i} />
+          ))}
+        </div>
+      )
+    }
+
+    <p class="note label">Publications and posters will appear here as they're released.</p>
   </div>
+  <Lightbox />
 </PageLayout>
 
 <style>
@@ -91,50 +207,118 @@ const KIND = { paper: 'Paper', poster: 'Poster', talk: 'Talk', thesis: 'Thesis',
     padding-block: var(--s-8) var(--section);
   }
 
-  .lab {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
-    gap: var(--s-7);
+  /* ── featured lab ── */
+  .feature {
     padding: var(--s-7);
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     background: var(--bg-elev);
   }
 
-  .lab h2 {
-    margin-top: var(--s-3);
-    font-size: var(--step-3);
+  .feature + .feature {
+    margin-top: var(--s-7);
   }
 
-  .lab__role {
-    margin-top: var(--s-3);
-    font-weight: 600;
+  .feature__head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: var(--s-5);
   }
 
-  .lab__meta .label:last-child {
+  .feature__head h2 {
+    margin-top: var(--s-3);
+    font-size: var(--step-4);
+    letter-spacing: -0.03em;
+  }
+
+  .feature__sub {
     margin-top: var(--s-2);
+    color: var(--text-2);
   }
 
-  .lab__body .chip-list {
-    margin-top: var(--s-5);
+  .feature__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
   }
 
-  @media (max-width: 860px) {
-    .lab {
-      grid-template-columns: 1fr;
+  .feature__media {
+    display: grid;
+    grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr);
+    gap: var(--s-4);
+    margin-top: var(--s-7);
+  }
+
+  .feature__media--photos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .feature__video :global(.video) {
+    margin: 0;
+    max-width: none;
+  }
+
+  .feature__photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: var(--s-4);
+  }
+
+  .feature__photo {
+    display: block;
+    min-height: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: zoom-in;
+  }
+
+  .feature__photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--dur-3) var(--ease);
+  }
+
+  .feature__photo:hover :global(img) {
+    transform: scale(1.03);
+  }
+
+  @media (max-width: 760px) {
+    .feature {
       padding: var(--s-5);
-      gap: var(--s-5);
+    }
+    .feature__media {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .feature__video {
+      max-width: 340px;
     }
   }
 
+  .feature__body {
+    margin-top: var(--s-6);
+  }
+
+  .feature__body .chip-list {
+    margin-top: var(--s-4);
+  }
+
+  .feature__projects {
+    margin-top: var(--s-7);
+  }
+
+  /* ── threads ── */
   .threads {
-    margin-top: var(--s-9);
+    margin-top: var(--s-7);
   }
 
   .threads ol {
     list-style: none;
     padding: 0;
-    margin-top: var(--s-5);
+    margin-top: var(--s-3);
     border-top: 1px solid var(--line);
   }
 
@@ -142,7 +326,7 @@ const KIND = { paper: 'Paper', poster: 'Poster', talk: 'Talk', thesis: 'Thesis',
     display: grid;
     grid-template-columns: 3.5rem minmax(0, 1fr);
     gap: var(--s-4);
-    padding-block: var(--s-6);
+    padding-block: var(--s-5);
     border-bottom: 1px solid var(--line);
   }
 
@@ -157,25 +341,86 @@ const KIND = { paper: 'Paper', poster: 'Poster', talk: 'Talk', thesis: 'Thesis',
     font-size: var(--step-2);
   }
 
+  .threads h3 a {
+    text-decoration: none;
+  }
+
+  .threads h3 a:hover {
+    color: var(--accent);
+  }
+
   .threads .muted {
-    margin-top: var(--s-3);
+    margin-top: var(--s-2);
     max-width: 70ch;
   }
 
-  .threads__links {
-    margin-top: var(--s-3);
-    display: flex;
-    gap: var(--s-4);
+  /* ── other labs ── */
+  .others {
+    margin-top: var(--s-9);
   }
 
-  .note {
-    margin-top: var(--s-4);
+  .others__title {
+    font-size: var(--step-3);
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .others__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: var(--s-5);
+    margin-top: var(--s-5);
+  }
+
+  .lab {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elev);
+    overflow: hidden;
+  }
+
+  .lab :global(.lab__photo) {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .lab__text {
+    padding: var(--s-5);
+  }
+
+  .lab h3 {
+    margin-top: var(--s-2);
+    font-size: var(--step-1);
+  }
+
+  .lab__role {
+    margin-top: var(--s-1);
+    font-weight: 600;
+    font-size: var(--step--1);
+  }
+
+  .lab .muted {
+    margin-top: var(--s-3);
+    font-size: var(--step--1);
+  }
+
+  .lab .link-arrow {
+    display: inline-block;
+    margin-top: var(--s-3);
   }
 
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
     gap: var(--s-6);
-    margin-top: var(--s-5);
+    margin-top: var(--s-4);
+  }
+
+  .note {
+    margin-top: var(--s-6);
   }
 </style>

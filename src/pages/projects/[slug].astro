@@ -10,6 +10,7 @@ import ImageHotspots from '../../components/media/ImageHotspots.astro';
 import ModelViewer from '../../components/media/ModelViewer.astro';
 import Diagram from '../../components/data/Diagram.astro';
 import RobotViewer from '../../components/media/RobotViewer.astro';
+import PcbViewer from '../../components/media/PcbViewer.astro';
 import SpecSheet from '../../components/data/SpecSheet.astro';
 import Callout from '../../components/ui/Callout.astro';
 import Columns from '../../components/ui/Columns.astro';
@@ -25,7 +26,7 @@ Astro.locals.projectSlug = project.id;
 const { Content } = await render(await getProjectBody(project.id));
 
 /** Every component available inside project MDX without an import. See docs/CONTENT.md. */
-const components = { Figure, Gallery, Video, CompareSlider, ImageHotspots, ModelViewer, RobotViewer, Diagram, SpecSheet, Callout, Columns };
+const components = { Figure, Gallery, Video, CompareSlider, ImageHotspots, ModelViewer, RobotViewer, PcbViewer, Diagram, SpecSheet, Callout, Columns };
 ---
 
 <ProjectLayout project={project}>

@@ -45,6 +45,7 @@ kermit-v3:
 | `end`       |          | `YYYY-MM`. Leave it out (or write `present`) for ongoing work.                            |
 | `status`    |          | `complete` (default) · `in-progress` · `paused` · `concept`                               |
 | `featured`  |          | `true` puts it on the home page. Keep 3–6 featured.                                       |
+| `makerGrant` |         | `true` if an Invention Studio Maker Grant funded it. The home page's Maker Grants count adds these up. |
 | `order`     |          | Higher sorts first among featured projects and ties.                                      |
 | `draft`     |          | `true` = visible in `npm run dev` only.                                                   |
 | `role`      | ✓        | "Sole designer", "Drone Lead", …                                                          |
@@ -93,6 +94,7 @@ project's photo, write `other-slug/photo.jpg`.
 
 <ModelViewer id="kermit-v3" caption="…" />                         {/* docs/3D-MODELS.md */}
 <RobotViewer id="dum-i" caption="…" />                             {/* URDF — docs/3D-MODELS.md */}
+<PcbViewer id="typhoon" caption="…" />                             {/* Gerbers — docs/3D-MODELS.md */}
 <Diagram id="eevi-signal-chain" caption="…" />                     {/* src/data/diagrams/ */}
 <CompareSlider before="v1.png" after="v2.png" beforeLabel="V1" afterLabel="V2" alt="…" />
 <SpecSheet specs={[{ label: 'Span', value: '450 mm' }]} title="Wing" />
@@ -124,6 +126,11 @@ Jobs, internships, labs, teams. The key (e.g. `robonav:`) is the id a project's 
 | `summary`              | A few plain sentences (≤ 480 chars) shown on the Experience page.           |
 | `highlights`           | Resume bullets, used on `/resume` only.                                      |
 | `photo`                | Optional photo in `src/assets/site/` shown with the entry.                   |
+| `orgUrl`               | The org or lab website (a "Lab website" button on /research).              |
+| `featured`             | Research labs only: `true` gives the lab the large section at the top of /research. |
+| `advisor`              | Shown under a featured lab's name.                                          |
+| `gallery`              | Photos for a featured lab: `- { src: <project>/<file>.jpg, alt: … }` (images from a project's `images/` folder). |
+| `video`                | A featured lab's video, e.g. `/media/<slug>/flight.mp4` (portrait is fine). |
 | `skills`               | Tool ids from `skills.yaml` shown on the entry.                             |
 | `onResume`             | `false` = timeline only, not on `/resume`.                                  |
 
@@ -153,6 +160,16 @@ solidworks:
 ## Site info — `src/data/site.yaml`
 
 Name, identity line, tagline, email, links, education, availability line, nav order and resume path.
+
+**Home page slideshow (`heroSlides`):** the background of the home page hero, in order. Each slide is an image or a video in `public/`, with a caption and a link that show in the strip under the hero:
+
+```yaml
+heroSlides:
+  - { video: /media/site/hero-urc.mp4, poster: /media/site/hero-urc.webp, caption: EEVi · URC 2025, href: /projects/eevi, seconds: 9 }
+  - { image: /media/site/hero-arl.webp, caption: ARL swarm testbed, href: /projects/arl-swarm-testbeds }
+```
+
+`seconds` defaults to 7. A video's `poster` defaults to the `.jpg` next to it. Use landscape images about 1920 × 1280 WebP (see docs/MEDIA.md). A missing file fails the build.
 
 ## Diagrams — `src/data/diagrams/<id>.yaml`
 

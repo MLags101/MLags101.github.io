@@ -78,7 +78,7 @@ const scrub = m.animations.find((a) => a.scrub);
   data-target={m.cameraTarget}
   data-scrub={scrub?.name}
 >
-  <div class="parts__layout">
+  <div class:list={['parts__layout', hotspots.length === 0 && 'parts__layout--solo']}>
     <div class="parts__stage model__stage crop-marks">
       <model-viewer
         class="model__mv"
@@ -153,6 +153,7 @@ const scrub = m.animations.find((a) => a.scrub);
       <div class="model__progress" aria-hidden="true"><span></span></div>
     </div>
 
+    {hotspots.length > 0 && (
     <ol class="parts__list" aria-label="Labeled parts">
       {
         hotspots.map((h, i) => (
@@ -167,6 +168,7 @@ const scrub = m.animations.find((a) => a.scrub);
         ))
       }
     </ol>
+    )}
   </div>
 
   {

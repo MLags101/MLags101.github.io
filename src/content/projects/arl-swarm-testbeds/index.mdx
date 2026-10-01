@@ -1,0 +1,34 @@
+<Callout tone="note" title="In progress">
+This is active research in the Aerospace Robotics Lab. More detail, media and results will be added as the work progresses.
+</Callout>
+
+## Overview
+
+I'm an undergraduate researcher in Georgia Tech's [Aerospace Robotics Lab](https://aerospaceroboticslab.github.io/), led by Dr. Yashwanth Nakka. My role is to design, build and test a group of small, autonomy-capable quadcopters that will work together to manipulate their environment. The lab uses them as testbeds for research in swarm coordination, mapping and localization.
+
+<Gallery
+  columns={2}
+  aspect="4/3"
+  items={[
+    { src: 'testbed-quad.jpg', alt: 'A testbed quadcopter on a lab bench with motion-capture markers on its top plate', caption: 'A testbed quad with its motion-capture marker plate.' },
+    { src: 'testbed-top.jpg', alt: 'Top view of a testbed quadcopter frame on a wooden table', caption: 'Frame and marker layout from above.' },
+  ]}
+/>
+
+## Motion capture
+
+Along with the vehicles, I developed the flight code and procedures for flying them with the lab's motion capture system, which gives high-precision position and attitude for localization.
+
+<Columns widths="minmax(0, 1fr) minmax(0, 1.4fr)">
+  <Video src="/media/arl-swarm-testbeds/flight.mp4" aspect="9/16" caption="A testbed flying in the motion capture arena." />
+  <div>
+    <SpecSheet
+      title="Testbed goals"
+      specs={[
+        { label: 'Research', value: 'Swarm coordination, mapping, localization' },
+        { label: 'Localization', value: 'Motion capture' },
+        { label: 'Next', value: 'Multi-vehicle manipulation' },
+      ]}
+    />
+  </div>
+</Columns>

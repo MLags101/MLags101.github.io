@@ -9,7 +9,10 @@ Unforeseen complications sent my learning in a different direction. The biggest 
 
 Despite the very different path, I learned a great deal of useful material that I'll use in future projects.
 
-<Video src="/media/dum-i/arm-motion.mp4" caption="DUM-I moving through its range." />
+<Columns widths="minmax(0, 1fr) minmax(0, 1.8fr)">
+  <Figure src="dum-i-full.jpg" alt="The full DUM-I(S) arm standing on its blue, white and yellow base" caption="The finished arm." />
+  <Video src="/media/dum-i/arm-motion.mp4" caption="DUM-I moving through its range." />
+</Columns>
 
 <Gallery
   columns={2}
@@ -21,6 +24,8 @@ Despite the very different path, I learned a great deal of useful material that 
 />
 
 ## Modular design
+
+<RobotViewer id="dum-i" caption="DUM-I(S) from its URDF. Drag the joint sliders to move the arm." />
 
 Modularity was always going to be central: a robotic arm is useful in many applications. I designed a **stackable base** for the electronics, so new features can be built seamlessly into it. I also gave the final joint a **modular interface**, so it can carry an end effector, a sensor package or something else.
 

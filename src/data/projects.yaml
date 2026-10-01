@@ -11,6 +11,25 @@
 # Full field reference: docs/CONTENT.md · Overview: SITE_GUIDE.md
 # ═══════════════════════════════════════════════════════════════════════════════
 
+# ── RESEARCH ─────────────────────────────────────────────────────────────────
+
+arl-swarm-testbeds:
+  title: ARL Swarm Testbeds
+  summary: >-
+    Small, autonomy-capable quadcopters I'm designing and building for swarm coordination,
+    mapping and localization research in Georgia Tech's Aerospace Robotics Lab.
+  category: research
+  start: 2025-08
+  status: in-progress
+  featured: true
+  order: 95
+  role: Undergraduate Researcher
+  context: aerospace-robotics-lab
+  cover: testbed-quad.jpg
+  coverAlt: One of the ARL quadcopter testbeds on a lab bench, with motion-capture markers on top
+  links:
+    - { label: Aerospace Robotics Lab, url: "https://aerospaceroboticslab.github.io/", kind: website }
+
 # ── TEAMS & ORGS ──────────────────────────────────────────────────────────────
 
 eevi:
@@ -68,6 +87,31 @@ electronics-box:
 
 # ── PERSONAL ──────────────────────────────────────────────────────────────────
 
+remy:
+  title: Remy
+  summary: >-
+    A custom rover I'm building to learn SLAM and autonomous navigation.
+  category: personal
+  start: 2026-09
+  status: in-progress
+  order: 0
+  role: Sole designer
+  cover: remy.jpg
+  coverAlt: Remy, a small wheeled rover with a lidar on top and its electronics exposed, on a desk
+
+kermit-lite:
+  title: Kermit Lite
+  summary: >-
+    A smaller, navigation-focused version of my Kermit quadcopters.
+  category: personal
+  start: 2026-09
+  status: in-progress
+  order: 0
+  role: Sole designer
+  cover: kermit-lite.jpg
+  coverAlt: Kermit Lite quadcopter frame partly assembled on a bed, surrounded by parts
+  lineage: { family: Kermit, version: Lite, order: 4 }
+
 kermit-v3:
   title: Kermit V3
   summary: >-
@@ -76,9 +120,10 @@ kermit-v3:
   category: personal
   start: 2026-04
   end: 2026-04
+  makerGrant: true
   featured: true
   order: 100
-  role: Sole designer · Invention Studio funded
+  role: Sole designer · Maker Grant recipient
   context: invention-studio
   cover: img-8094.jpg
   coverAlt: Kermit V3 quadcopter on a table outdoors with its ground equipment
@@ -112,7 +157,7 @@ typhoon-bgc:
     - { label: Driver IC, value: ST L6234 3-phase }
     - { label: MCU (V1), value: Teensy (external) }
     - { label: MCU (V2), value: ATmega328 on-board }
-    - { label: PCB (V2), value: "Double-sided, fab-house" }
+    - { label: PCB (V2), value: "4-layer, fab-house (copper both sides + 2 inner)" }
     - { label: Control, value: Velocity + position }
     - { label: Deployed, value: EEVi v3 gimbal }
   related: [eevi, stm-remote]
@@ -125,14 +170,13 @@ mr-toad:
   category: personal
   start: 2026-01
   end: 2026-01
+  makerGrant: true
   featured: true
   order: 80
   role: Sole designer · Maker Grant recipient
   context: invention-studio
-  cover: rovercad.png
-  coverAlt: >-
-    SolidWorks render of the Mr Toad rover with antenna, GNSS puck and climbing stilts
-  model: mr-toad
+  cover: hero-shot.jpg
+  coverAlt: The finished Mr Toad rover held up against a white wall, with magenta wheels and its antenna
   specs:
     - { label: Class, value: Teleoperated / autonomy-capable UGV }
     - { label: Inspiration, value: iRobot 110 FirstLook }
@@ -152,6 +196,7 @@ kermit-v2:
   category: personal
   start: 2025-06
   end: 2025-06
+  makerGrant: true
   order: 60
   role: Sole designer · Maker Grant recipient
   context: invention-studio
@@ -178,6 +223,7 @@ dum-i:
   category: personal
   start: 2025-03
   end: 2025-03
+  makerGrant: true
   order: 50
   role: Sole designer · Maker Grant recipient
   context: invention-studio
@@ -282,6 +328,18 @@ quadfrog:
 
 # ── COURSEWORK ────────────────────────────────────────────────────────────────
 
+salamander:
+  title: Salamander
+  summary: >-
+    A completely custom micro quadcopter I'm building for my robotics classes this semester.
+  category: coursework
+  start: 2026-08
+  status: in-progress
+  order: 0
+  role: Sole designer
+  cover: salamander-board.jpg
+  coverAlt: Salamander's purple custom circuit board, which doubles as the quadcopter frame
+
 marlin:
   title: Marlin & Nemo
   summary: >-
@@ -315,6 +373,7 @@ shuttle-model:
   role: Designer · ME 1670
   cover: img-5869.jpg
   coverAlt: Small white SLS-printed Space Shuttle stack standing on a desk
+  model: shuttle-model
   specs:
     - { label: Course, value: ME 1670 }
     - { label: Parts, value: Orbiter · external tank · 2× SRB }

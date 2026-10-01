@@ -32,8 +32,20 @@ education:
   gpa: '3.95'
 
 
+# Home page background slideshow, in order. Files live in public/ (videos: npm run media:videos).
+# Each slide is an image or a video; caption + href show in the strip under the hero.
+# seconds = how long it stays up (default 7). poster defaults to the video's .jpg.
+heroSlides:
+  - { video: /media/site/hero-urc.mp4, poster: /media/site/hero-urc.webp, caption: EEVi · URC 2025 · Utah desert, href: /projects/eevi, seconds: 9 }
+  - { image: /media/site/hero-arl.webp, caption: ARL swarm testbed · Georgia Tech, href: /projects/arl-swarm-testbeds }
+  - { video: /media/kermit-v3/flight.mp4, caption: Kermit V3 · test flight, href: /projects/kermit-v3, seconds: 7.5 }
+  - { image: /media/site/hero-mr-toad.webp, caption: Mr Toad · rover, href: /projects/mr-toad }
+  - { image: /media/site/hero-kermit-v3.webp, caption: Kermit V3 · pre-flight, href: /projects/kermit-v3 }
+  - { image: /media/site/hero-typhoon.webp, caption: Typhoon · gimbal controller PCB, href: /projects/typhoon-bgc }
+
 # Top navigation, in order.
 nav:
+  - { href: /, label: Home }
   - { href: /projects, label: Projects }
   - { href: /experience, label: Experience }
   - { href: /research, label: Research }

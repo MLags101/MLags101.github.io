@@ -1,0 +1,67 @@
+# 3D model — used by <ModelViewer id="eevi" /> in the EEVi write-up.
+# Guide: docs/3D-MODELS.md · list part names: npm run model:parts -- eevi
+src: /models/eevi/model.glb
+poster: /models/eevi/poster.webp
+alt: EEVi drone CAD assembly with carbon arms, skid landing gear, gimbal camera and GPS masts
+sizeMB: 4.3
+forward: +x          # the gimbal end
+cameraOrbit: 35deg 65deg 95%
+hotspots:
+  - id: gps
+    part: Here4-2
+    from: top
+    label: Dual GNSS
+    partNo: CubePilot Here4 ×2
+    detail: Two Here4 GPS units on top of the airframe.
+  - id: link
+    part: Herelink Airunit 1.1 Case-1
+    from: top
+    label: Long-range link
+    partNo: Herelink air unit
+    detail: Combined control, telemetry and video radio.
+  - id: gimbal
+    part: gimbalv2
+    from: front
+    label: Camera gimbal
+    partNo: GM3506 motors · GoPro Hero 5
+    detail: Two-axis gimbal on encoder brushless motors, carrying a GoPro.
+  - id: lidar
+    part: LightWare LW20 CAD-1
+    from: front
+    label: Lidar rangefinder
+    partNo: LightWare LW20
+    detail: Forward/downward ranging mounted under the nose.
+  - id: flow
+    part: Hereflow_REV4-1
+    from: bottom
+    label: Optical flow
+    partNo: Hereflow
+    detail: Ground-facing optical flow sensor for low-altitude position hold.
+  - id: pi
+    part: RaspberryPi4ModelB-1
+    from: top
+    label: Companion computer
+    partNo: Raspberry Pi 4
+    detail: Onboard computer in the rear bay.
+  - id: battery
+    part: CNHL6200mAh6S-1
+    from: top
+    label: Battery
+    partNo: 6S 6200 mAh LiPo
+    detail: Main flight battery, slung between the top and bottom plates.
+  - id: motor
+    part: Motor - MN4110 IP45-2
+    from: top
+    label: Motors + props
+    partNo: T-Motor MN4110 · 22 × 6 in
+    detail: Four brushless motors on carbon arm tubes.
+  - id: skids
+    part: skid_tube-1
+    from: front
+    label: Landing skids
+    detail: Carbon skid tubes on printed cross mounts.
+
+# Colors applied by `npm run model:optimize` (re-run it after editing — see docs/3D-MODELS.md).
+appearance:
+  defaultColor: '#3c4046'
+  flattenTextures: '#1b1d21'

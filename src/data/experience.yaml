@@ -36,6 +36,14 @@ aerospace-robotics-lab:
   org: Aerospace Robotics Laboratory · Georgia Tech
   mark: ARL
   logo: georgia-tech.png
+  photo: arl-testbed.jpg
+  orgUrl: https://aerospaceroboticslab.github.io/
+  featured: true   # the large lab section on /research
+  advisor: Dr. Yashwanth Nakka
+  video: /media/arl-swarm-testbeds/flight.mp4
+  gallery:
+    - { src: arl-swarm-testbeds/testbed-quad.jpg, alt: "An ARL testbed quadcopter on a lab bench with motion-capture markers" }
+    - { src: arl-swarm-testbeds/testbed-top.jpg, alt: "Top view of a testbed quadcopter frame" }
   location: Atlanta, GA
   type: research
   start: 2025-08
@@ -69,11 +77,11 @@ invention-studio:
     Volunteer Prototyping Instructor at the Flowers Invention Studio, Georgia Tech's student-run
     makerspace. I help students and faculty build their projects and train on and maintain the
     studio's tools, from laser cutters to metalworking. As Electronics Master I help run the
-    electronics tool group. Three of my projects were funded by the studio's Maker Grants.
+    electronics tool group. Four of my projects were funded by the studio's Maker Grants: DUM-I(S), Kermit V2, Mr Toad and Kermit V3.
   highlights:
     - Promoted from Prototyping Instructor to Electronics Master of the electronics tool group
     - Wrote the operating procedure for the studio's new PCB mill (FlatCAM toolchain)
-    - Awarded three Maker Grants — DUM-I(S), Kermit V2, and Mr Toad
+    - Awarded four Maker Grants
   skills: [pcb-fab, 3d-printing, laser-cutting, soldering]
   onResume: false
 
@@ -126,9 +134,10 @@ gtri-acl:
   skills: [altium, matlab, solidworks, rf-comms]
 
 area-lab:
-  org: Aerial Robotics and Experimental Autonomy Lab · Georgia Tech
-  mark: AREA
+  org: Aerial Robotics and Experimental Autonomy Lab (AREAL) · Georgia Tech
+  mark: AREAL
   logo: georgia-tech.png
+  photo: area-pendulum-rig.jpg
   location: Atlanta, GA
   type: research
   start: 2024-09

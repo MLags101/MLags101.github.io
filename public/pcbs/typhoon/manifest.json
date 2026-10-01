@@ -1,0 +1,95 @@
+{
+ "id": "typhoon",
+ "units": "mm",
+ "width": 45,
+ "height": 30,
+ "viewBox": [
+  -22500,
+  -12500,
+  45000,
+  30000
+ ],
+ "layers": [
+  {
+   "id": "top-silkscreen",
+   "label": "Top silkscreen",
+   "type": "silkscreen",
+   "side": "top",
+   "color": "#f2f2ee",
+   "file": "layers/top-silkscreen.svg"
+  },
+  {
+   "id": "top-solder-mask",
+   "label": "Top solder mask",
+   "type": "soldermask",
+   "side": "top",
+   "color": "#2f8f4e",
+   "file": "layers/top-solder-mask.svg"
+  },
+  {
+   "id": "top-copper",
+   "label": "Top copper",
+   "type": "copper",
+   "side": "top",
+   "color": "#d9a441",
+   "file": "layers/top-copper.svg"
+  },
+  {
+   "id": "inner-copper-l2",
+   "label": "Inner copper L2",
+   "type": "copper",
+   "side": "inner",
+   "color": "#7f9fd8",
+   "file": "layers/inner-copper-l2.svg"
+  },
+  {
+   "id": "inner-copper-l3",
+   "label": "Inner copper L3",
+   "type": "copper",
+   "side": "inner",
+   "color": "#c46a3a",
+   "file": "layers/inner-copper-l3.svg"
+  },
+  {
+   "id": "bottom-silkscreen",
+   "label": "Bottom silkscreen",
+   "type": "silkscreen",
+   "side": "bottom",
+   "color": "#f2f2ee",
+   "file": "layers/bottom-silkscreen.svg"
+  },
+  {
+   "id": "bottom-solder-mask",
+   "label": "Bottom solder mask",
+   "type": "soldermask",
+   "side": "bottom",
+   "color": "#2f8f4e",
+   "file": "layers/bottom-solder-mask.svg"
+  },
+  {
+   "id": "bottom-copper",
+   "label": "Bottom copper",
+   "type": "copper",
+   "side": "bottom",
+   "color": "#d9a441",
+   "file": "layers/bottom-copper.svg"
+  },
+  {
+   "id": "board-outline",
+   "label": "Board outline",
+   "type": "outline",
+   "side": "all",
+   "color": "#9aa0a8",
+   "file": "layers/board-outline.svg"
+  },
+  {
+   "id": "plated-holes",
+   "label": "Plated holes",
+   "type": "drill",
+   "side": "all",
+   "color": "#050506",
+   "file": "layers/plated-holes.svg"
+  }
+ ],
+ "copperLayers": 4
+}

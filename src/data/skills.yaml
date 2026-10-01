@@ -17,7 +17,7 @@ python:
   name: Python
   group: languages
   resume: true
-  projects: [mr-toad, dum-i, robin, quadfrog]
+  projects: [arl-swarm-testbeds, mr-toad, dum-i, robin, quadfrog]
 
 matlab:
   name: MATLAB
@@ -37,7 +37,7 @@ solidworks:
   name: SolidWorks
   group: cad-sim
   resume: true
-  projects: [eevi, electronics-box, kermit-v3, mr-toad, kermit-v2, dum-i, robin, custom-remote, marlin, shuttle-model]
+  projects: [arl-swarm-testbeds, eevi, electronics-box, kermit-v3, mr-toad, kermit-v2, dum-i, robin, custom-remote, marlin, shuttle-model]
 
 fusion-360:
   name: Fusion 360
@@ -150,13 +150,13 @@ motion-capture:
   name: Motion Capture
   group: robotics
   resume: true
-  projects: []
+  projects: [arl-swarm-testbeds]
 
 linux:
   name: Linux
   group: robotics
   resume: true
-  projects: [dum-i]
+  projects: [arl-swarm-testbeds, dum-i]
 
 git:
   name: Git / GitHub
@@ -171,7 +171,7 @@ git:
   group: fabrication
   resume: true
   aliases: [3D Printing]
-  projects: [eevi, electronics-box, kermit-v3, mr-toad, kermit-v2, dum-i, robin, custom-remote, quadfrog, marlin, shuttle-model, glider]
+  projects: [arl-swarm-testbeds, eevi, electronics-box, kermit-v3, mr-toad, kermit-v2, dum-i, robin, custom-remote, quadfrog, marlin, shuttle-model, glider]
 
 pcb-fab:
   name: PCB Fabrication

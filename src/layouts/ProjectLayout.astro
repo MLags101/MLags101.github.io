@@ -129,20 +129,22 @@ const linkIcon = (kind: string) => (kind === 'github' ? 'github' : 'arrow-up-rig
         <div class="project__aside-inner">
           <SpecSheet specs={data.specs} title="Specifications" />
 
-          <section>
-            <p class="label">Skills & tools</p>
-            <ul class="chip-list">
-              {
-                skills.map((s) => (
-                  <li>
-                    <a class="chip" href={`/projects?skill=${s.id}`}>
-                      {s.data.name}
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </section>
+          {
+            skills.length > 0 && (
+              <section>
+                <p class="label">Skills & tools</p>
+                <ul class="chip-list">
+                  {skills.map((s) => (
+                    <li>
+                      <a class="chip" href={`/projects?skill=${s.id}`}>
+                        {s.data.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )
+          }
 
           {
             data.team && (

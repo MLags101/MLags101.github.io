@@ -1,0 +1,29 @@
+# 3D model — used by <ModelViewer id="shuttle-model" /> in the shuttle write-up.
+src: /models/shuttle-model/model.glb
+poster: /models/shuttle-model/poster.webp
+alt: Interlocking Space Shuttle model with orbiter, external tank and two solid rocket boosters
+sizeMB: 0.2
+forward: +z
+cameraOrbit: 30deg 75deg 105%
+hotspots:
+  - id: orbiter
+    # Picked on the fuselage; the part's top/front extremes are its nose and tail fin.
+    position: -0.0002m 0.0022m 0.0155m
+    normal: 0.746 0 0.666
+    label: Orbiter
+    detail: Keys onto the external tank with a printed interlock.
+  - id: tank
+    part: Lagana_Michael_ExternalTank-1
+    from: top
+    label: External tank
+    detail: The central piece the orbiter and both boosters lock onto.
+  - id: srb
+    part: Lagana_Michael_SRB-1
+    from: top
+    label: Solid rocket booster
+    detail: Attachment points were loosened after the first print fit too tightly.
+
+appearance:
+  defaultColor: '#e9e7e2'
+  parts:
+    - { match: ['*'], color: '#e9e7e2', roughness: 0.75 }

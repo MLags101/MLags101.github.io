@@ -42,7 +42,6 @@ const isActive = (href: string) => path === href || path.startsWith(href + '/');
       <button type="button" class="menu-btn" aria-label="Close menu" data-menu-close><Icon name="close" /></button>
     </div>
     <ul>
-      <li><a href="/" aria-current={path === '/' ? 'page' : undefined}><span class="label">00</span>Home</a></li>
       {
         site.nav.map((item, i) => (
           <li>
